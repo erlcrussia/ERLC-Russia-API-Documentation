@@ -5,11 +5,15 @@ icon: "webhook"
 
 Per ricevere webhook dal gioco:
 
-1. Digita `/webhook manage` sul nostro server Discord.
-2. Nel menu che appare, specifica l'URL del tuo webhook **personalizzato**.
-3. Prima di fare clic sul pulsante "Aggiungi", assicurati di fare clic sul pulsante "Test".
-   - Il sistema invierà un messaggio di prova. Se viene recapitato, significa che tutto è configurato correttamente e il webhook è pronto per l'uso.
-4. Dopo la verifica riuscita, fai clic sul pulsante "Aggiungi" per attivare la ricezione dei dati.
+1. Puoi configurare i webhook in due modi:
+   - Nella tua area personale sul sito web: vai alla sezione **Token -> Webhook** (`/my/tokens?tab=webhooks`).
+   - Sul nostro server Discord: esegui il comando `/webhook manage`.
+2. Specifica l'URL del tuo webhook **personalizzato** e seleziona i server:
+   - **Tutti i server** (predefinito) — il webhook riceverà eventi da tutti i server del progetto.
+   - **Server specifici** — il webhook riceverà eventi solo dai server di gioco selezionati.
+3. Prima di salvare l'URL, assicurati di cliccare sul pulsante "Verifica" / "Test":
+   - Il sistema invierà un messaggio di ping di prova con firma. Se il tuo endpoint risponde con HTTP `200 OK`, il webhook è verificato e pronto all'uso.
+4. Dopo la corretta verifica, attiva la ricezione dei dati.
 
 <Danger>
    **NON supportiamo webhook diretti di Discord. Il sistema funziona esclusivamente con webhook personalizzati (i tuoi endpoint/server dedicati).**
@@ -19,28 +23,47 @@ Il tuo endpoint deve verificare le firme Ed25519 su ogni richiesta. Il gioco sal
 
 ---
 
+### Intestazioni e Routing Multi-Server
+
+Ogni webhook inviato contiene informazioni sul server di origine dell'evento:
+
+#### Intestazioni HTTP:
+* `X-Signature-Ed25519` — firma Ed25519 codificata in hex.
+* `X-Signature-Timestamp` — timestamp Unix (in secondi).
+* `X-Server-ID` — identificatore del server di gioco in cui si è verificato l'evento.
+* `X-Server-Name` — nome/alias descrittivo del server (ad esempio, `MRP 1`, `MVD`), se configurato dagli amministratori.
+
+#### Corpo della Richiesta (JSON):
+* `server_id` (string) — ID del server di gioco.
+* `server_name` (string) — nome/alias del server.
+* Carico utile dell'evento (comandi chat, chiamate d'emergenza, ecc.).
+
+---
+
 ### Requisiti
 
 #### Il tuo endpoint deve accettare
 
-* Richieste `POST` con corpo in formato JSON.
-* I seguenti header su ogni richiesta firmata:
-  * `X-Signature-Ed25519` (firma Ed25519 con codifica esadecimale).
-  * `X-Signature-Timestamp` (stringa con timestamp Unix).
+* Richieste `POST` con corpo JSON.
+* Queste intestazioni su ogni richiesta firmata:
+  * `X-Signature-Ed25519` (firma Ed25519 codificata in hex).
+  * `X-Signature-Timestamp` (stringa timestamp Unix).
+  * `X-Server-ID` (identificatore del server).
+  * `X-Server-Name` (nome del server).
 
-#### Il tuo Endpoint Deve:
+#### Il Tuo Endpoint Deve:
 
-1. Leggere i **byte grezzi del corpo della richiesta (raw body)** esattamente come ricevuti (senza re-serializzare il JSON).
+1. Leggere i **byte grezzi del corpo della richiesta** esattamente come ricevuti (non riserializzare il JSON).
 2. Leggere `X-Signature-Timestamp`.
 3. Leggere `X-Signature-Ed25519`.
 4. Verificare la firma per:
 
    `message = timestamp + raw_body`
 
-   Dove `timestamp` è il valore dell'header come stringa, concatenato direttamente con i byte del corpo grezzo.
+   Dove `timestamp` è il valore dell'intestazione come stringa, concatenato direttamente con i byte grezzi del corpo.
 5. Restituire:
    * **2xx** solo se la firma è valida.
-   * **4xx** se gli header sono mancanti o non validi, oppure se la verifica della firma fallisce.
+   * **4xx** se le intestazioni mancano, non sono valide o la verifica della firma fallisce.
 
 ---
 
@@ -59,23 +82,23 @@ MCowBQYDK2VwAyEArbRTkyh3A035YUWWZdyF3vck4QN3I7uU8cp7YaxocFE=
 #### Dati di Input
 
 * `timestamp`: stringa esatta da `X-Signature-Timestamp`.
-* `sigHex`: stringa esatta da `X-Signature-Ed25519` (esadecimale).
+* `sigHex`: stringa esatta da `X-Signature-Ed25519` (hex).
 * `rawBody`: byte grezzi del corpo della richiesta.
 
 #### Passaggi
 
 1. Decodifica `sigHex` da esadecimale a byte.
 2. Costruisci `message` come:
-   * byte di `timestamp` in UTF-8
-   * Seguiti immediatamente da `rawBody`
-3. Verifica la firma Ed25519 utilizzando la chiave pubblica sopra indicata.
+   * Byte di `timestamp` in UTF-8
+   * Subito dopo `rawBody`
+3. Verifica la firma Ed25519 usando la chiave pubblica sopra.
 
 #### Errori Comuni
 
-* Non utilizzare un oggetto JSON parsato per la verifica. Usa solo i byte grezzi del corpo.
+* Non utilizzare un oggetto JSON analizzato per la verifica. Utilizza solo byte grezzi del corpo.
 * Non aggiungere separatori o spazi tra timestamp e corpo.
-* Tratta la firma come esadecimale (hex), non come base64.
-* Assicurati che il tuo framework web non consumi il flusso del corpo prima di averlo memorizzato.
+* Tratta la firma come hex, non base64.
+* Assicurati che il tuo framework non consumi il corpo prima di acquisirlo.
 
 ---
 
@@ -85,6 +108,6 @@ Attualmente il gioco invia webhook per:
 
 * Messaggi che iniziano con **;**
   * Questo consente di creare comandi personalizzati nel gioco!
-* Chiamate di Emergenza
+* Chiamate d'emergenza (Emergency Calls)
 
 In futuro potrebbero essere aggiunti nuovi eventi. Nota: il sistema di webhook non è inteso a sostituire il polling dell'API HTTP o il WebSocket.

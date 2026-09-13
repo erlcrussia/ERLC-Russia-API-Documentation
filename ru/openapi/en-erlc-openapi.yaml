@@ -111,7 +111,9 @@ info:
   version: 1.0.0
 servers:
   - url: https://api.erlcrussia.xyz/v1
-    description: Production
+    description: Production API V1 (xyz)
+  - url: https://api.erlcrussia.com/v1
+    description: Production API V1 (com)
 tags:
   - name: ERLC
     description: ER:LC game server data and management.

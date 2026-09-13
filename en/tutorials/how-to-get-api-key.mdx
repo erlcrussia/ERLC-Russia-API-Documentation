@@ -16,7 +16,7 @@ To integrate with our services, you will need appropriate access and authorizati
     Wait for the project administration to review your request. Once your application is approved, the appropriate access rights will be linked to your Discord account.
   </Step>
   <Step title="Viewing and Managing Keys">
-    Once rights are granted, you can generate, view, and manage your tokens directly within the Discord server using slash commands.
+    Once rights are granted, you can view your tokens in your personal account on the website or directly within the Discord server using slash commands.
   </Step>
 </Steps>
 
@@ -25,10 +25,13 @@ To integrate with our services, you will need appropriate access and authorizati
 ### 1. HTTP API Key
 The main token used for sending standard HTTP requests to our endpoints. Passed in the `Authorization` header.
 * **View command:** `/api view`
+* **Website view:** Account -> **Tokens -> HTTP API** (`/my/tokens?tab=api`).
 
 ### 2. WebSocket Key
 For working with real-time events, a **separate independent key** is used. Do not try to use the standard HTTP token to connect to sockets — the server will reject it.
 * **View command:** `/websocket view`
+* **Website view:** Account -> **Tokens -> WebSocket** (`/my/tokens?tab=websocket`).
+
 <Danger>
   **Always keep your keys secret. WebSocket and HTTP API keys are completely autonomous and managed independently from each other.**
 </Danger>
@@ -37,10 +40,11 @@ For working with real-time events, a **separate independent key** is used. Do no
 
 If your service needs to receive automatic notifications about server events, you can set up webhooks.
 
-Access to the webhook management panel is also granted **strictly through tickets** with project administration. Once rights are linked to your account, a special configuration command will become available:
+Access to the webhook management panel is also granted **strictly through tickets** with project administration. Once rights are linked to your account, you can manage webhooks:
 
-* **Management command:** `/webhook manage`
+* **Discord command:** `/webhook manage`
+* **Website dashboard:** Account -> **Tokens -> Webhooks** (`/my/tokens?tab=webhooks`).
 
 <Tip>
-  **When using this command, the bot will open a convenient menu where you can bind, remove, and view active URLs for sending webhooks.**
+  **You can bind, test, activate/deactivate, and select specific game servers for webhooks directly on the website or via Discord bot.**
 </Tip>

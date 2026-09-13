@@ -7,14 +7,14 @@ WebSocket Gateway позволяет получать данные сервер�
 
 ### Подключение
 
-**URL:** `wss://api.erlcrussia.com/v2/gateway`
+**URL:** `wss://api.erlcrussia.com/v3/gateway`
 
 При подключении к HTTP эндпоинту (не WebSocket) возвращается ошибка `426` с кодом `5020`.
 
 ## Быстрый Старт
 
 ```js
-const ws = new WebSocket('wss://api.erlcrussia.com/v2/gateway');
+const ws = new WebSocket('wss://api.erlcrussia.com/v3/gateway');
 
 ws.on('open', () => {
   console.log('Подключено к Gateway');
@@ -407,7 +407,7 @@ ws.on('message', (data) => {
 ```js
 const WebSocket = require('ws');
 
-const ws = new WebSocket('wss://api.erlcrussia.com/v2/gateway');
+const ws = new WebSocket('wss://api.erlcrussia.com/v3/gateway');
 
 ws.on('open', () => {
   // 1. Аутентификация

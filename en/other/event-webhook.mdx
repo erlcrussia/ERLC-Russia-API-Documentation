@@ -5,17 +5,38 @@ icon: "webhook"
 
 To receive webhooks from the game:
 
-1. Type `/webhook manage` on our Discord server.
-2. In the menu that appears, specify the URL of your **custom** webhook.
-3. Before clicking the "Add" button, be sure to click the "Test" button.
-   - The system will send a test message. If it arrives — everything is configured correctly and the webhook is ready for use.
-4. After successful verification, click the "Add" button to activate data reception.
+1. You can configure webhooks in two ways:
+   - In your personal account on the website: go to **Tokens -> Webhooks** (`/my/tokens?tab=webhooks`).
+   - On our Discord server: run the `/webhook manage` command.
+2. Specify the URL of your **custom** webhook and select servers:
+   - **All servers** (default) — the webhook will receive events from all project servers.
+   - **Specific servers** — the webhook will only receive events from the selected game servers.
+3. Before saving the URL, make sure to click "Test":
+   - The system will send a signed ping request. If your endpoint responds with HTTP `200 OK`, the webhook is verified and ready.
+4. After successful verification, activate data reception.
 
 <Danger>
-   **We do NOT support direct Discord webhooks. The system works exclusively with custom webhooks (your own handlers).**
+   **We do NOT support direct Discord webhooks. The system works exclusively with custom webhooks (your own handlers/endpoints).**
 </Danger>
 
 Your endpoint must verify Ed25519 signatures on every request. The game will only save URLs that pass verification.
+
+---
+
+### Headers & Multi-Server Routing
+
+Every outgoing webhook includes information about the origin server:
+
+#### HTTP Headers:
+* `X-Signature-Ed25519` — hex-encoded Ed25519 signature.
+* `X-Signature-Timestamp` — Unix timestamp (in seconds).
+* `X-Server-ID` — ID of the game server where the event occurred.
+* `X-Server-Name` — human-friendly server alias/name (e.g., `MRP 1`, `MVD`), if configured by administrators.
+
+#### Request Body (JSON):
+* `server_id` (string) — game server ID.
+* `server_name` (string) — server alias/name.
+* Event payload (chat commands, emergency call data, etc.).
 
 ---
 
@@ -27,6 +48,8 @@ Your endpoint must verify Ed25519 signatures on every request. The game will onl
 * These headers on every signed request:
   * `X-Signature-Ed25519` (hex-encoded Ed25519 signature).
   * `X-Signature-Timestamp` (Unix timestamp string).
+  * `X-Server-ID` (game server ID).
+  * `X-Server-Name` (game server name/alias).
 
 #### Your Endpoint Must:
 

@@ -76,7 +76,6 @@
         },
         {
           "version": "API V2",
-          "default": true,
           "pages": [
             {
               "group": "Документация API V2",
@@ -134,6 +133,145 @@
               ]
             }
           ]
+        },
+        {
+          "version": "API V3",
+          "default": true,
+          "pages": [
+            {
+              "group": "Документация API V3",
+              "icon": "file-code",
+              "pages": [
+                {
+                  "group": "ER:LC API V3",
+                  "icon": "gamepad",
+                  "pages": [
+                    "ru/api-reference/api-v3/erlc/get-erlc-server",
+                    "ru/api-reference/api-v3/erlc/get-erlc-server-bans",
+                    "ru/api-reference/api-v3/erlc/post-erlc-server-command"
+                  ]
+                },
+                {
+                  "group": "API Экономики V3",
+                  "icon": "coins",
+                  "pages": [
+                    {
+                      "group": "GET-Эндпоинты Экономики",
+                      "icon": "arrow-down",
+                      "pages": [
+                        "ru/api-reference/api-v3/civops/get-civops-economy",
+                        "ru/api-reference/api-v3/civops/get-civops-users",
+                        "ru/api-reference/api-v3/civops/get-civops-businesses",
+                        "ru/api-reference/api-v3/civops/get-civops-mafias",
+                        "ru/api-reference/api-v3/civops/get-civops-government",
+                        "ru/api-reference/api-v3/civops/get-civops-store",
+                        "ru/api-reference/api-v3/civops/get-civops-ads",
+                        "ru/api-reference/api-v3/civops/get-civops-system",
+                        "ru/api-reference/api-v3/civops/get-civops-health"
+                      ]
+                    },
+                    {
+                      "group": "POST-Эндпоинты Экономики",
+                      "icon": "arrow-up",
+                      "pages": [
+                        "ru/api-reference/api-v3/civops/post-civops-economy",
+                        "ru/api-reference/api-v3/civops/post-civops-users",
+                        "ru/api-reference/api-v3/civops/post-civops-businesses",
+                        "ru/api-reference/api-v3/civops/post-civops-mafias",
+                        "ru/api-reference/api-v3/civops/post-civops-government",
+                        "ru/api-reference/api-v3/civops/post-civops-store",
+                        "ru/api-reference/api-v3/civops/post-civops-ads"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "group": "API Статистики V3",
+                  "icon": "chart-line",
+                  "pages": [
+                    "ru/api-reference/api-v3/stats/get-stats"
+                  ]
+                },
+                {
+                  "group": "API Верификации V3",
+                  "icon": "id-badge",
+                  "pages": [
+                    "ru/api-reference/api-v3/users/get-users",
+                    "ru/api-reference/api-v3/users/post-users"
+                  ]
+                },
+                {
+                  "group": "CDN API V3",
+                  "icon": "server",
+                  "pages": [
+                    "ru/api-reference/api-v3/cdn/overview",
+                    {
+                      "group": "Ассеты и Файлы",
+                      "icon": "file",
+                      "pages": [
+                        "ru/api-reference/api-v3/cdn/resolve-asset",
+                        "ru/api-reference/api-v3/cdn/get-manifest",
+                        "ru/api-reference/api-v3/cdn/get-assets",
+                        "ru/api-reference/api-v3/cdn/get-cdn-stats",
+                        "ru/api-reference/api-v3/cdn/get-asset",
+                        "ru/api-reference/api-v3/cdn/upload-asset",
+                        "ru/api-reference/api-v3/cdn/external-asset",
+                        "ru/api-reference/api-v3/cdn/update-asset",
+                        "ru/api-reference/api-v3/cdn/purge-asset",
+                        "ru/api-reference/api-v3/cdn/batch-assign-folder",
+                        "ru/api-reference/api-v3/cdn/batch-delete-assets",
+                        "ru/api-reference/api-v3/cdn/delete-asset"
+                      ]
+                    },
+                    {
+                      "group": "Папки CDN",
+                      "icon": "folder",
+                      "pages": [
+                        "ru/api-reference/api-v3/cdn/get-folders",
+                        "ru/api-reference/api-v3/cdn/create-folder",
+                        "ru/api-reference/api-v3/cdn/reorder-folders",
+                        "ru/api-reference/api-v3/cdn/rename-folder",
+                        "ru/api-reference/api-v3/cdn/delete-folder",
+                        "ru/api-reference/api-v3/cdn/batch-delete-folders"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "group": "API Наказаний V3",
+                  "icon": "gavel",
+                  "pages": [
+                    "ru/api-reference/api-v3/points/get-user-points",
+                    "ru/api-reference/api-v3/points/get-user-history",
+                    "ru/api-reference/api-v3/points/add-user-points",
+                    "ru/api-reference/api-v3/points/remove-user-points"
+                  ]
+                },
+                {
+                  "group": "API Подписок V3",
+                  "icon": "crown",
+                  "pages": [
+                    "ru/api-reference/api-v3/subscriptions/get-funpay-config",
+                    "ru/api-reference/api-v3/subscriptions/get-plans",
+                    "ru/api-reference/api-v3/subscriptions/get-user-subscriptions",
+                    "ru/api-reference/api-v3/subscriptions/get-user-benefits",
+                    "ru/api-reference/api-v3/subscriptions/create-funpay-order",
+                    "ru/api-reference/api-v3/subscriptions/get-funpay-order-status",
+                    "ru/api-reference/api-v3/subscriptions/activate-product",
+                    "ru/api-reference/api-v3/subscriptions/deactivate-subscription",
+                    "ru/api-reference/api-v3/subscriptions/purchase-with-coins"
+                  ]
+                },
+                {
+                  "group": "API Состояния V3",
+                  "icon": "heart-pulse",
+                  "pages": [
+                    "ru/api-reference/api-v3/health/get-health"
+                  ]
+                }
+              ]
+            }
+          ]
         }
       ]
     },
@@ -160,6 +298,13 @@
           "icon": "rocket",
           "pages": [
             "ru/tutorials/how-to-get-api-key"
+          ]
+        },
+        {
+          "group": "Интеграции",
+          "icon": "network-wired",
+          "pages": [
+            "ru/tutorials/nextjs-cdn-integration"
           ]
         }
       ]

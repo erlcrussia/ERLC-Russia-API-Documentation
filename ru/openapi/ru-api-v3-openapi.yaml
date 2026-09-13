@@ -1,0 +1,1466 @@
+openapi: 3.1.0
+info:
+  title: ER:LC Россия API V3
+  description: |
+    Официальная документация платформы ER:LC Россия API V3.
+    Включает в себя интеграцию с игровыми серверами ER:LC, экономику Экономика, аналитику статистики гильдий,
+    объектное облачное хранилище CDN, систему баллов, управление подписками и заказами FunPay, OAuth2 авторизацию,
+    WebSocket шлюз реального времени, входящие вебхуки событий PRC и полный административный API.
+  version: 3.0.0
+servers:
+  - url: https://api.erlcrussia.xyz/v3
+    description: Production API V3 (xyz)
+  - url: https://api.erlcrussia.com/v3
+    description: Production API V3 (com)
+tags:
+  - name: ER:LC Сервер
+    description: Получение статуса, онлайна, списков игроков и персонала сервера ER:LC.
+  - name: ER:LC Команды
+    description: Отправка и постановка в очередь команд внутриигрового сервера (:h, :m, :kick, :ban и др.).
+  - name: Экономика
+    description: Взаимодействие с экономической системой (пользователи, бизнесы, мафии, магазин, реклама).
+  - name: API Статистики
+    description: Высокопроизводительное получение статистики дискорд-серверов и игровых серверов (онлайн, участники, боты).
+  - name: API Верификации
+    description: Поиск и сопоставление Discord ID и Roblox ID аккаунтов.
+  - name: CDN Ассеты
+    description: Загрузка, управление, статистика и очистка кэша файлов объектного хранилища MinIO / Edge CDN.
+  - name: CDN Папки
+    description: Иерархическая структура и сортировка папок медиатеки CDN.
+  - name: API Наказаний
+    description: Управление балансом и историей транзакций баллов игроков.
+  - name: API Подписок
+    description: Каталог планов, заказы FunPay, начисление бенефитов и активация подписок.
+  - name: Реальное Время и Вебхуки
+    description: WebSocket шлюз событий и обработчик входящих вебхуков PRC с криптографической подписью Ed25519.
+  - name: API Состояния
+    description: Мониторинг работоспособности сервиса, подключений к PostgreSQL и Redis.
+
+paths:
+  # ==================== ER:LC V3 ====================
+  /erlc/server:
+    get:
+      tags: [ "ER:LC Сервер" ]
+      summary: Информация о Сервере ER:LC
+      description: |
+        Возвращает общие данные о сервере ER:LC (название, текущий онлайн, максимальный лимит, статус).
+        С помощью query-параметров можно опционально запросить списки игроков, персонала, очередь, логи входов/выходов, киллов и команд.
+      security:
+        - BearerAuth: []
+        - ApiKeyHeader: []
+        - ApiKeyQuery: []
+      parameters:
+        - name: Players
+          in: query
+          description: Включить детальный список игроков на сервере.
+          schema:
+            type: boolean
+        - name: Staff
+          in: query
+          description: Включить список сотрудников и модераторов (Admins, Mods).
+          schema:
+            type: boolean
+        - name: JoinLogs
+          in: query
+          description: Включить журнал входов и выходов.
+          schema:
+            type: boolean
+        - name: Queue
+          in: query
+          description: Включить состояние очереди ожидания подключения.
+          schema:
+            type: boolean
+        - name: KillLogs
+          in: query
+          description: Включить журнал убийств.
+          schema:
+            type: boolean
+        - name: CommandLogs
+          in: query
+          description: Включить журнал выполненных команд.
+          schema:
+            type: boolean
+        - name: ModCalls
+          in: query
+          description: Включить активные вызовы модераторов.
+          schema:
+            type: boolean
+        - name: Vehicles
+          in: query
+          description: Включить список заспавненных транспортных средств.
+          schema:
+            type: boolean
+      responses:
+        '200':
+          description: Успешный ответ с данными сервера.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ERLCServerResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+
+  /erlc/server/bans:
+    get:
+      tags: [ "ER:LC Сервер" ]
+      summary: Список Банов Сервера
+      description: Возвращает актуальный список заблокированных пользователей на сервере ER:LC.
+      security:
+        - BearerAuth: []
+        - ApiKeyHeader: []
+        - ApiKeyQuery: []
+      responses:
+        '200':
+          description: Список забаненных пользователей.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ERLCBanItem'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+
+  /erlc/server/command:
+    post:
+      tags: [ "ER:LC Команды" ]
+      summary: Выполнение Команды на Сервере
+      description: |
+        Отправляет команду на сервер ER:LC (например, `:h Сообщение`, `:m Внимание`, `:kick Nick`, `:ban Nick`).
+        При временных сетевых ошибках PRC (коды 1001, 1002, 9999) команда автоматически помещается в очередь повтора (retry queue).
+      security:
+        - BearerAuth: []
+        - ApiKeyHeader: []
+        - ApiKeyQuery: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [ "command" ]
+              properties:
+                command:
+                  type: string
+                  description: Текст команды с двоеточием (например, ":m Сервер перезагружается").
+                  example: ":m Внимание, плановый рестарт через 5 минут"
+      responses:
+        '200':
+          description: Команда успешно передана на сервер или поставлена в очередь.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ERLCCommandResponse'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+
+  # ==================== Экономика Экономика V3 ====================
+  /civops/economy:
+    get:
+      tags: [ "Экономика" ]
+      summary: Получение Данных Экономики
+      description: Сводные данные финансовой системы Экономика (общий оборот, налоги, казна).
+      security:
+        - BearerAuth: []
+        - ApiKeyQuery: []
+      responses:
+        '200':
+          description: Данные экономики.
+    post:
+      tags: [ "Экономика" ]
+      summary: Изменение Параметров Экономики
+      security:
+        - BearerAuth: []
+        - ApiKeyQuery: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        '200':
+          description: Успешное обновление.
+
+  /civops/users:
+    get:
+      tags: [ "Экономика" ]
+      summary: Профиль Пользователя в Экономике
+      security:
+        - BearerAuth: []
+        - ApiKeyQuery: []
+      parameters:
+        - name: id
+          in: query
+          schema:
+            type: string
+        - name: discord_id
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Данные профиля игрока.
+    post:
+      tags: [ "Экономика" ]
+      summary: Модификация Профиля Пользователя
+      security:
+        - BearerAuth: []
+        - ApiKeyQuery: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        '200':
+          description: Профиль обновлен.
+
+  /civops/businesses:
+    get:
+      tags: [ "Экономика" ]
+      summary: Список Бизнесов
+      security:
+        - BearerAuth: []
+        - ApiKeyQuery: []
+      responses:
+        '200':
+          description: Список зарегистрированных предприятий.
+    post:
+      tags: [ "Экономика" ]
+      summary: Создание / Редактирование Бизнеса
+      security:
+        - BearerAuth: []
+        - ApiKeyQuery: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        '200':
+          description: Операция выполнена.
+
+  /civops/mafias:
+    get:
+      tags: [ "Экономика" ]
+      summary: Данные Криминальных Организаций
+      security:
+        - BearerAuth: []
+        - ApiKeyQuery: []
+      responses:
+        '200':
+          description: Список мафий и группировок.
+    post:
+      tags: [ "Экономика" ]
+      summary: Управление Группировками
+      security:
+        - BearerAuth: []
+        - ApiKeyQuery: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        '200':
+          description: Статус операции.
+
+  /civops/government:
+    get:
+      tags: [ "Экономика" ]
+      summary: Данные Госструктур и Казны
+      security:
+        - BearerAuth: []
+        - ApiKeyQuery: []
+      responses:
+        '200':
+          description: Состояние госбюджета и департаментов.
+    post:
+      tags: [ "Экономика" ]
+      summary: Изменение Параметров Госструктур
+      security:
+        - BearerAuth: []
+        - ApiKeyQuery: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        '200':
+          description: Параметры обновлены.
+
+  /civops/store:
+    get:
+      tags: [ "Экономика" ]
+      summary: Магазин Товаров Экономика
+      security:
+        - BearerAuth: []
+        - ApiKeyQuery: []
+      responses:
+        '200':
+          description: Каталог товаров магазина.
+    post:
+      tags: [ "Экономика" ]
+      summary: Покупка / Управление Товарами
+      security:
+        - BearerAuth: []
+        - ApiKeyQuery: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        '200':
+          description: Результат транзакции.
+
+  /civops/ads:
+    get:
+      tags: [ "Экономика" ]
+      summary: Список Рекламных Объявлений
+      security:
+        - BearerAuth: []
+        - ApiKeyQuery: []
+      responses:
+        '200':
+          description: Активные рекламные кампании.
+    post:
+      tags: [ "Экономика" ]
+      summary: Подача Рекламного Объявления
+      security:
+        - BearerAuth: []
+        - ApiKeyQuery: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        '200':
+          description: Объявление размещено.
+
+  /civops/system:
+    get:
+      tags: [ "Экономика" ]
+      summary: Системная Информация Экономика
+      security:
+        - BearerAuth: []
+        - ApiKeyQuery: []
+      responses:
+        '200':
+          description: Версия и конфигурация экономики.
+
+  /civops/health:
+    get:
+      tags: [ "Экономика" ]
+      summary: Проверка Доступности Экономика API
+      security:
+        - BearerAuth: []
+        - ApiKeyQuery: []
+      responses:
+        '200':
+          description: Сервис экономики активен.
+
+  # ==================== Статистика Серверов V3 ====================
+  /stats:
+    get:
+      tags: [ "API Статистики" ]
+      summary: Универсальная Статистика Серверов
+      description: |
+        Высокопроизводительный эндпоинт для мониторинга Discord-гильдий и игровых серверов ER:LC.
+        Поддерживает множественные параметры `servers` и `metrics` (включая повторяющиеся query параметры):
+        - `membercount` — участники онлайн;
+        - `allmembercount` — общее количество участников сервера;
+        - `botcount` — количество ботов;
+        - `playercount` — текущий онлайн игроков в ER:LC.
+      parameters:
+        - name: servers
+          in: query
+          required: true
+          description: |
+            Имена серверов. Выберите один или несколько серверов из выпадающего списка:
+            - `MRP` — Moscow RolePlay (поддерживает все 4 метрики)
+            - `MVD`, `FSB`, `MCHS`, `MZ`, `112` — поддерживают `membercount`, `allmembercount`, `botcount`
+            - `DOT` — поддерживает только `membercount`
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - MRP
+                - MVD
+                - FSB
+                - MCHS
+                - MZ
+                - '112'
+                - DOT
+          example:
+            - MRP
+        - name: metrics
+          in: query
+          required: true
+          description: |
+            Типы запрашиваемых метрик:
+            - `playercount` — онлайн игроков в игре ER:LC (**доступен ТОЛЬКО для `MRP`**)
+            - `membercount` — количество участников Discord онлайн (доступен для всех)
+            - `allmembercount` — общее число участников Discord сервера (все кроме `DOT`)
+            - `botcount` — количество ботов на сервере (все кроме `DOT`)
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - membercount
+                - allmembercount
+                - botcount
+                - playercount
+          example:
+            - playercount
+      responses:
+        '200':
+          description: Объект со статистикой по каждому серверу и запрошенным метрикам.
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties:
+                  type: object
+                  additionalProperties:
+                    type: integer
+                example:
+                  MRP:
+                    membercount: 1450
+                    playercount: 38
+                  MVD:
+                    membercount: 320
+                    playercount: 12
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+
+  # ==================== Верификация Пользователей V3 ====================
+  /users:
+    get:
+      tags: [ "API Верификации" ]
+      summary: Поиск Связок Discord ID <-> Roblox ID
+      description: Быстрый поиск привязанного аккаунта по одиночным или пакетным идентификаторам.
+      parameters:
+        - name: discordId
+          in: query
+          description: Discord ID пользователя.
+          schema:
+            type: string
+        - name: robloxId
+          in: query
+          description: Roblox ID пользователя.
+          schema:
+            type: string
+        - name: discordIds
+          in: query
+          description: Несколько Discord ID через запятую.
+          schema:
+            type: string
+        - name: robloxIds
+          in: query
+          description: Несколько Roblox ID через запятую.
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Результаты верификации пользователей.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UsersLookupResponse'
+    post:
+      tags: [ "API Верификации" ]
+      summary: Пакетный Поиск Связок (Batch)
+      description: Пакетный поиск пользователей через JSON тело запроса.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                discordIds:
+                  type: array
+                  items:
+                    type: string
+                robloxIds:
+                  type: array
+                  items:
+                    type: string
+      responses:
+        '200':
+          description: Результаты пакетного поиска.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UsersLookupResponse'
+
+  # ==================== CDN Облачное Хранилище V3 ====================
+  /cdn/resolve/{path}:
+    get:
+      tags: [ "CDN Ассеты" ]
+      summary: Edge CDN Резолв и Отдача Файла
+      description: Прямая быстрая отдача кэшированных статических ассетов с Edge VPS с поддержкой ETag и 304 Not Modified.
+      parameters:
+        - name: path
+          in: path
+          required: true
+          description: Относительный путь к файлу в хранилище.
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Бинарное содержимое запрашиваемого файла.
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+
+  /cdn/manifest:
+    get:
+      tags: [ "CDN Ассеты" ]
+      summary: Манифест Файлов Хранилища
+      description: Возвращает сводный список всех кэшированных ассетов для синхронизации Edge VPS.
+      security:
+        - BearerAuth: []
+        - MasterKeyHeader: []
+      responses:
+        '200':
+          description: Манифест файлов.
+
+  /cdn/assets:
+    get:
+      tags: [ "CDN Ассеты" ]
+      summary: Список Ассетов Хранилища
+      description: Пагинированный каталог загруженных медиафайлов с фильтрацией по папкам и типам.
+      security:
+        - BearerAuth: []
+        - MasterKeyHeader: []
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 20
+        - name: folderId
+          in: query
+          schema:
+            type: string
+        - name: search
+          in: query
+          schema:
+            type: string
+        - name: type
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Каталог ассетов.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CDNAssetListResponse'
+
+  /cdn/assets/stats:
+    get:
+      tags: [ "CDN Ассеты" ]
+      summary: Статистика и Аналитика CDN
+      description: Общий объем занятого места, количество файлов, распределение по форматам и счетчик отдачи трафика.
+      security:
+        - BearerAuth: []
+        - MasterKeyHeader: []
+      responses:
+        '200':
+          description: Статистические показатели хранилища.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CDNStatsResponse'
+
+  /cdn/assets/{id}:
+    get:
+      tags: [ "CDN Ассеты" ]
+      summary: Метаданные Ассета
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      security:
+        - BearerAuth: []
+        - MasterKeyHeader: []
+      responses:
+        '200':
+          description: Данные ассета.
+    put:
+      tags: [ "CDN Ассеты" ]
+      summary: Обновление Метаданных Ассета
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      security:
+        - BearerAuth: []
+        - MasterKeyHeader: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                folderId:
+                  type: string
+                isPublic:
+                  type: boolean
+      responses:
+        '200':
+          description: Ассет обновлен.
+    delete:
+      tags: [ "CDN Ассеты" ]
+      summary: Удаление Ассета
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      security:
+        - BearerAuth: []
+        - MasterKeyHeader: []
+      responses:
+        '200':
+          description: Ассет удален из S3 и вычищен из Edge кэша.
+
+  /cdn/assets/upload:
+    post:
+      tags: [ "CDN Ассеты" ]
+      summary: Загрузка Файла в CDN
+      description: Принимает `multipart/form-data` (до 250 МБ), сохраняет в MinIO S3 и прогревает кэш на Edge VPS.
+      security:
+        - BearerAuth: []
+        - MasterKeyHeader: []
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [ "file" ]
+              properties:
+                file:
+                  type: string
+                  format: binary
+                name:
+                  type: string
+                folderId:
+                  type: string
+      responses:
+        '200':
+          description: Файл успешно загружен.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CDNUploadResponse'
+
+  /cdn/assets/external:
+    post:
+      tags: [ "CDN Ассеты" ]
+      summary: Импорт Внешнего Файла по URL
+      description: Скачивает файл по внешнему URL, сохраняет в MinIO и создает CDN ассет.
+      security:
+        - BearerAuth: []
+        - MasterKeyHeader: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [ "url" ]
+              properties:
+                url:
+                  type: string
+                name:
+                  type: string
+                folderId:
+                  type: string
+      responses:
+        '200':
+          description: Файл импортирован.
+
+  /cdn/assets/{id}/purge:
+    post:
+      tags: [ "CDN Ассеты" ]
+      summary: Сброс Кэша Ассета (Purge)
+      description: Мгновенно инвалидирует кэш файла на всех граничных Edge VPS серверах.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      security:
+        - BearerAuth: []
+        - MasterKeyHeader: []
+      responses:
+        '200':
+          description: Кэш успешно сброшен.
+
+  /cdn/assets/batch-assign-folder:
+    post:
+      tags: [ "CDN Ассеты" ]
+      summary: Пакетное Перемещение в Папку
+      security:
+        - BearerAuth: []
+        - MasterKeyHeader: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [ "assetIds", "folderId" ]
+              properties:
+                assetIds:
+                  type: array
+                  items:
+                    type: string
+                folderId:
+                  type: string
+      responses:
+        '200':
+          description: Файлы перемещены.
+
+  /cdn/assets/batch-delete:
+    post:
+      tags: [ "CDN Ассеты" ]
+      summary: Пакетное Удаление Ассетов
+      security:
+        - BearerAuth: []
+        - MasterKeyHeader: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [ "assetIds" ]
+              properties:
+                assetIds:
+                  type: array
+                  items:
+                    type: string
+      responses:
+        '200':
+          description: Файлы удалены.
+
+  /cdn/folders:
+    get:
+      tags: [ "CDN Папки" ]
+      summary: Список Папок CDN
+      security:
+        - BearerAuth: []
+        - MasterKeyHeader: []
+      responses:
+        '200':
+          description: Иерархия папок медиатеки.
+    post:
+      tags: [ "CDN Папки" ]
+      summary: Создание Папки
+      security:
+        - BearerAuth: []
+        - MasterKeyHeader: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [ "name" ]
+              properties:
+                name:
+                  type: string
+                parentId:
+                  type: string
+      responses:
+        '200':
+          description: Папка создана.
+
+  /cdn/folders/reorder:
+    put:
+      tags: [ "CDN Папки" ]
+      summary: Сортировка Папок
+      security:
+        - BearerAuth: []
+        - MasterKeyHeader: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [ "folderOrders" ]
+              properties:
+                folderOrders:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                      order:
+                        type: integer
+      responses:
+        '200':
+          description: Порядок сохранен.
+
+  /cdn/folders/{id}:
+    put:
+      tags: [ "CDN Папки" ]
+      summary: Переименование Папки
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      security:
+        - BearerAuth: []
+        - MasterKeyHeader: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [ "name" ]
+              properties:
+                name:
+                  type: string
+      responses:
+        '200':
+          description: Папка обновлена.
+    delete:
+      tags: [ "CDN Папки" ]
+      summary: Удаление Папки
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      security:
+        - BearerAuth: []
+        - MasterKeyHeader: []
+      responses:
+        '200':
+          description: Папка удалена.
+
+  /cdn/folders/batch-delete:
+    post:
+      tags: [ "CDN Папки" ]
+      summary: Пакетное Удаление Папок
+      security:
+        - BearerAuth: []
+        - MasterKeyHeader: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [ "folderIds" ]
+              properties:
+                folderIds:
+                  type: array
+                  items:
+                    type: string
+      responses:
+        '200':
+          description: Папки удалены.
+
+  # ==================== Интеграция и Токены V3 ====================
+  /points/{userId}:
+    get:
+      tags: [ "API Наказаний" ]
+      summary: Баланс Баллов Пользователя
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          description: Discord ID или Roblox ID игрока.
+          schema:
+            type: string
+      security:
+        - BearerAuth: []
+        - ApiKeyHeader: []
+        - ApiKeyQuery: []
+      responses:
+        '200':
+          description: Текущий баланс баллов.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PointsBalanceResponse'
+
+  /points/{userId}/history:
+    get:
+      tags: [ "API Наказаний" ]
+      summary: История Транзакций Баллов
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+      security:
+        - BearerAuth: []
+        - ApiKeyHeader: []
+        - ApiKeyQuery: []
+      responses:
+        '200':
+          description: История начислений и списаний.
+
+  /points/{userId}/add:
+    post:
+      tags: [ "API Наказаний" ]
+      summary: Начисление Баллов
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+      security:
+        - BearerAuth: []
+        - ApiKeyHeader: []
+        - ApiKeyQuery: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [ "amount" ]
+              properties:
+                amount:
+                  type: integer
+                  minimum: 1
+                reason:
+                  type: string
+      responses:
+        '200':
+          description: Баллы успешно начислены.
+
+  /points/{userId}/remove:
+    post:
+      tags: [ "API Наказаний" ]
+      summary: Списание Баллов
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+      security:
+        - BearerAuth: []
+        - ApiKeyHeader: []
+        - ApiKeyQuery: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [ "amount" ]
+              properties:
+                amount:
+                  type: integer
+                  minimum: 1
+                reason:
+                  type: string
+      responses:
+        '200':
+          description: Баллы успешно списаны.
+
+  # ==================== Подписки и Магазин V3 ====================
+  /subscriptions/config/funpay:
+    get:
+      tags: [ "API Подписок" ]
+      summary: Конфигурация Магазина FunPay
+      description: Возвращает список доступных для покупки лотов, цен и описаний товаров FunPay.
+      responses:
+        '200':
+          description: Конфиг товаров.
+
+  /subscriptions/config/plans:
+    get:
+      tags: [ "API Подписок" ]
+      summary: Тарифные Планы и Лимиты
+      description: Возвращает матрицу планов подписок (Free, Premium, Enterprise), лимиты запросов и доступные функции.
+      responses:
+        '200':
+          description: Каталог планов.
+
+  /subscriptions/user:
+    get:
+      tags: [ "API Подписок" ]
+      summary: Активные Подписки Пользователя
+      security:
+        - CookieAuth: []
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Список действующих подписок с датами окончания.
+
+  /subscriptions/user-benefits:
+    get:
+      tags: [ "API Подписок" ]
+      summary: Активные Преимущества Пользователя
+      security:
+        - CookieAuth: []
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Сводный список включенных опций (роли, лимиты, доступы).
+
+  /subscriptions/funpay/create-order:
+    post:
+      tags: [ "API Подписок" ]
+      summary: Создание Заказа FunPay
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [ "planId" ]
+              properties:
+                planId:
+                  type: string
+                discordId:
+                  type: string
+      responses:
+        '200':
+          description: Заказ сформирован. Возвращается проверочный код.
+
+  /subscriptions/funpay/order-status/{code}:
+    get:
+      tags: [ "API Подписок" ]
+      summary: Проверка Статуса Заказа FunPay
+      parameters:
+        - name: code
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Статус оплаты и активации заказа.
+
+  /subscriptions/activate:
+    post:
+      tags: [ "API Подписок" ]
+      summary: Прямая Активация Подписки
+      description: Требуется Master Key или административная сессия.
+      security:
+        - MasterKeyHeader: []
+        - CookieAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [ "discordId", "planId", "durationDays" ]
+              properties:
+                discordId:
+                  type: string
+                planId:
+                  type: string
+                durationDays:
+                  type: integer
+      responses:
+        '200':
+          description: Подписка активирована.
+
+  /subscriptions/deactivate:
+    post:
+      tags: [ "API Подписок" ]
+      summary: Деактивация Подписки
+      security:
+        - MasterKeyHeader: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [ "subscriptionId" ]
+              properties:
+                subscriptionId:
+                  type: string
+      responses:
+        '200':
+          description: Подписка деактивирована.
+
+  /subscriptions/purchase-with-coins:
+    post:
+      tags: [ "API Подписок" ]
+      summary: Покупка Подписки за Коины
+      security:
+        - CookieAuth: []
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [ "planId" ]
+              properties:
+                planId:
+                  type: string
+      responses:
+        '200':
+          description: Подписка приобретена со списанием коинов с баланса.
+
+  # ==================== Авторизация и Сессии V3 ====================
+  /gateway:
+    get:
+      tags: [ "Реальное Время и Вебхуки" ]
+      summary: WebSocket Gateway V3
+      description: |
+        Высокоскоростное двунаправленное WebSocket соединение для получения событий игровых серверов в реальном времени:
+        - Каналы: `queue`, `players`, `staff`, `kills`, `modcalls`, `vehicles`, `joinlogs`, `commandlogs`.
+        - Клиент подписывается сообщением: `{"op": "subscribe", "channels": ["players", "queue"], "token": "..."}`.
+      responses:
+        '101':
+          description: Успешный апгрейд до WebSocket протокола.
+
+  /webhooks:
+    post:
+      tags: [ "Реальное Время и Вебхуки" ]
+      summary: Входящие Вебхуки Событий PRC
+      description: |
+        Эндпоинт приема серверных событий из игры. Каждое сообщение обязательно подписано
+        криптографической подписью Ed25519 в заголовках:
+        - `x-signature-timestamp` — Unix timestamp запроса (защита от replay атак, окно 5 минут);
+        - `x-signature-ed25519` — Hex-строка подписи тела запроса.
+      security:
+        - SignatureTimestamp: []
+        - SignatureEd25519: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        '200':
+          description: Событие успешно обработано и смаршрутизировано.
+        '401':
+          description: Неверная подпись Ed25519 или устаревший timestamp.
+
+  # ==================== Административный API V3 ====================
+  /health:
+    get:
+      tags: [ "API Состояния" ]
+      summary: Проверка Здоровья Сервиса (Health Check)
+      description: Проверяет статус подключения к базе данных PostgreSQL и кэшу Redis.
+      responses:
+        '200':
+          description: Сервис полностью исправен.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthResponse'
+        '503':
+          description: База данных или Redis недоступны (режим degraded).
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      description: API Ключ в заголовке Authorization (формат `Bearer <token>`).
+    ApiKeyHeader:
+      type: apiKey
+      in: header
+      name: X-API-Key
+      description: API Ключ в заголовке X-API-Key.
+    ApiKeyQuery:
+      type: apiKey
+      in: query
+      name: token
+      description: API Ключ в query параметре `token`.
+    MasterKeyHeader:
+      type: apiKey
+      in: header
+      name: X-Master-Key
+      description: Секретный мастер-ключ сервиса (SUPER_ADMIN).
+    CookieAuth:
+      type: apiKey
+      in: cookie
+      name: erlc_auth
+      description: Сессионная HTTP-Only кука авторизации на портале.
+    SignatureTimestamp:
+      type: apiKey
+      in: header
+      name: x-signature-timestamp
+      description: Unix timestamp подписи входящего вебхука.
+    SignatureEd25519:
+      type: apiKey
+      in: header
+      name: x-signature-ed25519
+      description: Криптографическая Ed25519 подпись тела запроса вебхука.
+
+  schemas:
+    ERLCServerResponse:
+      type: object
+      properties:
+        Name:
+          type: string
+          example: "Moscow RolePlay | City & Province"
+        OwnerId:
+          type: integer
+          example: 1133665013
+        CoOwnerIds:
+          type: array
+          items:
+            type: integer
+        CurrentPlayers:
+          type: integer
+          example: 42
+        MaxPlayers:
+          type: integer
+          example: 50
+        JoinKey:
+          type: string
+          example: "MRP"
+        AccVerifiedReq:
+          type: string
+          example: "Disabled"
+        TeamBalance:
+          type: boolean
+          example: true
+
+    ERLCBanItem:
+      type: object
+      properties:
+        Player:
+          type: string
+          example: "PlayerName:12345678"
+        Reason:
+          type: string
+          example: "Нарушение правил сервера"
+
+    ERLCCommandResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        message:
+          type: string
+          example: "Команда успешно выполнена"
+
+    UsersLookupResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        users:
+          type: array
+          items:
+            type: object
+            properties:
+              discordId:
+                type: string
+                example: "1133665013794607114"
+              robloxId:
+                type: string
+                example: "450123984"
+              robloxUsername:
+                type: string
+                example: "Alex_Roblox"
+
+    CDNAssetListResponse:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/CDNAsset'
+        total:
+          type: integer
+          example: 120
+        page:
+          type: integer
+          example: 1
+        totalPages:
+          type: integer
+          example: 6
+
+    CDNAsset:
+      type: object
+      properties:
+        id:
+          type: string
+          example: "ast_9f8d1c2b"
+        name:
+          type: string
+          example: "banner_summer_2026.png"
+        url:
+          type: string
+          example: "https://api.erlcrussia.xyz/v3/cdn/resolve/banners/banner_summer_2026.png"
+        sizeBytes:
+          type: integer
+          example: 2451920
+        mimeType:
+          type: string
+          example: "image/png"
+        folderId:
+          type: string
+          nullable: true
+          example: "fld_general"
+        createdAt:
+          type: string
+          format: date-time
+
+    CDNUploadResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        asset:
+          $ref: '#/components/schemas/CDNAsset'
+
+    CDNStatsResponse:
+      type: object
+      properties:
+        totalAssets:
+          type: integer
+          example: 350
+        totalSizeBytes:
+          type: integer
+          example: 1548291000
+        totalFolders:
+          type: integer
+          example: 14
+
+    PointsBalanceResponse:
+      type: object
+      properties:
+        userId:
+          type: string
+          example: "1133665013794607114"
+        points:
+          type: integer
+          example: 1500
+
+    AuthSessionResponse:
+      type: object
+      properties:
+        valid:
+          type: boolean
+          example: true
+        user:
+          type: object
+          properties:
+            discordId:
+              type: string
+              example: "1133665013794607114"
+            discordUsername:
+              type: string
+              example: "AdminDev"
+            robloxId:
+              type: string
+              example: "450123984"
+            robloxUsername:
+              type: string
+              example: "Admin_RBLX"
+            roles:
+              type: array
+              items:
+                type: string
+              example: ["SUPER_ADMIN"]
+
+    HealthResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          example: "ok"
+        database:
+          type: string
+          example: "connected"
+        redis:
+          type: string
+          example: "ok"
+        timestamp:
+          type: string
+          format: date-time
+
+    ErrorResponse:
+      type: object
+      properties:
+        code:
+          type: integer
+          example: 400
+        message:
+          type: string
+          example: "Описание ошибки"
+
+  responses:
+    BadRequestError:
+      description: Неверные параметры запроса.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    UnauthorizedError:
+      description: Отсутствует или недействителен токен авторизации.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    ForbiddenError:
+      description: Недостаточно прав или действие заблокировано ограничениями ключа.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    NotFoundError:
+      description: Запрашиваемый ресурс не найден.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'

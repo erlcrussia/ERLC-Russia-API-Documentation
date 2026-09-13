@@ -32,8 +32,9 @@ info:
 
 servers:
   - url: https://api.erlcrussia.xyz/v2
-    description: ClueControl M API Server
-
+    description: Production API V2 (xyz)
+  - url: https://api.erlcrussia.com/v2
+    description: Production API V2 (com)
 tags:
   - name: Status
     description: Эндпоинты для получения статуса сервера и шардов.

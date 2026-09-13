@@ -70,7 +70,9 @@ info:
   version: 2.0.0
 servers:
   - url: https://api.erlcrussia.xyz/v2
-    description: Production
+    description: Production API V2 (xyz)
+  - url: https://api.erlcrussia.com/v2
+    description: Production API V2 (com)
 tags:
   - name: ERLC v2
     description: ER:LC v2 API game server data and management.
