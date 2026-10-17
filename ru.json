@@ -2,7 +2,7 @@
   "language": "ru",
   "tabs": [
     {
-      "tab": "Информация и Правила",
+      "tab": "Информация и правила",
       "icon": "circle-info",
       "pages": [
         "ru/index",
@@ -61,7 +61,7 @@
                   ]
                 },
                 {
-                  "group": "MRP API Статистики V1",
+                  "group": "MRP API статистики V1",
                   "icon": "chart-bar",
                   "pages": [
                     "ru/reference/v1/mrp-stats-api-v1/get-moscowroleplay-stats-playercount",
@@ -90,11 +90,11 @@
                   ]
                 },
                 {
-                  "group": "MRP API Экономики V2",
+                  "group": "MRP API экономики V2",
                   "icon": "coins",
                   "pages": [
                     {
-                      "group": "GET-Эндпоинты API Экономики",
+                      "group": "GET-эндпоинты API экономики",
                       "icon": "arrow-down",
                       "pages": [
                         "ru/reference/v2/mrp-civops-api-v2/mrp-get-endpoints-civops-api-v2/get-moscowroleplay-civops-economy",
@@ -109,7 +109,7 @@
                       ]
                     },
                     {
-                      "group": "POST-Эндпоинты API Экономики",
+                      "group": "POST-эндпоинты API экономики",
                       "icon": "arrow-up",
                       "pages": [
                         "ru/reference/v2/mrp-civops-api-v2/mrp-post-endpoints-civops-api-v2/post-moscowroleplay-civops-economy",
@@ -124,7 +124,7 @@
                   ]
                 },
                 {
-                  "group": "MRP API Статистики V2",
+                  "group": "MRP API статистики V2",
                   "icon": "chart-bar",
                   "pages": [
                     "ru/reference/v2/mrp-stats-api-v2/get-moscowroleplay-stats"
@@ -153,11 +153,11 @@
                   ]
                 },
                 {
-                  "group": "API Экономики V3",
+                  "group": "API экономики V3",
                   "icon": "coins",
                   "pages": [
                     {
-                      "group": "GET-Эндпоинты Экономики",
+                      "group": "GET-эндпоинты экономики",
                       "icon": "arrow-down",
                       "pages": [
                         "ru/reference/v3/civops/get-civops-economy",
@@ -172,7 +172,7 @@
                       ]
                     },
                     {
-                      "group": "POST-Эндпоинты Экономики",
+                      "group": "POST-эндпоинты экономики",
                       "icon": "arrow-up",
                       "pages": [
                         "ru/reference/v3/civops/post-civops-economy",
@@ -187,14 +187,14 @@
                   ]
                 },
                 {
-                  "group": "API Статистики V3",
+                  "group": "API статистики V3",
                   "icon": "chart-line",
                   "pages": [
                     "ru/reference/v3/stats/get-stats"
                   ]
                 },
                 {
-                  "group": "API Верификации V3",
+                  "group": "API верификации V3",
                   "icon": "id-badge",
                   "pages": [
                     "ru/reference/v3/users/get-users",
@@ -208,7 +208,7 @@
                     "ru/reference/v3/cdn/overview",
                     "ru/reference/v3/cdn/bind-team",
                     {
-                      "group": "Ассеты и Пространства Имён",
+                      "group": "Ассеты и пространства имён",
                       "icon": "file",
                       "pages": [
                         "ru/reference/v3/cdn/get-assets",
@@ -222,7 +222,7 @@
                       ]
                     },
                     {
-                      "group": "Папки Интерфейса",
+                      "group": "Папки интерфейса",
                       "icon": "folder",
                       "pages": [
                         "ru/reference/v3/cdn/get-folders",
@@ -315,7 +315,7 @@
                   ]
                 },
                 {
-                  "group": "API Наказаний V3",
+                  "group": "API наказаний V3",
                   "icon": "gavel",
                   "pages": [
                     "ru/reference/v3/points/get-user-points",
@@ -325,7 +325,7 @@
                   ]
                 },
                 {
-                  "group": "API Подписок V3",
+                  "group": "API подписок V3",
                   "icon": "crown",
                   "pages": [
                     "ru/reference/v3/subscriptions/get-funpay-config",
@@ -338,7 +338,7 @@
                   ]
                 },
                 {
-                  "group": "API Состояния V3",
+                  "group": "API состояния V3",
                   "icon": "heart-pulse",
                   "pages": [
                     "ru/reference/v3/health/get-health"
@@ -556,7 +556,7 @@
       ]
     },
     {
-      "tab": "Другие Варианты Интеграции",
+      "tab": "Другие варианты интеграции",
       "icon": "puzzle-piece",
       "pages": [
         {
@@ -574,7 +574,7 @@
       "icon": "book-open",
       "pages": [
         {
-          "group": "Быстрый Старт",
+          "group": "Быстрый старт",
           "icon": "rocket",
           "pages": [
             "ru/tutorials/how-to-get-api-key"
@@ -594,11 +594,11 @@
       ]
     },
     {
-      "tab": "Возможности Документации",
+      "tab": "Возможности документации",
       "icon": "clipboard-list",
       "pages": [
         {
-          "group": "Инструменты Разработчика",
+          "group": "Инструменты разработчика",
           "icon": "terminal",
           "pages": [
             "ru/docs-features/mcp-server"
