@@ -1,0 +1,105 @@
+---
+title: Descripción general de CDN API V3
+description: Almacenamiento de objetos MinIO S3 con almacenamiento en caché Edge distribuido. Edge proporciona archivos directamente
+  desde MinIO; la API no tiene puntos finales de origen.
+icon: cloud
+---
+
+# Arquitectura CDN V3
+
+## Cómo funciona el almacenamiento
+
+Cada activo se almacena en MinIO con la clave **`{domain}/{path}`**:
+
+| Parte clave | ¿Qué es esto?
+|---|---|
+| `domain` | Organización de babosas; `default` - sólo ER:LC Rusia. O un dominio personalizado verificado de la organización |
+| `path` | Ruta de archivo arbitraria, por ejemplo `branding/logo.png` |
+
+Ya no existe un único "prefijo de categoría": si una ruta se especifica explícitamente, se utiliza tal cual. Si no se especifica la ruta, se genera automáticamente (según la extensión del archivo).
+
+## Organización y acceso
+
+Antes de comenzar a trabajar, vincule su clave a la organización:
+
+```bash
+curl -X PUT https://api.erlcrussia.com/v3/cdn/team \
+  -H 'erlcrussia-api-key: YOUR_API_KEY' \
+  -H 'Content-Type: application/json' \
+  -d '{"teamId":"YOUR_TEAM_ID"}'
+```
+
+El propietario de la clave debe ser propietario, administrador o miembro de una organización con permiso CDN. Cada solicitud vuelve a verificar la membresía. Sin un enlace de clave, la solicitud se rechaza. El `teamId` opcional en consulta debe coincidir con el enlace. Las rutas CDN públicas no aceptan una clave maestra o un secreto interno en lugar de una clave de usuario; Se requiere resolución V3.
+
+En `cdn.erlcrussia.com`, una organización típica recibe solo `/{slug}/...`. Slug contiene letras latinas minúsculas, números, `_` y `-`. Root y `/erlcrussia/...` pertenecen a la organización principal ER:LC Rusia. Tampoco puede escribir en las rutas reservadas de otras organizaciones. En un dominio personalizado verificado de una organización, hay disponibles rutas arbitrarias dentro de su espacio de nombres.
+
+Los activos, carpetas, estadísticas y operaciones por ID están limitados por la organización de la clave. La carpeta de la interfaz no reemplaza la verificación del propietario del recurso.
+
+## Flujo de carga
+
+```
+UI → POST /v3/cdn/assets?path=branding/logo.png
+        заголовок: erlcrussia-api-key
+API  → объект в MinIO:  {domain}/{path}
+API  → запись в базу
+API  → асинхронно POST {EDGE}/v3/warm
+        заголовок: erlcrussia-api-edge-key
+        тело: { domain, path, mimeType, size, sha256, isPinned }
+EDGE → GET MinIO напрямую, кладёт файл на SSD
+```
+
+No es necesario pasar la URL de descarga: el propio Edge recopila la clave de `domain` y `path`.
+
+## Leer hilo
+
+```
+Браузер → GET https://cdn.erlcrussia.com/{domain}/{path}
+EDGE:
+  HIT  → отдаёт файл с SSD (Range 206, ETag, 304)
+  MISS → GET MinIO/{domain}/{path} → отдаёт клиенту и асинхронно кладёт на SSD
+```
+
+API V3 no participa en esta cadena. La API no tiene puntos finales de Origin; No se proporciona la entrega a través de API V3.
+
+## Hilo de vaciado de caché
+
+```
+UI → POST /v3/cdn/assets/purge?domain=default&prefix=branding/
+API → POST {EDGE}/v3/purge?domain=default&prefix=branding/
+        заголовок: erlcrussia-api-edge-key
+EDGE → удаляет файлы с SSD и записи из SQLite
+Следующий запрос → MISS → edge сам тянет свежий файл из MinIO
+```
+
+## Carpetas y rutas públicas
+
+| Acción | Impacto en los archivos |
+|---|---|
+| Creando una carpeta | no |
+| Cambiar el nombre de una carpeta | **no**, los archivos permanecen en sus rutas |
+| Eliminar una carpeta | **no**, los archivos permanecen y pierden su vinculación |
+| `PATCH /cdn/assets` con `folderId` | sólo agrupación en UI |
+| `PATCH /cdn/assets` con `path` | transferencia física de un objeto a MinIO |
+
+## Autorización
+
+| Título | Donde se acepta |
+|---|---|
+| `erlcrussia-api-key` | todas las vías públicas `/v3/cdn/*` |
+| `erlcrussia-api-master-key` | `/v3/admin/cdn/*` para interfaz |
+| `erlcrussia-api-edge-key` | solo servicio `/v3/*` Go Edge, no utilizado en V3 |
+
+La clave se transmite exclusivamente en el encabezado. Los parámetros de consulta `?apiKey=` y `?token=` no son compatibles.
+
+## Convenciones sobre parámetros de consulta
+
+| Parámetro | Significado |
+|---|---|
+| `domain` | Espacio de nombres. Slug de organización de claves predeterminado (`default` solo para ER:LC Rusia) |
+| `ids` | Lista de ID separados por comas |
+| `path` | La ruta exacta dentro del espacio de nombres |
+| `prefix` | Prefijo de ruta para grupo de archivos |
+| `folderId` | Carpeta de interfaz: `root` - sin carpeta, `all` - sin filtro |
+| `page`, `limit` | Paginación de lista, `limit` máximo 100 |
+
+`pathEnabled` controla el prefijo únicamente de las descargas nuevas sin una ruta explícita. Las carpetas no mueven archivos ya descargados. Los dominios personalizados se gestionan a través de `/v3/cdn/custom-domains`; `/v3/cdn/domains` enumera el espacio de nombres con activos.

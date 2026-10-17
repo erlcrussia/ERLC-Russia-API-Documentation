@@ -1,204 +1,74 @@
 ---
-title: "Интеграция CDN в проект Next.js"
-description: "Пошаговое руководство по выносу статических чанков Next.js (_next/static) на собственный CDN (cdn.erlcrussia.com)."
+title: "Next.js: подключение статики к CDN"
+description: "Сборка, загрузка _next/static через пользовательский API V3 и проверка обоих CDN-доменов."
 icon: "network-wired"
 ---
 
-В этом руководстве подробно описано, как настроить проект Next.js (`ERLC-Russia-Site`) для автоматической загрузки всех статических ресурсов (JavaScript-чанков, CSS-файлов, шрифтов и медиа) с собственного CDN (`cdn.erlcrussia.com`).
+HTML и серверный код остаются в Next.js. На CDN загружается только содержимое `.next/static`, доступное как `_next/static`. Файлы из `public` требуют отдельных URL. Поведение `assetPrefix` описано в [документации Next.js](https://nextjs.org/docs/app/api-reference/config/next-config-js/assetPrefix).
 
-В результате основной сервер (`erlcrussia.com`) отдаёт исключительно начальный HTML и динамические API-запросы, а все ресурсы папки `_next/static` загружаются с CDN. В консоли разработчика браузера (F12, вкладка Network) запросы к папке `_next` на домене `erlcrussia.com` полностью отсутствуют.
+## 1. Выберите адрес доставки
 
----
+Общий CDN: `https://cdn.erlcrussia.com/YOUR_TEAM_SLUG/releases/RELEASE_ID`.
+Кастомный домен: `https://files.example.com/releases/RELEASE_ID` после регистрации, DNS/TLS-проверки и маршрутизации Host в Go Edge.
+В API поле `domain` — это slug организации либо подтверждённое имя домена, без схемы и без префикса релиза.
 
-## Архитектура и Принцип Работы
+## 2. Настройте production-сборку
 
-Когда пользователь открывает страницу сайта на Next.js:
-1. Браузер запрашивает HTML-документ у основного сервера: `GET https://erlcrussia.com/ru`.
-2. Сервер возвращает сгенерированный HTML (SSR). Внутри HTML находятся теги `<script>`, `<link rel="stylesheet">` и предзагрузки шрифтов.
-3. По умолчанию путь к чанкам выглядит как `/_next/static/chunks/main-app.js`. Но при настройке **`assetPrefix`** Next.js автоматически подставляет домен CDN:
-   ```html
-   <script src="https://cdn.erlcrussia.com/_next/static/chunks/fd9301ba-a764d2.js" defer=""></script>
-   <link rel="stylesheet" href="https://cdn.erlcrussia.com/_next/static/css/81a9f5c401.css" />
-   ```
-4. Браузер начинает параллельно загружать скрипты и стили с `cdn.erlcrussia.com`, снимая сетевую нагрузку и нагрузку на диск с основного Node.js-сервера.
-
-```mermaid
-sequenceDiagram
-    autonumber
-    actor User as Браузер (F12 Network)
-    participant Origin as Основной сайт (erlcrussia.com)
-    participant CDN as Edge CDN (cdn.erlcrussia.com)
-
-    User->>Origin: GET https://erlcrussia.com/
-    Note over Origin: Рендерит HTML со ссылками на cdn.erlcrussia.com
-    Origin-->>User: 200 OK (HTML страница)
-
-    User->>CDN: GET https://cdn.erlcrussia.com/_next/static/chunks/app.js
-    alt Есть в кэше Edge (Cache HIT)
-        CDN-->>User: 200 OK (из SSD-кэша CDN, immutable)
-    else Нет в кэше (Cache MISS - Origin Pull)
-        CDN->>Origin: GET https://erlcrussia.com/_next/static/chunks/app.js
-        Origin-->>CDN: 200 OK (исходный файл чанка)
-        Note over CDN: Сохраняет в локальный кэш
-        CDN-->>User: 200 OK (с заголовками кэширования)
-    end
+```js next.config.js
+module.exports = {
+  assetPrefix: process.env.CDN_ASSET_PREFIX,
+};
 ```
 
----
+```bash
+CDN_ASSET_PREFIX=https://cdn.erlcrussia.com/YOUR_TEAM_SLUG/releases/RELEASE_ID npm run build
+```
 
-## Способы Доставки Чанков в CDN
+Загружайте и запускайте одну и ту же production-сборку. После загрузки файлов запустите Next.js командой `npm run start` в своей среде размещения. Для кастомного домена укажите его адрес в `CDN_ASSET_PREFIX` перед сборкой.
 
-Существует два надёжных подхода к организации работы CDN для Next.js:
+## 3. Привяжите пользовательский ключ
 
-<Tabs>
-  <Tab title="1. Origin Pull (Рекомендуемый)">
-    **Origin Pull (автоматическое подтягивание)** — Edge-сервер CDN при первом запросе файла проверяет свой локальный кэш на SSD. Если файла нет, CDN сам запрашивает его у основного сайта (`erlcrussia.com`), сохраняет в кэш и отдаёт клиенту.
+```bash
+curl -X PUT "$API_BASE/v3/cdn/team" \
+  -H "erlcrussia-api-key: $CDN_API_KEY" \
+  -H 'Content-Type: application/json' \
+  -d '{"teamId":"YOUR_TEAM_ID"}'
+```
 
-    **Преимущества:**
-    * Не требуется изменять скрипты деплоя или загружать гигабайты файлов перед стартом контейнера.
-    * При релизе новой версии сайта генерируются новые уникальные хэши файлов (например, `main-a82f.js`). CDN мгновенно и прозрачно подтянет новые файлы при первом же открытии страницы пользователями.
-    * Старые чанки продолжают работать у пользователей, которые ещё не обновили вкладку браузера.
-  </Tab>
+Задайте `API_BASE=https://api.erlcrussia.com`. Пользовательские CDN-маршруты требуют `erlcrussia-api-key`; мастер-ключ для них не используется. Не помещайте ключ в `NEXT_PUBLIC_*`, HTML или JavaScript приложения.
 
-  <Tab title="2. CI/CD Pre-Upload в MinIO">
-    **CI/CD Pre-Upload** — во время сборки проекта (`next build`) скрипт пайплайна загружает сгенерированную директорию `.next/static/` в MinIO/S3 хранилище CDN.
+## 4. Загрузите файлы до запуска релиза
 
-    **Преимущества:**
-    * Даже самый первый пользователь получает файл напрямую из хранилища CDN без задержки на холодный прокси-запрос к origin.
-  </Tab>
-</Tabs>
+Для каждого файла `.next/static/RELATIVE_PATH` отправьте запрос с путём `releases/RELEASE_ID/_next/static/RELATIVE_PATH`:
 
----
+```bash
+curl -X POST "$API_BASE/v3/cdn/assets" \
+  -H "erlcrussia-api-key: $CDN_API_KEY" \
+  -F 'file=@.next/static/chunks/example.js;type=text/javascript' \
+  -F 'domain=YOUR_TEAM_SLUG' \
+  -F 'path=releases/RELEASE_ID/_next/static/chunks/example.js' \
+  -F 'compress=false'
+```
 
-## Пошаговая Интеграция
+Для CSS используйте `text/css`, для шрифтов — MIME соответствующего формата. Не задавайте общий `Content-Type: multipart/form-data` вручную: boundary добавляет клиент. `compress=false` сохраняет байты и SHA-256 сборки. Для собственного домена замените `domain` на `files.example.com`.
 
-<Steps>
-  <Step title="Настройка next.config.js">
-    В конфигурационном файле проекта фронтенда укажите параметр `assetPrefix`. Рекомендуется включать его только в режиме `production`, чтобы во время локальной разработки (`npm run dev`) файлы отдавались локальным сервером:
+HTTP 200 возвращает `{ "success": true, "asset": { ... } }`. Занятый явный путь даёт 409; не считайте это успешной перезаписью. Сравните SHA-256 существующего ассета или используйте новый RELEASE_ID. При 429 ждите `Retry-After`/`retry_after` и повторяйте только отклонённый запрос. Загружайте последовательно с учётом общего лимита, а не сотнями параллельных запросов.
 
-    ```javascript next.config.js
-    /** @type {import('next').NextConfig} */
-    const isProduction = process.env.NODE_ENV === 'production' || process.env.MODE === 'PRODUCTION';
+Не загружайте всю `.next`: там находятся серверный код и конфигурация. Исходные карты `.map` публикуйте только при осознанной необходимости. Старые релизы сохраняйте, пока их используют открытые вкладки.
 
-    const nextConfig = {
-      // Подставляем префикс CDN только для продакшен-сборки
-      assetPrefix: isProduction ? 'https://cdn.erlcrussia.com' : undefined,
+## 5. Картинки и другие public-файлы
 
-      // Разрешённые домены для компонента next/image
-      images: {
-        remotePatterns: [
-          {
-            protocol: 'https',
-            hostname: 'cdn.erlcrussia.com',
-            pathname: '/**',
-          },
-        ],
-      },
-    };
+```html
+<img src="https://cdn.erlcrussia.com/YOUR_TEAM_SLUG/releases/RELEASE_ID/logo.png" alt="Логотип">
+<img src="https://files.example.com/releases/RELEASE_ID/logo.png" alt="Логотип">
+```
 
-    module.exports = nextConfig;
-    ```
+Обычный `img` запрашивает CDN напрямую. При использовании оптимизации `next/image` браузер может обращаться к локальному `/_next/image`; это отдельный механизм. `assetPrefix` не переносит HTML, API, Server Actions и динамические данные Next.js на CDN.
 
-    <Warning>
-      Параметр `assetPrefix` изменяет URL только для статических ресурсов (`_next/static/...`). Сами страницы сайта, Server Actions и маршруты Route Handlers (`/api/...`) продолжают запрашиваться с основного домена `erlcrussia.com`.
-    </Warning>
-  </Step>
+## 6. Проверьте результат
 
-  <Step title="Настройка Origin Pull на Edge CDN Сервере (Nginx)">
-    Если CDN работает через Nginx на Edge VPS, добавьте блок обработки пути `/_next/static/`:
+В Network проверьте домен JS/CSS/шрифтов, MIME, CORS и HTTP 200. Сравните байты с исходными файлами, затем HEAD, Range (206) и условный запрос по ETag (304). Нажмите интерактивную кнопку: наличие HTML ещё не доказывает выполнение JavaScript.
 
-    ```nginx /etc/nginx/sites-available/cdn.erlcrussia.com
-    # Кэш зона в оперативной памяти и на SSD
-    proxy_cache_path /var/cache/nginx/next_static 
-                     levels=1:2 
-                     keys_zone=NEXT_STATIC_CACHE:100m 
-                     max_size=10g 
-                     inactive=30d 
-                     use_temp_path=off;
+CDN доставляет заранее загруженные файлы. `originUrl` задаёт адрес перенаправления для корня домена или отсутствующего объекта, а не источник автоматической загрузки. Загрузите файлы сборки через API до публикации релиза.
 
-    server {
-        server_name cdn.erlcrussia.com;
-
-        # Обработка Next.js статических чанков
-        location /_next/static/ {
-            proxy_pass https://erlcrussia.com/_next/static/;
-            proxy_set_header Host erlcrussia.com;
-            proxy_set_header X-Real-IP $remote_addr;
-            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-            proxy_set_header X-Forwarded-Proto https;
-
-            # Кэширование на стороне Edge
-            proxy_cache NEXT_STATIC_CACHE;
-            proxy_cache_valid 200 365d;
-            proxy_cache_valid 404 1m;
-            proxy_cache_use_stale error timeout updating http_500 http_502 http_503 http_504;
-            proxy_cache_lock on;
-
-            # Заголовки для браузера клиента
-            add_header X-Cache-Status $upstream_cache_status always;
-            add_header Cache-Control "public, max-age=31536000, immutable" always;
-            add_header Access-Control-Allow-Origin "*" always;
-            add_header Access-Control-Allow-Methods "GET, OPTIONS" always;
-
-            # Сжатие gzip и brotli
-            gzip on;
-            gzip_types text/css application/javascript application/json font/woff2;
-        }
-
-        # Обработка пользовательских ассетов CDN (изображения, документы и др.)
-        location / {
-            proxy_pass http://127.0.0.1:50009; # API CDN Resolver
-            proxy_set_header Host $host;
-            # ...
-        }
-    }
-    ```
-  </Step>
-
-  <Step title="Настройка CORS заголовков">
-    Поскольку JavaScript-скрипты, CSS и шрифты загружаются с домена `cdn.erlcrussia.com` на страницу `erlcrussia.com`, это междоменный запрос (Cross-Origin). 
-    
-    Для корректной работы шрифтов (`.woff2`) и корректного сбора ошибок в Sentry/клиентских логах CDN **обязан** отдавать заголовок:
-    ```http
-    Access-Control-Allow-Origin: *
-    ```
-  </Step>
-
-  <Step title="Проверка в F12 DevTools">
-    После развёртывания сборки откройте сайт `https://erlcrussia.com` и выполните проверку:
-
-    1. Откройте панель разработчика (нажмите **F12**).
-    2. Перейдите во вкладку **Network** (Сеть).
-    3. Выберите фильтр **JS** или **CSS**.
-    4. В колонке **Domain** убедитесь, что все файлы из `_next/static/chunks/` загружаются с домена `cdn.erlcrussia.com`.
-    5. Запросы к домену `erlcrussia.com` должны содержать только начальный документ (`document`), вызовы `/api/...` и служебные запросы данных. Папки `_next` на домене `erlcrussia.com` в запросах браузера **нет**.
-  </Step>
-</Steps>
-
----
-
-## Кэширование и Заголовок `immutable`
-
-Так как Next.js генерирует уникальные хэши в именах файлов для каждой сборки (например, `pages-app-9c2b4e.js`), содержимое конкретного URL **никогда не изменяется**.
-
-* Рекомендуемый заголовок ответа CDN:
-  ```http
-  Cache-Control: public, max-age=31536000, immutable
-  ```
-* Директива `immutable` сообщает браузеру, что файл гарантированно статичен. Браузер даже при повторных переходах и принудительном обновлении страницы не будет отправлять `304 Not Modified` условные запросы, загружая файл мгновенно из дискового кэша пользователя.
-
----
-
-## Часто Задаваемые Вопросы (FAQ)
-
-<Accordion title="Что происходит при выпуске нового релиза сайта?">
-  Next.js создаст новые имена файлов с новыми хэшами. HTML-страница начнёт ссылаться на новые URL в CDN. CDN подтянет новые файлы при первом запросе, а старые файлы останутся в кэше CDN для пользователей, у которых сайт был открыт до релиза.
-</Accordion>
-
-<Accordion title="Что делать, если картинки из next/image не загружаются?">
-  Убедитесь, что домен `cdn.erlcrussia.com` указан в массиве `images.remotePatterns` в `next.config.js`. Также убедитесь, что SVG-файлы отдаются с заголовком `Content-Type: image/svg+xml` и `Content-Disposition: inline`.
-</Accordion>
-
-<Accordion title="Влияет ли CDN на Server Side Rendering (SSR) и SEO?">
-  Нет, HTML формируется на стороне основного сервера и поисковые боты получают полноценную разметку. При этом ускорение отдачи статики напрямую улучшает метрики Core Web Vitals (LCP, FID, CLS) и повышает рейтинг сайта в поисковых системах.
-</Accordion>
+Пути, начинающиеся с `_next/static/`, получают immutable в Go Edge. Если перед `_next` стоит префикс релиза, текущая реализация применяет обычный Cache-Control; проверяйте фактический заголовок. Сброс Go Edge не очищает браузерный кэш и сам по себе не подтверждает очистку Cloudflare.

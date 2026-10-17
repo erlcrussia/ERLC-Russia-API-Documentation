@@ -1,0 +1,105 @@
+---
+title: CDN API V3 overview
+description: MinIO S3 object storage with distributed Edge caching. Edge provides files directly from MinIO; the API does
+  not have origin endpoints.
+icon: cloud
+---
+
+# CDN V3 architecture
+
+## How storage works
+
+Each asset is stored in MinIO under the key **`{domain}/{path}`**:
+
+| Key part | What is this |
+|---|---|
+| `domain` | Slug organization; `default` - only ER:LC Russia. Or a verified custom domain of the organization |
+| `path` | Arbitrary file path, for example `branding/logo.png` |
+
+There is no longer a single "category prefix": if a path is specified explicitly, it is used as is. If the path is not specified, it is generated automatically (based on the file extension).
+
+## Organization and access
+
+Before starting work, bind your key to the organization:
+
+```bash
+curl -X PUT https://api.erlcrussia.com/v3/cdn/team \
+  -H 'erlcrussia-api-key: YOUR_API_KEY' \
+  -H 'Content-Type: application/json' \
+  -d '{"teamId":"YOUR_TEAM_ID"}'
+```
+
+The owner of the key must be an owner, administrator, or member of an organization with CDN permission. Each request rechecks membership. Without a key binding, the request is rejected. The optional `teamId` in query must match the binding. Public CDN routes do not accept a master key or internal secret in place of a user key; V3 resolution required.
+
+On `cdn.erlcrussia.com`, a typical organization receives only `/{slug}/...`. Slug contains lowercase Latin letters, numbers, `_` and `-`. Root and `/erlcrussia/...` belong to the main organization ER:LC Russia. It also cannot write to other organizations' reserved paths. On a verified custom domain of an organization, arbitrary paths within its namespace are available.
+
+Assets, folders, statistics and operations by ID are limited by the organization of the key. The interface folder does not replace resource owner verification.
+
+## Load flow
+
+```
+UI → POST /v3/cdn/assets?path=branding/logo.png
+        заголовок: erlcrussia-api-key
+API  → объект в MinIO:  {domain}/{path}
+API  → запись в базу
+API  → асинхронно POST {EDGE}/v3/warm
+        заголовок: erlcrussia-api-edge-key
+        тело: { domain, path, mimeType, size, sha256, isPinned }
+EDGE → GET MinIO напрямую, кладёт файл на SSD
+```
+
+There is no need to pass the download URL: edge itself collects the key from `domain` and `path`.
+
+## Read thread
+
+```
+Браузер → GET https://cdn.erlcrussia.com/{domain}/{path}
+EDGE:
+  HIT  → отдаёт файл с SSD (Range 206, ETag, 304)
+  MISS → GET MinIO/{domain}/{path} → отдаёт клиенту и асинхронно кладёт на SSD
+```
+
+API V3 is not involved in this chain. The API does not have Origin endpoints; delivery via API V3 is not provided.
+
+## Cache flush thread
+
+```
+UI → POST /v3/cdn/assets/purge?domain=default&prefix=branding/
+API → POST {EDGE}/v3/purge?domain=default&prefix=branding/
+        заголовок: erlcrussia-api-edge-key
+EDGE → удаляет файлы с SSD и записи из SQLite
+Следующий запрос → MISS → edge сам тянет свежий файл из MinIO
+```
+
+## Folders and public paths
+
+| Action | Impact on files |
+|---|---|
+| Creating a folder | no |
+| Renaming a folder | **no**, the files remain on their paths |
+| Delete a folder | **no**, the files remain and lose their binding |
+| `PATCH /cdn/assets` with `folderId` | only grouping in UI |
+| `PATCH /cdn/assets` with `path` | physical transfer of an object to MinIO |
+
+## Authorization
+
+| Title | Where is accepted |
+|---|---|
+| `erlcrussia-api-key` | all public routes `/v3/cdn/*` |
+| `erlcrussia-api-master-key` | `/v3/admin/cdn/*` for interface |
+| `erlcrussia-api-edge-key` | only `/v3/*` Go edge service, not used in V3 |
+
+The key is transmitted exclusively in the header. Query parameters `?apiKey=` and `?token=` are not supported.
+
+## Conventions on query parameters
+
+| Parameter | Meaning |
+|---|---|
+| `domain` | Namespace. Default key organization slug (`default` only for ER:LC Russia) |
+| `ids` | List of IDs separated by commas |
+| `path` | The exact path inside the namespace |
+| `prefix` | Path prefix for group of files |
+| `folderId` | Interface folder: `root` - no folder, `all` - no filter |
+| `page`, `limit` | List pagination, `limit` maximum 100 |
+
+`pathEnabled` controls the prefix of only new downloads without an explicit path. Folders do not move already downloaded files. Custom domains are managed via `/v3/cdn/custom-domains`; `/v3/cdn/domains` lists namespace with assets.

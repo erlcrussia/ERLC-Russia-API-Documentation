@@ -1,0 +1,60 @@
+---
+title: "Особисті файли та бібліотека"
+description: "Приватні вкладення чату й аудіо на userassets.erlcrussia.com."
+icon: "folder-closed"
+---
+
+Файл доступний лише власнику з чинною сесією. Ключ компанії або підписане посилання не замінюють сесію користувача. Домен має бути зареєстрований і підтверджений у компанії.
+
+Сайт завантажує початкові байти через Backend. Go API визначає власника за сесією та зберігає оригінал у приватному MinIO. Повідомлення містить ID вкладення; повторне прикріплення не створює копію.
+
+До 25 МіБ на файл, 1 ГіБ і 1000 невидалених файлів на користувача. Тип визначається за вмістом. Архіви не розпаковуються автоматично. Модель отримує підтримувані зображення, PDF і текст; збереження архіву не означає, що AI прочитав його.
+
+## Маршрути
+
+| Go API | Site Backend | |
+|---|---|---|
+| `GET /v3/user-assets` | `/api/v3/ai/files` | Список особистих файлів |
+| `POST /v3/user-assets?name=example.png` | `/api/v3/ai/files?name=example.png` | Завантажити особистий файл |
+| `GET /v3/user-assets/{id}` | `—` | Метадані особистого файлу |
+| `DELETE /v3/user-assets/{id}` | `/api/v3/ai/files/{id}` | Видалити особистий файл |
+| `GET / HEAD /v3/user-assets/{id}/content` | `/api/v3/ai/files/{id}/content` | Отримати вміст файлу |
+
+```javascript
+const uploaded = await fetch(`${backendUrl}/api/v3/ai/files?${new URLSearchParams({ name: file.name })}`, {
+  method: "POST", credentials: "include",
+  headers: { "Content-Type": "application/octet-stream" }, body: file
+});
+if (!uploaded.ok) throw new Error(`Upload failed: ${uploaded.status}`);
+const asset = await uploaded.json();
+// POST /api/v3/ai/chat
+const attachment = { assetId: asset.id };
+```
+
+```json
+{
+  "id": "0123456789abcdef0123456789abcdef",
+  "domain": "userassets.erlcrussia.com",
+  "path": "_private/users/123456789012345678/upload/0123456789abcdef0123456789abcdef/original",
+  "name": "example.png",
+  "mimeType": "image/png",
+  "size": 68,
+  "kind": "upload",
+  "status": "ready",
+  "createdAt": "2026-10-15T19:00:00Z",
+  "expiresAt": null,
+  "url": "https://userassets.erlcrussia.com/_private/users/123456789012345678/upload/0123456789abcdef0123456789abcdef/original"
+}
+```
+
+401 — немає чинної сесії; 404 — чужий, видалений або прострочений файл; 413 — розмір чи квота; 415 — хибний формат аудіо; 429 — ліміт запитів; 503 — домен не підтверджено або залежність недоступна.
+
+## Експлуатація
+
+Публічний CDN та автоматичне очищення SSD працюють як раніше. Приватні відповіді мають private, no-store й оминають спільний кеш Cloudflare. Сесія, власник і строк перевіряються перед кожним читанням, зокрема SSD HIT, HEAD, Range та через загальний CDN-домен. TTL Cloudflare не визначає зберігання оригіналу.
+
+upload зберігається до видалення. recording (мікрофон) і speech (серверне озвучення) спливають через 24 години. Після expiresAt доступ одразу закрито; щохвилинне завдання видаляє копії MinIO та SSD і повторює невдалі операції. Завантажені копії відкликати неможливо. Браузерний синтез чи розпізнавання без аудіофайлу не створюють архів.
+
+HTML, SVG та активні документи завантажуються з Content-Disposition: attachment і sandbox. Прямий MinIO не є публічним. Префікс _private зарезервований для приватних файлів і закритий для звичайного CDN API.
+
+Незареєстрований або непідтверджений Host повертає 421 і через загальний Nginx потрапляє до Redirect зі сторінкою неприв’язаного домену. Збій реєстру повертає 502; відсутній файл підтвердженого CDN-домену лишається помилкою CDN.

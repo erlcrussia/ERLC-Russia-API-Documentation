@@ -1,0 +1,78 @@
+---
+title: Codici di errore dell'API CDN
+description: Un riferimento completo ai codici di errore e ai formati del corpo per gli endpoint CDN.
+icon: triangle-alert
+---
+
+# Formato dell'errore
+
+Gli errori CDN vengono restituiti nello stesso formato di tutti gli altri errori API V3:
+
+```json
+{
+  "code": 5007,
+  "message": "Missing Token"
+}
+```
+
+| Campo | Digitare | Descrizione |
+|---|---|---|
+| `code` | intero | codice errore numerico |
+| `message` | stringa | breve descrizione in inglese |
+
+A seconda dell'errore, potrebbero essere presenti errore, dettagli e retry_after. I motivi tecnici vengono scritti nel registro di servizio,
+e non in risposta: possono essere visualizzati nei log API.
+
+<Note>
+La chiave, i parametri della richiesta e il contenuto del file non vengono mai restituiti nella risposta.
+</Note>
+
+## Autorizzazione
+
+| HTTP | Codice | Messaggio | Quando |
+|---|---|---|---|
+| 401| 5007| `Missing Token` | intestazione `erlcrussia-api-key` non inviata |
+| 401| 5008| `Invalid Token` | chiave non trovata o disabilitata |
+| 403| 5009| `Forbidden` | esiste una chiave, ma non è richiesto alcun endpoint/azione richiesta |
+
+La chiave nei parametri di query (`?apiKey=`, `?token=`) **non è supportata** e restituisce 5007.
+
+## Richiedi parametri
+
+| HTTP | Codice | Messaggio | Quando |
+|---|---|---|---|
+| 400| 5002| `Missing Parameters` | non esiste un campo obbligatorio oppure non esiste né `ids` né `path` |
+| 400| 5004| `Invalid Param Name` | il valore del parametro non è stato convalidato |
+| 400| 5034| `Invalid Json` | il corpo non è un JSON valido |
+
+## Risorse
+
+| HTTP | Codice | Messaggio | Quando |
+|---|---|---|---|
+| 404| 5041| `Asset Not Found` | non c'è vantaggio con questo `domain` + `path` |
+| 404| 5137| `CDN Folder Not Found` | non esiste alcuna cartella con questo `id` |
+| 409| 5136| `CDN Folder Slug Already Exists` | la cartella slug è già occupata |
+| 409| 5135| `CDN Path Already Exists` | la strada esplicita è già intrapresa; la riscrittura automatica non avviene |
+
+## Archiviazione e fonte
+
+| HTTP | Codice | Messaggio | Quando |
+|---|---|---|---|
+| 502| 5139| `CDN Source Unavailable` | la fonte esterna non ha restituito il file durante l'importazione |
+| 503| 5138| `CDN Storage Unavailable` | MinIO non disponibile o download non riuscito |
+
+## Codici correlati
+
+| HTTP | Codice | Messaggio | Quando |
+|---|---|---|---|
+| 401| 5006| `Invalid Master Key` | `/v3/admin/cdn/*` non viene richiamato dalla chiave master |
+| 503| — | `INTERNAL_SECRET не настроен, /v3/* отключён` | servizio edge lanciato senza `INTERNAL_SECRET` |
+
+## Come distinguere gli errori gli uni dagli altri
+
+| Cosa fare | Dove cercare nei log |
+|---|---|
+| 5135| Da `storage: путь занят, подбирается суффикс` a `cdn_db.go` |
+| 5136| il testo con lo slug occupato è scritto in `[CDN Rename Folder Error]` |
+| 5138| `[CDN Upload Error]` con testo di errore MinIO |
+| 5139| `[CDN External Import Error]` con codice di risposta sorgente |

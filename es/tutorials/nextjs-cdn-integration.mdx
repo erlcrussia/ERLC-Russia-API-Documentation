@@ -1,0 +1,74 @@
+---
+title: "Next.js: servir archivos estáticos mediante la CDN"
+description: Compile, cargue _next/static a través de la API personalizada V3 y verifique ambos dominios CDN.
+icon: network-wired
+---
+
+El HTML y el código del servidor permanecen en Next.js. Solo el contenido de `.next/static`, disponible como `_next/static`, se carga en la CDN. Los archivos de `public` requieren URL independientes. El comportamiento de `assetPrefix` se describe en la [documentación de Next.js] (https://nextjs.org/docs/app/api-reference/config/next-config-js/assetPrefix).
+
+## 1. Seleccione la dirección de entrega
+
+CDN general: `https://cdn.erlcrussia.com/YOUR_TEAM_SLUG/releases/RELEASE_ID`.
+Dominio personalizado: `https://files.example.com/releases/RELEASE_ID` después del registro, verificación de DNS/TLS y enrutamiento del host en Go Edge.
+En la API, el campo `domain` es un slug de organización o un nombre de dominio verificado, sin esquema y sin prefijo de versión.
+
+## 2. Configurar una compilación de producción
+
+```js next.config.js
+module.exports = {
+  assetPrefix: process.env.CDN_ASSET_PREFIX,
+};
+```
+
+```bash
+CDN_ASSET_PREFIX=https://cdn.erlcrussia.com/YOUR_TEAM_SLUG/releases/RELEASE_ID npm run build
+```
+
+Carga y ejecuta la misma compilación de producción. Después de cargar los archivos, inicia Next.js con `npm run start` en tu entorno de alojamiento. Configura el dominio personalizado en `CDN_ASSET_PREFIX` antes de compilar la versión.
+
+## 3. Vincular una clave personalizada
+
+```bash
+curl -X PUT "$API_BASE/v3/cdn/team" \
+  -H "erlcrussia-api-key: $CDN_API_KEY" \
+  -H 'Content-Type: application/json' \
+  -d '{"teamId":"YOUR_TEAM_ID"}'
+```
+
+Configura `API_BASE=https://api.erlcrussia.com`. Las rutas CDN de usuario requieren `erlcrussia-api-key`; no utilizan la clave maestra. No incluyas la clave en `NEXT_PUBLIC_*`, HTML ni JavaScript de la aplicación.
+
+## 4. Cargue archivos antes del lanzamiento
+
+Para cada archivo `.next/static/RELATIVE_PATH`, envíe una solicitud con la ruta `releases/RELEASE_ID/_next/static/RELATIVE_PATH`:
+
+```bash
+curl -X POST "$API_BASE/v3/cdn/assets" \
+  -H "erlcrussia-api-key: $CDN_API_KEY" \
+  -F 'file=@.next/static/chunks/example.js;type=text/javascript' \
+  -F 'domain=YOUR_TEAM_SLUG' \
+  -F 'path=releases/RELEASE_ID/_next/static/chunks/example.js' \
+  -F 'compress=false'
+```
+
+Para CSS use `text/css`, para fuentes use MIME del formato apropiado. No configure el `Content-Type: multipart/form-data` genérico manualmente: el límite lo agrega el cliente. `compress=false` guarda bytes y ensamblaje SHA-256. Para su propio dominio, reemplace `domain` con `files.example.com`.
+
+HTTP 200 devuelve `{ "success": true, "asset": { ... } }`. Una ruta explícita ocupada devuelve 409; No consideres esto como una reescritura exitosa. Compare el SHA-256 de un activo existente o utilice un nuevo RELEASE_ID. En 429, espere `Retry-After`/`retry_after` y vuelva a intentar solo la solicitud rechazada. Cargue secuencialmente, teniendo en cuenta el límite general, en lugar de cientos de solicitudes paralelas.
+
+No descargues el `.next` completo: ahí está el código del servidor y la configuración. Publicar mapas fuente `.map` solo si existe una necesidad consciente. Conserve las versiones antiguas siempre que las pestañas abiertas las utilicen.
+
+## 5. Imágenes y otros archivos públicos
+
+```html
+<img src="https://cdn.erlcrussia.com/YOUR_TEAM_SLUG/releases/RELEASE_ID/logo.png" alt="Логотип">
+<img src="https://files.example.com/releases/RELEASE_ID/logo.png" alt="Логотип">
+```
+
+El `img` normal solicita la CDN directamente. Cuando se utiliza la optimización `next/image`, el navegador puede acceder al `/_next/image` local; Este es un mecanismo separado. `assetPrefix` no transfiere HTML, API, Server Actions y datos dinámicos de Next.js a CDN.
+
+## 6. Comprueba el resultado
+
+En Red, verifique JS/CSS/dominio de fuente, MIME, CORS y HTTP 200. Compare los bytes con los archivos fuente, luego HEAD, Rango (206) y solicitud condicional por ETag (304). Haga clic en el botón interactivo: la presencia de HTML no prueba la ejecución de JavaScript.
+
+La CDN sirve archivos cargados previamente. `originUrl` indica una redirección para la raíz del dominio o un objeto ausente, no un origen de descarga automática. Carga los archivos mediante la API antes de publicar la versión.
+
+Las rutas que comienzan con `_next/static/` se vuelven inmutables en Go Edge. Si `_next` está precedido por un prefijo de versión, la implementación actual utiliza un control de caché normal; verifique el título real. Restablecer Go Edge no borra el caché del navegador y no confirma que Cloudflare lo haya borrado.

@@ -1,10 +1,11 @@
 ---
-title: "Códigos de Error"
-description: "Cuando la API de ER:LC Rusia rechaza una solicitud, devuelve una respuesta JSON con un código de error. Esta página te ayuda a comprender rápidamente qué ocurrió y cómo puede solucionarlo tu servicio."
-icon: "triangle-exclamation"
+title: Códigos de error
+description: Si la API de ER:LC Rusia rechaza la solicitud, devuelve una respuesta JSON con un código de error. En esta página
+  podrá comprender fácilmente qué salió mal exactamente y cómo su servicio puede solucionarlo.
+icon: triangle-exclamation
 ---
 
-### Formato de Respuesta de Error
+### Formato de respuesta de error
 
 Todos los errores se devuelven en formato JSON con los campos `code` y `message`.
 
@@ -16,136 +17,136 @@ Todos los errores se devuelven en formato JSON con los campos `code` y `message`
 }
 ```
 
-## Tabla de Errores de la API de ER:LC Rusia
+## Tabla de errores de API ER:LC Rusia
 
 <AccordionGroup>
-  <Accordion title="Errores Internos de la API (5001–5037)">
-    | Código | Descripción | Significado |
+<Accordion title="Внутренние ошибки API (5001–5037)">
+| Código | Descripción | Significado |
     | --- | -------- | ------- |
-    | `5001` | Missing Discord Id | Falta `discord_id`. Agrega el campo `discord_id` al cuerpo de la solicitud |
-    | `5002` | Missing Parameters | Faltan parámetros obligatorios. Revisa el cuerpo de la solicitud |
-    | `5003` | Invalid Version | Versión de API no válida. Usa `v1` o `v2` |
-    | `5004` | Invalid Param Name | Nombre de parámetro de consulta no válido |
-    | `5005` | Missing Command | Comando no proporcionado. Agrega el campo `command` al cuerpo de la solicitud |
-    | `5006` | Invalid Master Key | Clave maestra no válida. Contacta a un administrador |
-    | `5007` | Missing Token | Falta el token. Agrega el encabezado `Authorization: Bearer <token>` |
-    | `5008` | Invalid Token | El token no es válido o ha sido desactivado |
-    | `5009` | Forbidden | Sin acceso a este endpoint. Contacta a un administrador |
-    | `5010` | Api Version Forbidden | El acceso a esta versión de la API está prohibido para tu clave |
-    | `5011` | Query Param Forbidden | El acceso a los parámetros de consulta solicitados está prohibido |
-    | `5012` | Discord Id Not Found | ID de Discord no encontrado en la base de datos |
-    | `5013` | Token Not Found | Token no encontrado |
-    | `5014` | Token Not Found Or Deleted | Token no encontrado o ha sido eliminado |
-    | `5015` | Command Queue Full | La cola de comandos está llena. Inténtalo de nuevo más tarde |
-    | `5016` | Rate Limit Exceeded | Límite de solicitudes superado. Espera el reinicio (consulta `retry_after`) |
-    | `5017` | Internal Error | Error interno del servidor. El error ha sido registrado |
-    | `5018` | Server Error | Error al acceder a la API externa. Los datos pueden provenir de la caché |
-    | `5019` | Prc Api Error | Error de la API de PRC. Consulta el campo `prc_code` para el código de error de PRC |
-    | `5020` | Not Found | Endpoint no encontrado. Revisa la URL de la solicitud |
-    | `5021` | Webhook Url Already Exists | La URL del webhook ya existe |
-    | `5022` | Webhook Not Found | Webhook no encontrado |
-    | `5023` | Webhook Url Not Found | URL del webhook no encontrada |
-    | `5024` | Cache Expired | La caché está obsoleta y no disponible. Todas las fuentes de datos devolvieron un error |
-    | `5025` | Websocket Key Not Found | Clave de WebSocket no encontrada |
-    | `5026` | Invalid Subscription Channel | Canal de suscripción no válido |
-    | `5034` | Invalid Json | Formato JSON no válido en el cuerpo de la solicitud |
-    | `5035` | Missing Signature Headers | Faltan encabezados de firma (`X-Signature-Ed25519`, `X-Signature-Timestamp`) |
-    | `5036` | Timestamp Too Old | La marca de tiempo de la solicitud es demasiado antigua (más de 5 minutos) |
-    | `5037` | Invalid Signature | Firma de solicitud no válida |
+| `5001` | Falta la identificación de Discord | Falta `discord_id`. Agregue el campo `discord_id` al cuerpo de la solicitud |
+| `5002` | Parámetros faltantes | Faltan parámetros requeridos. Consulta el cuerpo de la solicitud |
+| `5003` | Versión no válida | Versión de API no válida. Utilice `v1` o `v2` |
+| `5004` | Nombre de parámetro no válido | Nombre de parámetro de consulta no válido |
+| `5005` | Comando faltante | El comando no fue enviado. Agregue el campo `command` al cuerpo de la solicitud |
+| `5006` | Clave maestra no válida | Clave maestra no válida. Póngase en contacto con su administrador |
+| `5007` | Ficha faltante | Falta ficha. Agregue el encabezado `Authorization: Bearer <токен>` |
+| `5008` | Token no válido | El token no es válido o está desactivado |
+| `5009` | Prohibido | No hay acceso a este punto final. Póngase en contacto con su administrador |
+| `5010` | Versión API prohibida | El acceso a esta versión API está prohibido para su clave |
+| `5011` | Parámetro de consulta prohibido | Se deniega el acceso a los parámetros de consulta solicitados |
+| `5012` | ID de discordia no encontrado | ID de Discord no encontrado en la base de datos |
+| `5013` | Token no encontrado | Ficha no encontrada |
+| `5014` | Token no encontrado o eliminado | El token no fue encontrado o fue eliminado |
+| `5015` | Cola de comandos llena | La cola de comandos está llena. Inténtalo de nuevo más tarde |
+| `5016` | Límite de tarifa excedido | Se superó el límite de solicitudes. Espere a que se reinicie (ver `retry_after`) |
+| `5017` | Error interno | Error Interno del Servidor. El error está registrado |
+| `5018` | Error del servidor | Error al acceder a la API externa. Los datos pueden ser del caché |
+| `5019` | Error de API de PRC | Error de la API de la República Popular China. Consulte el campo `prc_code` para conocer el código de error PRC |
+| `5020` | No encontrado | Punto final no encontrado. Verifique la URL de solicitud |
+| `5021` | La URL del webhook ya existe | La URL del webhook ya existe |
+| `5022` | Webhook no encontrado | Webhook no encontrado |
+| `5023` | URL del webhook no encontrada | URL del webhook no encontrada |
+| `5024` | Caché caducada | El caché está desactualizado y no está disponible. Todas las fuentes de datos arrojaron un error |
+| `5025` | Clave de Websocket no encontrada | Clave WebSocket no encontrada |
+| `5026` | Canal de suscripción no válido | Canal de suscripción no válido |
+| `5034` | Json no válido | Formato JSON no válido en el cuerpo de la solicitud |
+| `5035` | Encabezados de firma faltantes | Faltan encabezados de firma (`X-Signature-Ed25519`, `X-Signature-Timestamp`) |
+| `5036` | Marca de tiempo demasiado antigua | La marca de tiempo de la solicitud es demasiado antigua (más de 5 minutos) |
+| `5037` | Firma no válida | Firma de solicitud no válida |
   </Accordion>
 
-  <Accordion title="Errores del WebSocket Gateway (5101–5134)">
-    | Código | Descripción | Significado |
+<Accordion title="Ошибки WebSocket Gateway (5101–5134)">
+| Código | Descripción | Significado |
     | --- | -------- | ------- |
-    | `5101` | Invalid Message Format | Revisa el formato JSON y el campo `action` |
-    | `5102` | Token Required | Agrega el campo `token` al mensaje `auth` |
-    | `5107` | Not Authenticated | Envía un mensaje `auth` antes de otras acciones |
-    | `5108` | Invalid Token | Revisa tu token de WebSocket |
-    | `5109` | Connection Blocked | Contacta a un administrador |
-    | `5117` | Authentication Failed | Error interno. Inténtalo de nuevo más tarde |
-    | `5127` | Connected | Código informativo, no requiere acción |
-    | `5128` | Auth Success | Código informativo, no requiere acción |
-    | `5129` | Pong | Código informativo, no requiere acción |
-    | `5130` | Subscription Denied | Sin acceso a este canal de datos |
-    | `5131` | Subscribed | Código informativo, no requiere acción |
-    | `5132` | Unsubscribed | Código informativo, no requiere acción |
-    | `5133` | Cache Empty | Datos aún no cargados, por favor espera |
-    | `5134` | Empty Snapshot | La caché existe pero no hay datos para tus suscripciones |
+| `5101` | Formato de mensaje no válido | Verifique el formato JSON y el campo `action` |
+| `5102` | Token requerido | Agregar campo `token` al mensaje `auth` |
+| `5107` | No autenticado | Enviar mensaje `auth` antes de otras acciones |
+| `5108` | Token no válido | Verifique su token WebSocket |
+| `5109` | Conexión bloqueada | Póngase en contacto con su administrador |
+| `5117` | Error de autenticación | Error interno. Inténtalo de nuevo más tarde |
+| `5127` | Conectado | Código de información, no se requiere acción |
+| `5128` | Autenticación exitosa | Código de información, no se requiere acción |
+| `5129` | Pong | Código de información, no se requiere acción |
+| `5130` | Suscripción denegada | Sin derechos sobre este canal de datos |
+| `5131` | Suscrito | Código de información, no se requiere acción |
+| `5132` | Cancelar suscripción | Código de información, no se requiere acción |
+| `5133` | Caché vacía | Los datos aún no se han cargado, espere |
+| `5134` | Instantánea vacía | Hay caché, pero no hay datos para tus suscripciones |
   </Accordion>
 
-  <Accordion title="Errores de la API de Economía (6000–6021)">
-    | Código | Descripción | Significado |
+<Accordion title="Ошибки API Экономики (6000–6021)">
+| Código | Descripción | Significado |
     | --- | -------- | ------- |
-    | `6000` | Unknown Error Occurred | Revisa los registros, contacta a un administrador |
-    | `6001` | Database Error Occurred. Please Try Again Later. | Reintenta la solicitud después de unos segundos |
-    | `6002` | Invalid Amount Specified. | Revisa el formato de la cantidad (debe ser un número positivo) |
-    | `6003` | Invalid Or Missing Parameters. | Revisa los campos obligatorios en la solicitud |
-    | `6004` | Requested Resource Not Found. | Revisa el ID del recurso |
-    | `6005` | Internal Server Error Occurred. | Reintenta la solicitud más tarde |
-    | `6006` | Discord Operation Failed. | Revisa los permisos del bot en Discord |
-    | `6007` | Data Serialization Error. | Contacta a un administrador |
-    | `6008` | Guild Not Found | Revisa el `guildId` en los parámetros |
-    | `6009` | Discord Channel Not Found | Revisa el `channelId` en la solicitud |
-    | `6010` | Business Not Found | Revisa el `businessId` o `businessName` |
-    | `6011` | Mafia Not Found | Revisa el `mafiaId` o `mafiaName` |
-    | `6012` | Transaction Not Found | Revisa el `transactionId` |
-    | `6013` | Item Not Found | Revisa el `itemName` |
-    | `6014` | Request Not Found Or Expired | Revisa el `requestId` |
-    | `6015` | Duplicate Entry Found. | El recurso ya existe |
-    | `6016` | User Not Found | Revisa el `userId` |
-    | `6017` | Insufficient Funds | El usuario no tiene fondos suficientes |
-    | `6018` | Invalid Action Specified | Revisa el parámetro `action` |
-    | `6019` | Missing Required Fields | Completa todos los campos obligatorios |
-    | `6020` | Permission Denied | Revisa el token y los permisos de acceso |
-    | `6021` | Rate Limit Exceeded | Espera a que se reinicie el límite |
+| `6000` | Se produjo un error desconocido | Verifique los registros, comuníquese con el administrador |
+| `6001` | Se produjo un error en la base de datos. Vuelva a intentarlo más tarde. | Inténtelo de nuevo en unos segundos |
+| `6002` | Monto especificado no válido. | Consulta el formato del importe (debe ser un número positivo) |
+| `6003` | Parámetros no válidos o faltantes. | Verifique los campos obligatorios en la solicitud |
+| `6004` | Recurso solicitado no encontrado. | Verificar ID de recurso |
+| `6005` | Se produjo un error interno del servidor. | Inténtelo de nuevo más tarde |
+| `6006` | La operación de discordia falló. | Verifique los permisos de los bots en Discord |
+| `6007` | Error de serialización de datos. | Póngase en contacto con su administrador |
+| `6008` | Gremio no encontrado | Verifique `guildId` en parámetros |
+| `6009` | Canal de Discord no encontrado | Consulte `channelId` en Consulta |
+| `6010` | Negocio no encontrado | Echa un vistazo a `businessId` o `businessName` |
+| `6011` | Mafia no encontrada | Echa un vistazo a `mafiaId` o `mafiaName` |
+| `6012` | Transacción no encontrada | Echa un vistazo a `transactionId` |
+| `6013` | Artículo no encontrado | Echa un vistazo a `itemName` |
+| `6014` | Solicitud no encontrada o caducada | Echa un vistazo a `requestId` |
+| `6015` | Entrada duplicada encontrada. | El recurso ya existe |
+| `6016` | Usuario no encontrado | Echa un vistazo a `userId` |
+| `6017` | Fondos insuficientes | El usuario no tiene fondos suficientes |
+| `6018` | Acción no válida especificada | Verifique el parámetro `action` |
+| `6019` | Faltan campos obligatorios | Complete todos los campos obligatorios |
+| `6020` | Permiso denegado | Verificar token y permisos |
+| `6021` | Límite de tarifa excedido | Espere a que se restablezca el límite |
   </Accordion>
 </AccordionGroup>
 
-## Tabla de Errores de la API de ER:LC
+## ER:Tabla de errores de API LC
 
-Estos códigos de error pueden ser devueltos por la API externa de ER:LC al realizar solicitudes a los endpoints `*/erlc/*`.
+Estos códigos de error pueden devolverse desde la API ER:LC externa al realizar solicitudes a los puntos finales `*/erlc/*`.
 
 <AccordionGroup>
-  <Accordion title="Errores del Sistema (0, 1001, 1002)">
-    | Código | Significado |
-    | ------ | ----------- |
-    | `0`    | Ocurrió un error desconocido. Si el error persiste, contacta al soporte de ER:LC Rusia mediante un ticket (nos comunicaremos con el soporte de PRC si el error ocurre con frecuencia). |
-    | `1001` | Error de comunicación con Roblox o con el servidor privado dentro del juego. |
-    | `1002` | Ocurrió un error interno del sistema. |
+<Accordion title="Системные ошибки (0, 1001, 1002)">
+| Código | Significado |
+    | ------ | ------------------------------------------------------------------------ |
+| `0` | Se ha producido un error desconocido. Si el error persiste, comuníquese con el soporte de ER:LC Rusia a través de un ticket (nos comunicaremos con el soporte de la República Popular China si el error ocurre con frecuencia). |
+| `1001` | Error al conectarse a Roblox o al servidor privado del juego.              |
+| `1002` | Se ha producido un error interno del sistema.                                   |
   </Accordion>
 
-  <Accordion title="Errores de Autenticación (2000–2004)">
-    | Código | Significado |
-    | ------ | ----------- |
-    | `2000` | No proporcionaste una clave de servidor (server-key). |
-    | `2001` | Proporcionaste una clave de servidor en un formato no válido. |
-    | `2002` | Proporcionaste una clave de servidor no válida o vencida. |
-    | `2003` | Proporcionaste una clave de API global no válida. |
-    | `2004` | Tu clave de servidor tiene el acceso a la API bloqueado. |
+<Accordion title="Ошибки аутентификации (2000–2004)">
+| Código | Significado |
+    | ------ | ------------------------------------------------------------------------- |
+| `2000` | No proporcionaste la clave del servidor.                                            |
+| `2001` | Especificó la clave del servidor en el formato incorrecto.                                 |
+| `2002` | Proporcionó una clave de servidor no válida o caducada.                 |
+| `2003` | Proporcionó una clave API global no válida.                     |
+| `2004` | Su clave de servidor no puede acceder a la API.                            |
   </Accordion>
 
-  <Accordion title="Errores de Solicitud (3001–3002)">
-    | Código | Significado |
-    | ------ | ----------- |
-    | `3001` | No especificaste un comando válido en el cuerpo de la solicitud. |
-    | `3002` | El servidor al que intentas acceder está desconectado actualmente (sin jugadores). |
+<Accordion title="Ошибки запросов (3001–3002)">
+| Código | Significado |
+    | ------ | ------------------------------------------------------------------------- |
+| `3001` | No especificó el comando correcto en el cuerpo de la solicitud.                          |
+| `3002` | El servidor al que intentas acceder está inactivo actualmente (no hay jugadores). |
   </Accordion>
 
-  <Accordion title="Errores de Límite de Frecuencia y Acceso (4001–4003)">
-    | Código | Significado |
-    | ------ | ----------- |
-    | `4001` | Límite de frecuencia de solicitudes superado. |
-    | `4002` | El comando que intentas ejecutar está restringido. |
-    | `4003` | El mensaje que intentas enviar está prohibido. |
+<Accordion title="Ошибки лимитов и доступа (4001–4003)">
+| Código | Significado |
+    | ------ | ------------------------------------------------------------------------- |
+| `4001` | Se superó el límite de solicitudes.                                                  |
+| `4002` | El comando que intenta ejecutar es limitado.                      |
+| `4003` | El mensaje que intentas enviar está prohibido.                     |
   </Accordion>
 
-  <Accordion title="Códigos Especiales (9998, 9999)">
-    | Código | Significado |
-    | ------ | ----------- |
-    | `9998` | El recurso al que intentas acceder está restringido. |
-    | `9999` | El módulo en el servidor del juego está desactualizado. |
+<Accordion title="Специальные коды (9998, 9999)">
+| Código | Significado |
+    | ------ | ------------------------------------------------------------------------- |
+| `9998` | El recurso al que está accediendo es limitado.                             |
+| `9999` | El módulo del servidor del juego no está actualizado.                                  |
   </Accordion>
 </AccordionGroup>
 
-## Manejo del Código `0`
-Si encuentras un error con el código `0` (Error Desconocido) y persiste a lo largo de varias solicitudes consecutivas, crea un ticket en nuestro servidor de Discord. Adjunta los detalles de tu solicitud al ticket para que nuestro equipo pueda investigar el problema.
+## Código de procesamiento `0`
+Si detecta un error con el código `0` (Error desconocido) y se repite en varias solicitudes seguidas, cree un ticket en nuestro servidor de Discord. Adjunte los detalles de su solicitud a su solicitud para que nuestro equipo pueda descubrir cuál es el problema.

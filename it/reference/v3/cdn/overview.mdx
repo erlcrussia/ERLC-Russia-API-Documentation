@@ -1,0 +1,105 @@
+---
+title: Panoramica dell'API CDN V3
+description: Archiviazione di oggetti MinIO S3 con cache Edge distribuita. Edge fornisce file direttamente da MinIO; l'API
+  non ha endpoint di origine.
+icon: cloud
+---
+
+# Architettura CDN V3
+
+## Come funziona l'archiviazione
+
+Ogni asset è archiviato in MinIO sotto la chiave **`{domain}/{path}`**:
+
+| Parte fondamentale | Cos'è questo |
+|---|---|
+| `domain` | Organizzazione delle lumache; `default` - solo ER:LC Russia. Oppure un dominio personalizzato verificato dell'organizzazione |
+| `path` | Percorso file arbitrario, ad esempio `branding/logo.png` |
+
+Non esiste più un unico "prefisso di categoria": se un percorso viene specificato esplicitamente, viene utilizzato così com'è. Se il percorso non è specificato, viene generato automaticamente (in base all'estensione del file).
+
+## Organizzazione e accesso
+
+Prima di iniziare il lavoro, vincola la tua chiave all'organizzazione:
+
+```bash
+curl -X PUT https://api.erlcrussia.com/v3/cdn/team \
+  -H 'erlcrussia-api-key: YOUR_API_KEY' \
+  -H 'Content-Type: application/json' \
+  -d '{"teamId":"YOUR_TEAM_ID"}'
+```
+
+Il proprietario della chiave deve essere un proprietario, un amministratore o un membro di un'organizzazione con autorizzazione CDN. Ogni richiesta ricontrolla l'appartenenza. Senza un'associazione chiave, la richiesta viene rifiutata. Il valore `teamId` facoltativo nella query deve corrispondere all'associazione. I percorsi CDN pubblici non accettano una chiave master o un segreto interno al posto di una chiave utente; È richiesta la risoluzione V3.
+
+Su `cdn.erlcrussia.com`, un'organizzazione tipica riceve solo `/{slug}/...`. Slug contiene lettere latine minuscole, numeri, `_` e `-`. Root e `/erlcrussia/...` appartengono all'organizzazione principale ER:LC Russia. Inoltre, non può scrivere sui percorsi riservati di altre organizzazioni. Su un dominio personalizzato verificato di un'organizzazione sono disponibili percorsi arbitrari all'interno del relativo spazio dei nomi.
+
+Risorse, cartelle, statistiche e operazioni per ID sono limitate dall'organizzazione della chiave. La cartella dell'interfaccia non sostituisce la verifica del proprietario della risorsa.
+
+## Carica il flusso
+
+```
+UI → POST /v3/cdn/assets?path=branding/logo.png
+        заголовок: erlcrussia-api-key
+API  → объект в MinIO:  {domain}/{path}
+API  → запись в базу
+API  → асинхронно POST {EDGE}/v3/warm
+        заголовок: erlcrussia-api-edge-key
+        тело: { domain, path, mimeType, size, sha256, isPinned }
+EDGE → GET MinIO напрямую, кладёт файл на SSD
+```
+
+Non è necessario passare l'URL di download: edge stesso raccoglie la chiave da `domain` e `path`.
+
+## Leggi la discussione
+
+```
+Браузер → GET https://cdn.erlcrussia.com/{domain}/{path}
+EDGE:
+  HIT  → отдаёт файл с SSD (Range 206, ETag, 304)
+  MISS → GET MinIO/{domain}/{path} → отдаёт клиенту и асинхронно кладёт на SSD
+```
+
+L'API V3 non è coinvolta in questa catena. L'API non dispone di endpoint Origin; la consegna tramite API V3 non è fornita.
+
+## Memorizza il thread di svuotamento della cache
+
+```
+UI → POST /v3/cdn/assets/purge?domain=default&prefix=branding/
+API → POST {EDGE}/v3/purge?domain=default&prefix=branding/
+        заголовок: erlcrussia-api-edge-key
+EDGE → удаляет файлы с SSD и записи из SQLite
+Следующий запрос → MISS → edge сам тянет свежий файл из MinIO
+```
+
+## Cartelle e percorsi pubblici
+
+| Azione | Impatto sui file |
+|---|---|
+| Creazione di una cartella | no |
+| Rinominare una cartella | **no**, i file rimangono sui loro percorsi |
+| Elimina una cartella | **no**, i file rimangono e perdono la loro rilegatura |
+| `PATCH /cdn/assets` con `folderId` | solo raggruppamento nell'interfaccia utente |
+| `PATCH /cdn/assets` con `path` | trasferimento fisico di un oggetto a MinIO |
+
+## Autorizzazione
+
+| Titolo | Dove è accettato |
+|---|---|
+| `erlcrussia-api-key` | tutte le tratte pubbliche `/v3/cdn/*` |
+| `erlcrussia-api-master-key` | `/v3/admin/cdn/*` per interfaccia |
+| `erlcrussia-api-edge-key` | solo servizio `/v3/*` Go Edge, non utilizzato in V3 |
+
+La chiave viene trasmessa esclusivamente nell'intestazione. I parametri di query `?apiKey=` e `?token=` non sono supportati.
+
+## Convenzioni sui parametri di query
+
+| Parametro | Significato |
+|---|---|
+| `domain` | Spazio dei nomi. Slug di organizzazione chiave predefinito (`default` solo per ER:LC Russia) |
+| `ids` | Elenco degli ID separati da virgole |
+| `path` | Il percorso esatto all'interno dello spazio dei nomi |
+| `prefix` | Prefisso del percorso per il gruppo di file |
+| `folderId` | Cartella interfaccia: `root` - nessuna cartella, `all` - nessun filtro |
+| `page`, `limit` | Impaginazione elenco, `limit` massimo 100 |
+
+`pathEnabled` controlla il prefisso solo dei nuovi download senza un percorso esplicito. Le cartelle non spostano i file già scaricati. I domini personalizzati vengono gestiti tramite `/v3/cdn/custom-domains`; `/v3/cdn/domains` elenca lo spazio dei nomi con le risorse.

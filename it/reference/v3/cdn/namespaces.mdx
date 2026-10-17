@@ -1,0 +1,11 @@
+---
+title: Spazi dei nomi CDN
+description: Come scegliere uno spazio dei nomi dell'organizzazione o un dominio personalizzato da caricare.
+icon: folder-tree
+---
+
+La CDN generale utilizza lo spazio dei nomi dell'organizzazione: `https://cdn.erlcrussia.com/YOUR_TEAM_SLUG/path/file.png`. Nel dominio in più parti, passa YOUR_TEAM_SLUG. Lo spazio dei nomi root predefinito è disponibile solo per l'organizzazione primaria.
+
+Per un dominio personalizzato verificato, trasmetti il nome completo senza schema: domain=files.example.com. Il file sarà disponibile come `https://files.example.com/path/file.png`; questo è un oggetto separato dal file nello spazio dei nomi generale.
+
+L'associazione dei tasti viene eseguita tramite `PUT /v3/cdn/team`. La registrazione dello spazio dei nomi viene eseguita dal sistema di gestione dell'organizzazione e non dalla chiave principale dell'utente. L'aggiunta di un dominio personalizzato non richiede una configurazione Nginx separata: l'ingresso generale controlla l'host tramite il registro CDN.

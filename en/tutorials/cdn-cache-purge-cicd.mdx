@@ -1,0 +1,28 @@
+---
+title: CDN in CI/CD and cache reset
+description: Release publishing and spot cleaning of Cloudflare and Go Edge.
+icon: arrows-rotate
+---
+
+Release order: build with new RELEASE_ID, download files sequentially, check SHA-256 and HTTP, then switch HTML to new build. Save old chunks for open tabs. Store keys only in CI/CD secrets.
+
+## Verified custom domain
+
+Pass exact file paths in JSON paths, maximum 100. Do not use query prefix: this route does not support it. Missing or empty paths means the entire domain.
+
+```bash
+curl -X POST "$API_BASE/v3/cdn/webhook/purge" \
+  -H "erlcrussia-api-cdn-token: $CDN_DEPLOY_TOKEN" \
+  -H 'Content-Type: application/json' \
+  -d '{"paths":["releases/RELEASE_ID/logo.png"]}'
+```
+
+With a custom key, the same JSON is sent to `POST /v3/cdn/custom-domains/{id}/purge` via the erlcrussia-api-key header.
+
+The response contains success, domain, cloudflarePurged, edgePurged and timestamp. HTTP 200 does not guarantee success: success=false means an error at one or both levels. Check every flag. The browser cache is not cleared by this request.
+
+## Regular namespace and file groups
+
+`POST /v3/cdn/assets/purge?domain=YOUR_TEAM_SLUG&prefix=releases/RELEASE_ID/` accepts prefix and schedules Go Edge cleanup. This is a different contract. Without ids/path/prefix, the entire namespace is selected. success means acceptance of the operation; check subsequent delivery.
+
+The new release URL is more reliable than replacing the old immutable file. HTTP 429 requires waiting Retry-After/retry_after; HTTP 409 means an existing object, not a successful download.

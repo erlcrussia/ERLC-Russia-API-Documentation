@@ -1,0 +1,15 @@
+---
+title: Dominios CDN personalizados
+description: Registro, verificación de DNS/TLS y enrutamiento de solicitudes en Go Edge.
+icon: globe
+---
+
+1. Vincula la clave API a la organización a través de `PUT /v3/cdn/team`.
+2. Ejecute `POST /v3/cdn/custom-domains` con JSON `{ "domain": "files.example.com", "s3Backup": true }`. La respuesta 201 es un objeto de dominio sin un contenedor de éxito.
+3. Agregue registros DNS de verificación, ejecute `POST /v3/cdn/custom-domains/{id}/verify`. Echa un vistazo a isVerified, cnameVerified, cfStatus y cfSslStatus.
+4. El ingreso general guarda el Host y accede primero a Go Edge. Edge define un dominio CDN a través del registro API. Solo se envía a Redirect HTTP 421 para un dominio fuera del registro CDN; Los errores de CDN 403/404/502 permanecen en la CDN. No se requiere un bloque de servidor separado para cada dominio personalizado.
+5. Cargue el archivo a través de `POST /v3/cdn/assets` pasando dominio multiparte=files.example.com y ruta=images/logo.png. Abra `https://files.example.com/images/logo.png`.
+
+`GET /v3/cdn/custom-domains` devuelve una matriz. Todas estas operaciones, incluida la lectura, requieren administración de CDN. Está prohibido eliminar un dominio con activos. PATCH acepta originUrl y s3Backup; vacío originUrl desactiva el origen externo. El secreto deployHookToken está destinado a CI/CD del lado del servidor.
+
+Si el dominio HTTP 400 no está verificado, verifique qué servicio generó el HTML. Para HTTP 502, verifique el acceso de Edge a la API Go y al registro de dominio MinIO. No cambie isVerified manualmente para omitir la verificación.

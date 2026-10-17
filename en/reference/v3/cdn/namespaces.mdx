@@ -1,0 +1,11 @@
+---
+title: CDN namespaces
+description: How to choose an organization namespace or custom domain to upload.
+icon: folder-tree
+---
+
+The general CDN uses the organization's namespace: `https://cdn.erlcrussia.com/YOUR_TEAM_SLUG/path/file.png`. In multipart domain, pass YOUR_TEAM_SLUG. The root namespace default is available only to the primary organization.
+
+For a verified custom domain, pass the full name without a scheme: domain=files.example.com. The file will be available as `https://files.example.com/path/file.png`; this is a separate object from the file in the general namespace.
+
+Key binding is performed via `PUT /v3/cdn/team`. Namespace registration is performed by the organization management system, and not by the user's master key. Adding a custom domain does not require a separate Nginx config: the general ingress checks the Host through the CDN registry.

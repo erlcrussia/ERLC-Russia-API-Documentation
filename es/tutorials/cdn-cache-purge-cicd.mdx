@@ -1,0 +1,28 @@
+---
+title: CDN en CI/CD y restablecimiento de caché
+description: Publicación de lanzamientos y limpieza puntual de Cloudflare y Go Edge.
+icon: arrows-rotate
+---
+
+Orden de lanzamiento: compilar con el nuevo RELEASE_ID, descargar archivos secuencialmente, verificar SHA-256 y HTTP, luego cambiar HTML a una nueva compilación. Guarde fragmentos antiguos para pestañas abiertas. Almacene claves solo en secretos de CI/CD.
+
+## Dominio personalizado verificado
+
+Pase rutas de archivos exactas en rutas JSON, máximo 100. No utilice el prefijo de consulta: esta ruta no lo admite. Las rutas faltantes o vacías significan todo el dominio.
+
+```bash
+curl -X POST "$API_BASE/v3/cdn/webhook/purge" \
+  -H "erlcrussia-api-cdn-token: $CDN_DEPLOY_TOKEN" \
+  -H 'Content-Type: application/json' \
+  -d '{"paths":["releases/RELEASE_ID/logo.png"]}'
+```
+
+Con una clave personalizada, el mismo JSON se envía a `POST /v3/cdn/custom-domains/{id}/purge` a través del encabezado erlcrussia-api-key.
+
+La respuesta contiene éxito, dominio, cloudflarePurged, edgePurged y marca de tiempo. HTTP 200 no garantiza el éxito: Success=false significa un error en uno o ambos niveles. Revisa cada bandera. Esta solicitud no borra la memoria caché del navegador.
+
+## Espacio de nombres normal y grupos de archivos
+
+`POST /v3/cdn/assets/purge?domain=YOUR_TEAM_SLUG&prefix=releases/RELEASE_ID/` acepta prefijos y programa la limpieza de Go Edge. Este es un contrato diferente. Sin identificadores/ruta/prefijo, se selecciona todo el espacio de nombres. éxito significa aceptación de la operación; comprobar entrega posterior.
+
+La nueva URL de versión es más confiable que reemplazar el antiguo archivo inmutable. HTTP 429 requiere esperar Reintentar después/retry_after; HTTP 409 significa un objeto existente, no una descarga exitosa.

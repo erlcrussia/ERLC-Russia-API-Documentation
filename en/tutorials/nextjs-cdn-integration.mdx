@@ -1,0 +1,74 @@
+---
+title: "Next.js: serving static assets through the CDN"
+description: Build your app, upload _next/static through the V3 user API, and verify delivery from both CDN domains.
+icon: network-wired
+---
+
+The HTML and server code remain in Next.js. Only the content of `.next/static`, available as `_next/static`, is loaded onto the CDN. Files from `public` require separate URLs. The behavior of `assetPrefix` is described in [Next.js documentation](https://nextjs.org/docs/app/api-reference/config/next-config-js/assetPrefix).
+
+## 1. Select delivery address
+
+General CDN: `https://cdn.erlcrussia.com/YOUR_TEAM_SLUG/releases/RELEASE_ID`.
+Custom domain: `https://files.example.com/releases/RELEASE_ID` after registration, DNS/TLS check and Host routing in Go Edge.
+The API `domain` field takes the organization slug or a verified hostname, without a URL scheme or release prefix.
+
+## 2. Set up a production build
+
+```js next.config.js
+module.exports = {
+  assetPrefix: process.env.CDN_ASSET_PREFIX,
+};
+```
+
+```bash
+CDN_ASSET_PREFIX=https://cdn.erlcrussia.com/YOUR_TEAM_SLUG/releases/RELEASE_ID npm run build
+```
+
+Upload and run the same production build. After uploading the files, start Next.js with `npm run start` in your hosting environment. Set the custom domain in `CDN_ASSET_PREFIX` before building a release for that domain.
+
+## 3. Bind the user API key
+
+```bash
+curl -X PUT "$API_BASE/v3/cdn/team" \
+  -H "erlcrussia-api-key: $CDN_API_KEY" \
+  -H 'Content-Type: application/json' \
+  -d '{"teamId":"YOUR_TEAM_ID"}'
+```
+
+Set `API_BASE=https://api.erlcrussia.com`. User CDN routes require `erlcrussia-api-key`; they do not use a master key. Keep your key out of `NEXT_PUBLIC_*`, HTML, and application JavaScript.
+
+## 4. Upload files before launch
+
+For each file `.next/static/RELATIVE_PATH`, send a request with the path `releases/RELEASE_ID/_next/static/RELATIVE_PATH`:
+
+```bash
+curl -X POST "$API_BASE/v3/cdn/assets" \
+  -H "erlcrussia-api-key: $CDN_API_KEY" \
+  -F 'file=@.next/static/chunks/example.js;type=text/javascript' \
+  -F 'domain=YOUR_TEAM_SLUG' \
+  -F 'path=releases/RELEASE_ID/_next/static/chunks/example.js' \
+  -F 'compress=false'
+```
+
+For CSS use `text/css`, for fonts use MIME of the appropriate format. Do not set the generic `Content-Type: multipart/form-data` manually: the boundary is added by the client. `compress=false` saves bytes and SHA-256 assembly. For your own domain, replace `domain` with `files.example.com`.
+
+HTTP 200 returns `{ "success": true, "asset": { ... } }`. A busy explicit path returns 409; don't consider this a successful rewrite. Compare the SHA-256 of an existing asset or use a new RELEASE_ID. At 429, wait for `Retry-After`/`retry_after` and retry only the rejected request. Load sequentially, taking into account the overall limit, rather than hundreds of parallel requests.
+
+Don't download the entire `.next`: that's where the server code and configuration are. Publish source maps `.map` only if there is a conscious need. Keep old releases as long as open tabs use them.
+
+## 5. Pictures and other public files
+
+```html
+<img src="https://cdn.erlcrussia.com/YOUR_TEAM_SLUG/releases/RELEASE_ID/logo.png" alt="Логотип">
+<img src="https://files.example.com/releases/RELEASE_ID/logo.png" alt="Логотип">
+```
+
+The regular `img` requests the CDN directly. When using the `next/image` optimization, the browser can access the local `/_next/image`; this is a separate mechanism. `assetPrefix` does not port HTML, API, Server Actions and Next.js dynamic data to CDN.
+
+## 6. Check the result
+
+In Network, check JS/CSS/font domain, MIME, CORS and HTTP 200. Compare bytes to source files, then HEAD, Range (206) and conditional request by ETag (304). Click the interactive button: the presence of HTML does not prove the execution of JavaScript.
+
+The CDN serves files uploaded in advance. `originUrl` specifies a redirect destination for the domain root or a missing object, rather than a source for automatic downloads. Upload build files through the API before publishing the release.
+
+Paths starting with `_next/static/` are made immutable in Go Edge. If `_next` is preceded by a release prefix, the current implementation uses a normal Cache-Control; check the actual title. Resetting Go Edge does not clear the browser cache and does not itself confirm that Cloudflare has cleared it.

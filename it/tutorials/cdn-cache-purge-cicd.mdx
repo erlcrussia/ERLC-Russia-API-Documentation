@@ -1,0 +1,28 @@
+---
+title: CDN in CI/CD e ripristino della cache
+description: Pubblicazione dei rilasci e pulizia spot di Cloudflare e Go Edge.
+icon: arrows-rotate
+---
+
+Ordine di rilascio: crea con il nuovo RELEASE_ID, scarica i file in sequenza, controlla SHA-256 e HTTP, quindi cambia HTML nella nuova build. Salva i vecchi blocchi per le schede aperte. Archiviare le chiavi solo nei segreti CI/CD.
+
+## Dominio personalizzato verificato
+
+Passa percorsi di file esatti in percorsi JSON, massimo 100. Non utilizzare il prefisso della query: questo percorso non lo supporta. Per percorsi mancanti o vuoti si intende l'intero dominio.
+
+```bash
+curl -X POST "$API_BASE/v3/cdn/webhook/purge" \
+  -H "erlcrussia-api-cdn-token: $CDN_DEPLOY_TOKEN" \
+  -H 'Content-Type: application/json' \
+  -d '{"paths":["releases/RELEASE_ID/logo.png"]}'
+```
+
+Con una chiave personalizzata, lo stesso JSON viene inviato a `POST /v3/cdn/custom-domains/{id}/purge` tramite l'intestazione erlcrussia-api-key.
+
+La risposta contiene successo, dominio, cloudflarePurged, edgePurged e timestamp. HTTP 200 non garantisce il successo: success=false significa un errore a uno o entrambi i livelli. Controlla ogni bandiera. La cache del browser non viene cancellata da questa richiesta.
+
+## Spazio dei nomi e gruppi di file regolari
+
+`POST /v3/cdn/assets/purge?domain=YOUR_TEAM_SLUG&prefix=releases/RELEASE_ID/` accetta il prefisso e pianifica la pulizia Go Edge. Questo è un contratto diverso. Senza ID/percorso/prefisso, viene selezionato l'intero spazio dei nomi. il successo significa l'accettazione dell'operazione; verificare la consegna successiva.
+
+Il nuovo URL di rilascio è più affidabile rispetto alla sostituzione del vecchio file immutabile. HTTP 429 richiede l'attesa Retry-After/retry_after; HTTP 409 indica un oggetto esistente, non un download riuscito.

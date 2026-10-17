@@ -1,0 +1,15 @@
+---
+title: Кастомні CDN-домени
+description: Реєстрація, перевірка DNS/TLS та маршрутизація запитів на Go Edge.
+icon: globe
+---
+
+1. Прив'яжіть API-ключ до організації через `PUT /v3/cdn/team`.
+2. Виконайте `POST /v3/cdn/custom-domains` із JSON `{ "domain": "files.example.com", "s3Backup": true }`. Відповідь 201 - об'єкт домену без обгортки success.
+3. Додайте DNS-записи з verification, виконайте `POST /v3/cdn/custom-domains/{id}/verify`. Перевіряйте isVerified, cnameVerified, cfStatus та cfSslStatus.
+4. Загальний ingress зберігає Host і спочатку звертається до Go Edge. Edge визначає CDN-домен через реєстр API. Тільки HTTP 421 для домену поза CDN-реєстром направляється в Redirect; помилки CDN 403/404/502 залишаються у CDN. Окремий сервер блок для кожного кастомного домену не потрібен.
+5. Завантажте файл через `POST /v3/cdn/assets`, передавши multipart domain=files.example.com та path=images/logo.png. Відкрийте `https://files.example.com/images/logo.png`.
+
+`GET /v3/cdn/custom-domains` повертає масив. Для цих операцій, включаючи читання, потрібно CDN manage. Видалення домену з ассетами заборонено. PATCH приймає originUrl та s3Backup; порожній originUrl вимикає зовнішній origin. Секрет deployHookToken призначений для серверного CI/CD.
+
+Під час HTTP 400 Domain Not Verified перевірте, який сервіс сформував HTML. При HTTP 502 перевірте доступ Edge до реєстру доменів Go API та MinIO. Не змінюйте isVerified вручну для обходу перевірки.

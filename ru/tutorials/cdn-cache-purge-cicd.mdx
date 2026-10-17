@@ -1,0 +1,28 @@
+---
+title: "CDN в CI/CD и сброс кэша"
+description: "Публикация релиза и точечная очистка Cloudflare и Go Edge."
+icon: "arrows-rotate"
+---
+
+Порядок релиза: сборка с новым RELEASE_ID, последовательная загрузка файлов, проверка SHA-256 и HTTP, затем переключение HTML на новую сборку. Старые чанки сохраняйте для открытых вкладок. Ключи храните только в секретах CI/CD.
+
+## Подтверждённый кастомный домен
+
+Передайте точные пути файлов в JSON paths, максимум 100. Не используйте query prefix: этот маршрут его не поддерживает. Отсутствующий или пустой paths означает весь домен.
+
+```bash
+curl -X POST "$API_BASE/v3/cdn/webhook/purge" \
+  -H "erlcrussia-api-cdn-token: $CDN_DEPLOY_TOKEN" \
+  -H 'Content-Type: application/json' \
+  -d '{"paths":["releases/RELEASE_ID/logo.png"]}'
+```
+
+С пользовательским ключом тот же JSON отправляется в `POST /v3/cdn/custom-domains/{id}/purge` через заголовок erlcrussia-api-key.
+
+Ответ содержит success, domain, cloudflarePurged, edgePurged и timestamp. HTTP 200 не гарантирует успех: success=false означает ошибку одного или обоих уровней. Проверяйте каждый флаг. Браузерный кэш этим запросом не очищается.
+
+## Обычный namespace и группы файлов
+
+`POST /v3/cdn/assets/purge?domain=YOUR_TEAM_SLUG&prefix=releases/RELEASE_ID/` принимает prefix и планирует очистку Go Edge. Это другой контракт. Без ids/path/prefix выбирается весь namespace. success означает принятие операции; проверяйте последующую доставку.
+
+Новый URL релиза надёжнее замены старого immutable-файла. HTTP 429 требует ожидания Retry-After/retry_after; HTTP 409 означает существующий объект, а не успешную загрузку.

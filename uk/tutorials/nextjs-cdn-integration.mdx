@@ -1,0 +1,74 @@
+---
+title: "Next.js: підключення статики до CDN"
+description: Складання, завантаження _next/static через API V3 і перевірка обох CDN-доменів.
+icon: network-wired
+---
+
+HTML та серверний код залишаються в Next.js. На CDN завантажується лише вміст `.next/static`, доступний як `_next/static`. Файли `public` потребують окремих URL-адрес. Поведінка `assetPrefix` описана в [документації Next.js](https://nextjs.org/docs/app/api-reference/config/next-config-js/assetPrefix).
+
+## 1. Виберіть адресу доставки
+
+Спільний CDN: `https://cdn.erlcrussia.com/YOUR_TEAM_SLUG/releases/RELEASE_ID`.
+Кастомний домен: `https://files.example.com/releases/RELEASE_ID` після реєстрації, DNS/TLS-перевірки та маршрутизації Host у Go Edge.
+В API поле `domain` - це slug організації або підтверджене ім'я домену, без схеми та без префікса релізу.
+
+## 2. Налаштуйте production-складання
+
+```js next.config.js
+module.exports = {
+  assetPrefix: process.env.CDN_ASSET_PREFIX,
+};
+```
+
+```bash
+CDN_ASSET_PREFIX=https://cdn.erlcrussia.com/YOUR_TEAM_SLUG/releases/RELEASE_ID npm run build
+```
+
+Завантажуйте та запускайте ту саму production-збірку. Після завантаження файлів запустіть Next.js командою `npm run start` у своєму середовищі розміщення. Для власного домену вкажіть його адресу в `CDN_ASSET_PREFIX` перед збиранням.
+
+## 3. Прив'яжіть ключ користувача
+
+```bash
+curl -X PUT "$API_BASE/v3/cdn/team" \
+  -H "erlcrussia-api-key: $CDN_API_KEY" \
+  -H 'Content-Type: application/json' \
+  -d '{"teamId":"YOUR_TEAM_ID"}'
+```
+
+Задайте `API_BASE=https://api.erlcrussia.com`. Користувацькі CDN-маршрути потребують `erlcrussia-api-key`; майстер-ключ для них не використовується. Не розміщуйте ключ у `NEXT_PUBLIC_*`, HTML або JavaScript застосунку.
+
+## 4. Завантажте файли до запуску релізу
+
+Для кожного файлу `.next/static/RELATIVE_PATH` надішліть запит за допомогою `releases/RELEASE_ID/_next/static/RELATIVE_PATH`:
+
+```bash
+curl -X POST "$API_BASE/v3/cdn/assets" \
+  -H "erlcrussia-api-key: $CDN_API_KEY" \
+  -F 'file=@.next/static/chunks/example.js;type=text/javascript' \
+  -F 'domain=YOUR_TEAM_SLUG' \
+  -F 'path=releases/RELEASE_ID/_next/static/chunks/example.js' \
+  -F 'compress=false'
+```
+
+Для CSS використовуйте `text/css`, для шрифтів – MIME відповідного формату. Не ставте загальний `Content-Type: multipart/form-data` вручну: boundary додає клієнт. `compress=false` зберігає байти та SHA-256 збірки. Для власного домену замініть `domain` на `files.example.com`.
+
+HTTP 200 повертає `{ "success": true, "asset": { ... } }`. Зайнятий явний шлях дає 409; не вважайте це успішним перезаписом. Порівняйте SHA-256 існуючого ассета або використовуйте новий RELEASE_ID. При 429 чекайте на `Retry-After`/`retry_after` і повторюйте лише відхилений запит. Завантажуйте послідовно з урахуванням загального ліміту, а чи не сотнями паралельних запитів.
+
+Не завантажуйте всю `.next`: там є серверний код і конфігурація. Вихідні картки `.map` публікуйте лише за усвідомленої необхідності. Старі релізи зберігайте доти, доки їх використовують відкриті вкладки.
+
+## 5. Картинки та інші public-файли
+
+```html
+<img src="https://cdn.erlcrussia.com/YOUR_TEAM_SLUG/releases/RELEASE_ID/logo.png" alt="Логотип">
+<img src="https://files.example.com/releases/RELEASE_ID/logo.png" alt="Логотип">
+```
+
+Звичайний `img` запитує CDN безпосередньо. У разі використання оптимізації `next/image` браузер може звертатися до локального `/_next/image`; це окремий механізм. `assetPrefix` не переносить HTML, API, Server Actions та динамічні дані Next.js на CDN.
+
+## 6. Перевірте результат
+
+У Network перевірте домен JS/CSS/шрифтів, MIME, CORS та HTTP 200. Порівняйте байти з вихідними файлами, потім HEAD, Range (206) та умовний запит по ETag (304). Натисніть інтерактивну кнопку: наявність HTML ще не доводить виконання JavaScript.
+
+CDN доставляє заздалегідь завантажені файли. `originUrl` задає адресу перенаправлення для кореня домену або відсутнього об’єкта, а не джерело автоматичного завантаження. Завантажте файли збірки через API до публікації релізу.
+
+Шляхи, що починаються з `_next/static/`, отримують immutable у Go Edge. Якщо перед `_next` стоїть префікс релізу, поточна реалізація застосовує стандартний Cache-Control; перевіряйте фактичний заголовок. Скидання Go Edge не очищає браузерний кеш і не підтверджує очищення Cloudflare.

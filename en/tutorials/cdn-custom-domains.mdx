@@ -1,0 +1,15 @@
+---
+title: Custom CDN domains
+description: Registration, DNS/TLS checking and routing of requests on Go Edge.
+icon: globe
+---
+
+1. Link the API key to the organization via `PUT /v3/cdn/team`.
+2. Execute `POST /v3/cdn/custom-domains` with JSON `{ "domain": "files.example.com", "s3Backup": true }`. Response 201 is a domain object without a success wrapper.
+3. Add DNS records from verification, run `POST /v3/cdn/custom-domains/{id}/verify`. Check out isVerified, cnameVerified, cfStatus and cfSslStatus.
+4. The general ingress saves the Host and first accesses the Go Edge. Edge defines a CDN domain through the API registry. Only HTTP 421 for a domain outside the CDN registry is sent to Redirect; CDN errors 403/404/502 remain in the CDN. A separate server block for each custom domain is not required.
+5. Upload the file via `POST /v3/cdn/assets` by passing multipart domain=files.example.com and path=images/logo.png. Open `https://files.example.com/images/logo.png`.
+
+`GET /v3/cdn/custom-domains` returns an array. All of these operations, including reading, require CDN manage. Deleting a domain with assets is prohibited. PATCH accepts originUrl and s3Backup; empty originUrl disables external origin. The deployHookToken secret is intended for server-side CI/CD.
+
+If HTTP 400 Domain Not Verified, check which service generated the HTML. For HTTP 502, check Edge's access to the Go API and MinIO domain registry. Do not change isVerified manually to bypass the check.

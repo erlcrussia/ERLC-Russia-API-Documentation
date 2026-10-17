@@ -1,0 +1,39 @@
+---
+title: CDN V3 Integrations
+description: Direct URLs, Next.js and CI/CD with a verified organization domain.
+icon: cloud
+---
+
+## Select integration method
+
+| Script | Method |
+|---|---|
+| Pictures, documents, videos | Download via `POST /v3/cdn/assets`, use public URL |
+| Next.js | `assetPrefix` and loading only `.next/static` before launch |
+| Plain HTML/CSS | Full CDN URLs in `src`, `href` and `url()` |
+| Server import | `POST /v3/cdn/assets/external`; public HTTP(S) source is verified against SSRF |
+| Your domain | `POST /v3/cdn/custom-domains`, DNS/TLS, verify and Host routing in Go Edge |
+| CI/CD | New release prefix; if necessary, purge only your own prefix |
+
+Control API calls are made on the server with `erlcrussia-api-key`. Public delivery of key files does not require a key. The organization must have a CDN namespace, the key must be associated with it, and its owner must have CDN access.
+
+On a common domain, the URL looks like `https://cdn.erlcrussia.com/YOUR_TEAM_SLUG/images/logo.png`; MinIO key - `YOUR_TEAM_SLUG/images/logo.png`. On your domain URL - `https://files.example.com/images/logo.png`; MinIO key - `files.example.com/images/logo.png`. Simply changing the hostname does not make a different namespace file available: upload it to the desired domain.
+
+## Folders and paths
+
+`folderId` groups files in the interface. `pathEnabled=true` adds slug folders only when downloading without an explicit path. `false` leaves the regular group. Renaming a folder does not change the old URLs. An explicitly busy URL returns 409.
+
+## Cache and errors
+
+Go Edge reads MinIO and warms up the SSD. `X-Cache` describes Go Edge; `CF-Cache-Status` - Cloudflare. A successful purge means acceptance of the operation, so please check the delivery separately. Use immutable release names, do not replace the contents of the old hashed chunk.
+
+The custom-domains list returns an array without a success wrapper. GET assets with path returns asset, and a regular list returns assets, pagination and stats. Missing key: 401/5007, no access: 403/5009, busy path: 409/5135, limit: 429/5016.
+
+All custom domains use a common ingress cname.erlcrussia.com. Go Edge checks the Host in the CDN registry: the registered CDN domain is served there; HTTP 421 for others Host sends the request to Redirect. A separate config for each domain is not needed. If the registry is unavailable, the request ends with 502 rather than being sent to another service.
+
+See [Next.js](/en/tutorials/nextjs-cdn-integration), [custom domains](/en/tutorials/cdn-custom-domains), [CI/CD and purge](/en/tutorials/cdn-cache-purge-cicd).
+
+
+Unregistered and unverified custom Hosts return 421 and pass through the shared Nginx ingress to the Redirect unbound-domain page. Registry failures return 502; a missing file on a verified CDN domain remains a CDN error.
+
+[Private files and library](/en/other/user-assets).

@@ -1,0 +1,31 @@
+---
+title: Estadísticas del servidor universal
+openapi: /es/openapi/es-api-v3-openapi.yaml GET /stats
+keywords:
+- stats
+- estadísticas
+- en línea
+- participantes
+- robots
+- playercount
+icon: chart-line
+---
+
+## Compatibilidad de métricas y servidores
+
+API V3 admite la selección de múltiples servidores y métricas. Cada servidor tiene su propio conjunto de datos:
+
+| Servidor | Descripción del servidor | `membercount` (en línea) | `allmembercount` (total) | `botcount` (robots) | `playercount` (ER:LC) |
+| :--- | :--- | :---: | :---: | :---: | :---: |
+| **PRM** | Juego de rol de Moscú (proyecto principal) | ✅ | ✅ | ✅ | ✅ |
+| **MDV** | Ministerio del Interior | ✅ | ✅ | ✅ | ❌ |
+| **FSB** | Servicio Federal de Seguridad | ✅ | ✅ | ✅ | ❌ |
+| **MCHS** | Ministerio de Situaciones de Emergencia de Rusia | ✅ | ✅ | ✅ | ❌ |
+| **MZ** | Ministerio de Salud | ✅ | ✅ | ✅ | ❌ |
+| **112** | Servicio de llamadas de emergencia 112 | ✅ | ✅ | ✅ | ❌ |
+| **PUNTO** | Departamento de Transporte | ✅ | ❌ | ❌ | ❌ |
+
+<Warning>
+**Tenga en cuenta:**
+La métrica `playercount` refleja la cantidad de jugadores en el servidor ER:LC y está disponible **solo** para el servidor `MRP`. Si intenta solicitar `playercount` para cualquier otro servidor, se devolverá el error `400 Bad Request`.
+</Warning>

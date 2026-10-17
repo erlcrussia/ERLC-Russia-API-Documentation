@@ -1,0 +1,41 @@
+---
+title: 'API V3: inizio integrazione'
+description: Autorizzazione, formati di risposta e selezione del percorso personalizzato.
+icon: code
+---
+
+URL di base dell’API: `https://api.erlcrussia.com/v3`.
+
+## Autorizzazione
+
+L'integrazione del server passa la chiave utente a `erlcrussia-api-key`. La gestione della CDN e dei reindirizzamenti richiede il collegamento di una chiave a un'organizzazione e l'autorizzazione del proprietario della chiave al servizio corrispondente. Le chiavi segrete non vengono inserite nel JavaScript del browser. Il profilo dell'utente e i percorsi di sottoscrizione utilizzano la sessione erlc_auth e i webhook PRC in entrata utilizzano la firma.
+
+## Selezione del percorso
+
+| Problema | Itinerario |
+|---|---|
+| Stato del server di gioco | `GET /erlc/server` |
+| Collegamenti Discord/Roblox | `GET /users`, `POST /users` |
+| File e cartelle organizzative | `/cdn/assets`, `/cdn/folders` |
+| Domini CDN personalizzati | `/cdn/custom-domains` |
+| Reindirizzamenti dell'organizzazione | `/teams/{teamId}/redirects` |
+| Chiavi proprietarie | `GET /keys?api=true` |
+| Stato del servizio | `GET /health` |
+
+## Formati di risposta
+
+L'API non dispone ancora di un singolo wrapper. Gli utenti GET con un singolo discordId restituiscono `{ "robloxId": "123456789" }`; I parametri plurale e POST restituiscono un array di coppie. Una singola connessione non trovata dà 404, un batch vuoto dà 200 e []. Passa gli ID nelle stringhe e abbina i batch per ID, non per posizione.
+
+GET cdn/assets restituisce risorse, impaginazione e statistiche. Il percorso esatto senza ID/prefisso restituisce l'asset. GET cdn/custom-domains restituisce un array senza successo. GET chiavi restituisce un array per un tipo e un oggetto API/websocket per due tipi. Il campo delle restrizioni non rappresenta una politica di accesso completamente efficace.
+
+GET chiavi restituisce i valori della chiave segreta del proprietario, inclusi gli altri suoi server. Utilizzarlo solo in un ambiente server attendibile e non registrare la risposta. Associare una chiave a un'organizzazione non deve essere considerata una limitazione su tutte le altre risorse del proprietario.
+
+## Errori e richieste ripetute
+
+I principali campi di errore sono codice e messaggio; ulteriori errori, dettagli e retry_after dipendono dal motivo. A 429, considera Retry-After e retry_after. CDN, utenti e chiavi hanno attualmente un limite totale di 20 richieste al minuto per chiave. Il contatore è comune ai metodi, quindi include anche i controlli sull'esistenza dei file.
+
+Il caricamento di una CDN restituisce 200. La ripetizione di un percorso esplicito occupato restituisce 409 e non sovrascrive l'oggetto. Per le versioni utilizzare il nuovo prefisso; Non ripetere ciecamente l'operazione di modifica dopo un guasto della rete. L'eliminazione è pianificata in modo asincrono: il successo non conferma il completamento dell'eliminazione di tutti i livelli della cache.
+
+L'integrità di GET può restituire 200 con status=degraded se c'è un problema con Redis o con la cache del gioco; un database inaccessibile fornisce 503. Controlla contemporaneamente lo stato HTTP e JSON.
+
+Vedi [Integrazioni CDN](/en/other/cdn-integration) e [Next.js e CDN](/en/tutorials/nextjs-cdn-integration). I campi JSON, le intestazioni HTTP e i valori di esempio non vengono tradotti per preservare il contratto.

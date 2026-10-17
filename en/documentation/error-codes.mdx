@@ -1,12 +1,13 @@
 ---
-title: "Error Codes"
-description: "When the ER:LC Russia API rejects a request, it returns a JSON response with an error code. This page helps you quickly understand what went wrong and how your service can fix it."
-icon: "triangle-exclamation"
+title: Error Codes
+description: If the ER:LC Russia API rejects the request, it returns a JSON response with an error code. On this page you
+  can easily understand what exactly went wrong and how your service can fix it.
+icon: triangle-exclamation
 ---
 
 ### Error Response Format
 
-All errors are returned in JSON format with `code` and `message` fields.
+All errors are returned in JSON format with fields `code` and `message`.
 
 **For example:**
 ```json
@@ -16,136 +17,136 @@ All errors are returned in JSON format with `code` and `message` fields.
 }
 ```
 
-## ER:LC Russia API Error Table
+## API Error Table ER:LC Russia
 
 <AccordionGroup>
-  <Accordion title="Internal API Errors (5001–5037)">
-    | Code | Description | Meaning |
+<Accordion title="Внутренние ошибки API (5001–5037)">
+| Code | Description | Meaning |
     | --- | -------- | ------- |
-    | `5001` | Missing Discord Id | `discord_id` is missing. Add the `discord_id` field to the request body |
-    | `5002` | Missing Parameters | Required parameters are missing. Check the request body |
-    | `5003` | Invalid Version | Invalid API version. Use `v1` or `v2` |
-    | `5004` | Invalid Param Name | Invalid query parameter name |
-    | `5005` | Missing Command | Command not provided. Add the `command` field to the request body |
-    | `5006` | Invalid Master Key | Invalid master key. Contact an administrator |
-    | `5007` | Missing Token | Token is missing. Add the `Authorization: Bearer <token>` header |
-    | `5008` | Invalid Token | Token is invalid or deactivated |
-    | `5009` | Forbidden | No access to this endpoint. Contact an administrator |
-    | `5010` | Api Version Forbidden | Access to this API version is forbidden for your key |
-    | `5011` | Query Param Forbidden | Access to the requested query parameters is forbidden |
-    | `5012` | Discord Id Not Found | Discord ID not found in the database |
-    | `5013` | Token Not Found | Token not found |
-    | `5014` | Token Not Found Or Deleted | Token not found or has been deleted |
-    | `5015` | Command Queue Full | Command queue is full. Try again later |
-    | `5016` | Rate Limit Exceeded | Request limit exceeded. Wait for reset (see `retry_after`) |
-    | `5017` | Internal Error | Internal server error. The error is logged |
-    | `5018` | Server Error | Error when accessing the external API. Data may be from cache |
-    | `5019` | Prc Api Error | Error from PRC API. See the `prc_code` field for the PRC error code |
-    | `5020` | Not Found | Endpoint not found. Check the request URL |
-    | `5021` | Webhook Url Already Exists | Webhook URL already exists |
-    | `5022` | Webhook Not Found | Webhook not found |
-    | `5023` | Webhook Url Not Found | Webhook URL not found |
-    | `5024` | Cache Expired | Cache is stale and unavailable. All data sources returned an error |
-    | `5025` | Websocket Key Not Found | WebSocket key not found |
-    | `5026` | Invalid Subscription Channel | Invalid subscription channel |
-    | `5034` | Invalid Json | Invalid JSON format in the request body |
-    | `5035` | Missing Signature Headers | Signature headers missing (`X-Signature-Ed25519`, `X-Signature-Timestamp`) |
-    | `5036` | Timestamp Too Old | Request timestamp is too old (more than 5 minutes) |
-    | `5037` | Invalid Signature | Invalid request signature |
+| `5001` | Missing Discord Id | `discord_id` is missing. Add the `discord_id` field to the request body |
+| `5002` | Missing Parameters | Required parameters are missing. Check the request body |
+| `5003` | Invalid Version | Invalid API version. Use `v1` or `v2` |
+| `5004` | Invalid Param Name | Invalid query parameter name |
+| `5005` | Missing Command | The command was not sent. Add the `command` field to the request body |
+| `5006` | Invalid Master Key | Invalid master key. Contact your administrator |
+| `5007` | Missing Token | Token missing. Add the header `Authorization: Bearer <токен>` |
+| `5008` | Invalid Token | Token is invalid or deactivated |
+| `5009` | Forbidden | There is no access to this endpoint. Contact your administrator |
+| `5010` | API Version Forbidden | Access to this API version is prohibited for your key |
+| `5011` | Query Param Forbidden | Access to the requested query parameters is denied |
+| `5012` | Discord Id Not Found | Discord ID not found in database |
+| `5013` | Token Not Found | Token not found |
+| `5014` | Token Not Found Or Deleted | The token was not found or was deleted |
+| `5015` | Command Queue Full | The command queue is full. Try again later |
+| `5016` | Rate Limit Exceeded | Request limit exceeded. Wait for reset (see `retry_after`) |
+| `5017` | Internal Error | Internal Server Error. The error is logged |
+| `5018` | Server Error | Error when accessing external API. Data may be from cache |
+| `5019` | Prc Api Error | Error from PRC API. See field `prc_code` for PRC error code |
+| `5020` | Not Found | Endpoint not found. Check the request URL |
+| `5021` | Webhook Url Already Exists | Webhook URL already exists |
+| `5022` | Webhook Not Found | Webhook not found |
+| `5023` | Webhook Url Not Found | Webhook URL not found |
+| `5024` | Cache Expired | The cache is out of date and unavailable. All data sources returned an error |
+| `5025` | Websocket Key Not Found | WebSocket key not found |
+| `5026` | Invalid Subscription Channel | Invalid subscription channel |
+| `5034` | Invalid Json | Invalid JSON format in request body |
+| `5035` | Missing Signature Headers | Signature headers are missing (`X-Signature-Ed25519`, `X-Signature-Timestamp`) |
+| `5036` | Timestamp Too Old | Request timestamp is too old (more than 5 minutes) |
+| `5037` | Invalid Signature | Invalid request signature |
   </Accordion>
 
-  <Accordion title="WebSocket Gateway Errors (5101–5134)">
-    | Code | Description | Meaning |
+<Accordion title="Ошибки WebSocket Gateway (5101–5134)">
+| Code | Description | Meaning |
     | --- | -------- | ------- |
-    | `5101` | Invalid Message Format | Check the JSON format and `action` field |
-    | `5102` | Token Required | Add the `token` field to the `auth` message |
-    | `5107` | Not Authenticated | Send an `auth` message before other actions |
-    | `5108` | Invalid Token | Check your WebSocket token |
-    | `5109` | Connection Blocked | Contact an administrator |
-    | `5117` | Authentication Failed | Internal error. Try again later |
-    | `5127` | Connected | Informational code, no action required |
-    | `5128` | Auth Success | Informational code, no action required |
-    | `5129` | Pong | Informational code, no action required |
-    | `5130` | Subscription Denied | No access to this data channel |
-    | `5131` | Subscribed | Informational code, no action required |
-    | `5132` | Unsubscribed | Informational code, no action required |
-    | `5133` | Cache Empty | Data not yet loaded, please wait |
-    | `5134` | Empty Snapshot | Cache exists but no data for your subscriptions |
+| `5101` | Invalid Message Format | Check the JSON format and field `action` |
+| `5102` | Token Required | Add field `token` to message `auth` |
+| `5107` | Not Authenticated | Send message `auth` before other actions |
+| `5108` | Invalid Token | Check your WebSocket token |
+| `5109` | Connection Blocked | Contact your administrator |
+| `5117` | Authentication Failed | Internal error. Try again later |
+| `5127` | Connected | Information code, no action required |
+| `5128` | Auth Success | Information code, no action required |
+| `5129` | Pong | Information code, no action required |
+| `5130` | Subscription Denied | No rights to this data channel |
+| `5131` | Subscribed | Information code, no action required |
+| `5132` | Unsubscribed | Information code, no action required |
+| `5133` | Cache Empty | Data has not been loaded yet, please wait |
+| `5134` | Empty Snapshot | There is cache, but there is no data for your subscriptions |
   </Accordion>
 
-  <Accordion title="Economy API Errors (6000–6021)">
-    | Code | Description | Meaning |
+<Accordion title="Ошибки API Экономики (6000–6021)">
+| Code | Description | Meaning |
     | --- | -------- | ------- |
-    | `6000` | Unknown Error Occurred | Check logs, contact an administrator |
-    | `6001` | Database Error Occurred. Please Try Again Later. | Retry the request after a few seconds |
-    | `6002` | Invalid Amount Specified. | Check the amount format (must be a positive number) |
-    | `6003` | Invalid Or Missing Parameters. | Check required fields in the request |
-    | `6004` | Requested Resource Not Found. | Check the resource ID |
-    | `6005` | Internal Server Error Occurred. | Retry the request later |
-    | `6006` | Discord Operation Failed. | Check the bot's permissions in Discord |
-    | `6007` | Data Serialization Error. | Contact an administrator |
-    | `6008` | Guild Not Found | Check the `guildId` in parameters |
-    | `6009` | Discord Channel Not Found | Check the `channelId` in the request |
-    | `6010` | Business Not Found | Check the `businessId` or `businessName` |
-    | `6011` | Mafia Not Found | Check the `mafiaId` or `mafiaName` |
-    | `6012` | Transaction Not Found | Check the `transactionId` |
-    | `6013` | Item Not Found | Check the `itemName` |
-    | `6014` | Request Not Found Or Expired | Check the `requestId` |
-    | `6015` | Duplicate Entry Found. | Resource already exists |
-    | `6016` | User Not Found | Check the `userId` |
-    | `6017` | Insufficient Funds | User has insufficient funds |
-    | `6018` | Invalid Action Specified | Check the `action` parameter |
-    | `6019` | Missing Required Fields | Fill in all required fields |
-    | `6020` | Permission Denied | Check the token and access permissions |
-    | `6021` | Rate Limit Exceeded | Wait for the limit to reset |
+| `6000` | Unknown Error Occurred | Check the logs, contact the administrator |
+| `6001` | Database Error Occurred. Please Try Again Later. | Please try again in a few seconds |
+| `6002` | Invalid Amount Specified. | Check the format of the amount (must be a positive number) |
+| `6003` | Invalid Or Missing Parameters. | Check required fields in request |
+| `6004` | Requested Resource Not Found. | Check Resource ID |
+| `6005` | Internal Server Error Occurred. | Please try again later |
+| `6006` | Discord Operation Failed. | Check bot permissions on Discord |
+| `6007` | Data Serialization Error. | Contact your administrator |
+| `6008` | Guild Not Found | Check `guildId` in parameters |
+| `6009` | Discord Channel Not Found | Check out `channelId` in Query |
+| `6010` | Business Not Found | Check out `businessId` or `businessName` |
+| `6011` | Mafia Not Found | Check out `mafiaId` or `mafiaName` |
+| `6012` | Transaction Not Found | Check out `transactionId` |
+| `6013` | Item Not Found | Check out `itemName` |
+| `6014` | Request Not Found Or Expired | Check out `requestId` |
+| `6015` | Duplicate Entry Found. | The resource already exists |
+| `6016` | User Not Found | Check out `userId` |
+| `6017` | Insufficient Funds | User has insufficient funds |
+| `6018` | Invalid Action Specified | Check parameter `action` |
+| `6019` | Missing Required Fields | Fill in all required fields |
+| `6020` | Permission Denied | Check token and permissions |
+| `6021` | Rate Limit Exceeded | Wait for the limit to reset |
   </Accordion>
 </AccordionGroup>
 
 ## ER:LC API Error Table
 
-These error codes may be returned from the external ER:LC API when requesting `*/erlc/*` endpoints.
+These error codes may be returned from the external ER:LC API when making requests to the `*/erlc/*` endpoints.
 
 <AccordionGroup>
-  <Accordion title="System Errors (0, 1001, 1002)">
-    | Code    | Meaning                                                                 |
+<Accordion title="Системные ошибки (0, 1001, 1002)">
+| Code | Meaning |
     | ------ | ------------------------------------------------------------------------ |
-    | `0`    | An unknown error occurred. If the error persists, contact ER:LC Russia support via a ticket (we will reach out to PRC support if the error occurs frequently). |
-    | `1001` | Communication error with Roblox or the in-game private server.              |
-    | `1002` | An internal system error occurred.                                   |
+| `0` | An unknown error has occurred. If the error persists, contact ER:LC Russia support via a ticket (we will contact PRC support if the error occurs frequently). |
+| `1001` | Error connecting to Roblox or in-game private server.              |
+| `1002` | An internal system error has occurred.                                   |
   </Accordion>
 
-  <Accordion title="Authentication Errors (2000–2004)">
-    | Code    | Meaning                                                                  |
+<Accordion title="Ошибки аутентификации (2000–2004)">
+| Code | Meaning |
     | ------ | ------------------------------------------------------------------------- |
-    | `2000` | You did not provide a server-key.                                            |
-    | `2001` | You provided a server-key in an invalid format.                                 |
-    | `2002` | You provided an invalid or expired server-key.                 |
-    | `2003` | You provided an invalid global API key.                     |
-    | `2004` | Your server-key is blocked from API access.                            |
+| `2000` | You did not provide server-key.                                            |
+| `2001` | You specified server-key in the wrong format.                                 |
+| `2002` | You provided an invalid or expired server-key.                 |
+| `2003` | You provided an invalid global API key.                     |
+| `2004` | Your server-key is blocked from accessing the API.                            |
   </Accordion>
 
-  <Accordion title="Request Errors (3001–3002)">
-    | Code    | Meaning                                                                  |
+<Accordion title="Ошибки запросов (3001–3002)">
+| Code | Meaning |
     | ------ | ------------------------------------------------------------------------- |
-    | `3001` | You did not specify a valid command in the request body.                          |
-    | `3002` | The server you are trying to reach is currently offline (no players). |
+| `3001` | You did not specify the correct command in the request body.                          |
+| `3002` | The server you are trying to access is currently down (no players). |
   </Accordion>
 
-  <Accordion title="Rate Limit and Access Errors (4001–4003)">
-    | Code    | Meaning                                                                  |
+<Accordion title="Ошибки лимитов и доступа (4001–4003)">
+| Code | Meaning |
     | ------ | ------------------------------------------------------------------------- |
-    | `4001` | Request rate limit exceeded.                                                  |
-    | `4002` | The command you are trying to execute is restricted.                      |
-    | `4003` | The message you are trying to send is prohibited.                     |
+| `4001` | Request limit exceeded.                                                  |
+| `4002` | The command you are trying to execute is limited.                      |
+| `4003` | The message you are trying to send is prohibited.                     |
   </Accordion>
 
-  <Accordion title="Special Codes (9998, 9999)">
-    | Code    | Meaning                                                                  |
+<Accordion title="Специальные коды (9998, 9999)">
+| Code | Meaning |
     | ------ | ------------------------------------------------------------------------- |
-    | `9998` | The resource you are accessing is restricted.                             |
-    | `9999` | The module on the in-game server is outdated.                                  |
+| `9998` | The resource you are accessing is limited.                             |
+| `9999` | The module on the in-game server is out of date.                                  |
   </Accordion>
 </AccordionGroup>
 
-## Handling Code `0`
-If you encounter an error with code `0` (Unknown Error) and it persists across multiple consecutive requests, create a ticket on our Discord server. Attach details of your request to the ticket so our team can investigate the issue.
+## Processing Code `0`
+If you catch an error with code `0` (Unknown Error) and it repeats on several requests in a row, create a ticket on our Discord server. Attach the details of your request to your request so that our team can figure out what the problem is.

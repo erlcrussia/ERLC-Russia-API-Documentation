@@ -1,84 +1,51 @@
 ---
-title: "Rate Limits"
-description: "The ER:LC Russia API uses request rate limits to protect our servers from overload and ensure stable operation for everyone. Understanding how these limits work and how to handle them properly is essential for building a reliable integration."
-icon: "gauge-high"
+title: Request limits
+description: Current windows, shared counters, headers, and HTTP 429 handling.
+icon: gauge-high
 ---
 
-## Limits Table
+Limits may change and may differ by IP address and API key. The table lists baseline values; response headers describe the limits applied to your requests. Follow `X-RateLimit-Limit`, `X-RateLimit-Remaining`, `X-RateLimit-Reset`, and `Retry-After`.
 
-| Endpoints | Limit | Description |
-| --------- | ----- | -------- |
-| `/v1/*` | **120 requests/min** | All API V1 endpoints |
-| `/v2/*` | **120 requests/min** | All API V2 endpoints |
-| `/v1/*/stats/*` | **20 requests/min** | Stats API V1 |
-| `/v2/*/stats/*` | **40/120 requests/min** | Stats API V2 (without token / with token) |
+## Standard routes
 
-### Rate Limit Exceeded Response Example
+| Group | Limit |
+|---|---|
+| `/v3/cdn/*`, `/v3/users`, `/v3/keys`, `/v3/points/*`, `/v3/health` | 20 requests per minute |
+| `/v3/erlc/*`, `/v3/civops/*`, `/v3/subscriptions/*`, `/v3/admin/*` | 120 requests per minute |
+| `/v3/stats` without an API key | 40 requests per minute |
+| `/v3/stats` with an API key | 120 requests per minute |
+| `/v3/ai/*`, `/v1/chat*`, `/v1/models*`, `/v1/audio/*` | 120 requests per second |
+
+Standard routes share a counter per key across methods and routes; requests without credentials use the IP address. AI has a separate one-second window. Checking a file with GET and uploading it with POST count as separate requests. Stop sending requests when limited, then retry only the rejected request after the specified wait.
+
+## Authorization
+
+OAuth login and callbacks, and session/init: 10 requests per minute per signed visitor or verified session. Other user auth routes allow 250 requests per session or 60 per anonymous visitor.
+
+Anonymous requests also have a shared IP limit: 120 per minute for login and 240 for other auth routes. A visitor is identified by the signed HttpOnly cookie erlc_auth_visitor. The window resets at the start of each calendar minute. These auth routes do not use the standard limiter's five-minute ban.
+
+## Headers and the 429 response
+
+| Header | Value |
+|---|---|
+| `X-RateLimit-Limit` | Limit for the current window |
+| `X-RateLimit-Remaining` | Requests remaining |
+| `X-RateLimit-Reset` | Unix timestamp in milliseconds |
+| `Retry-After` | Seconds to wait after a 429 response |
 
 ```json
 {
   "code": 5016,
   "message": "Rate Limit Exceeded",
-  "retry_after": 45,
-  "details": {
-    "limit": 120,
-    "count": 125,
-    "excess": 5,
-    "reset_at": 1740339600000
-  }
+  "retry_after": 30,
+  "details": {"limit": 20, "count": 21, "excess": 1, "reset_at": 1792083600000}
 }
 ```
 
-## Rate Limit Headers
+The auth limiter omits details. A spam ban from the standard middleware returns code=5039, message=spam_blocked, blocked_until, and remaining_seconds. Standard windows have a threshold of 400 excess requests and a base ban of five minutes; AI uses a threshold of 200 excess requests per second.
 
-The API returns rate limit information headers in **every response**:
+Rate limiting does not make mutations idempotent. After a network interruption, inspect the resource before retrying. An explicit CDN path conflict returns 409; it is neither a 429 response nor confirmation of a successful overwrite.
 
-| Header | Example Value | Description |
-| --------- | --------------- | -------- |
-| `X-RateLimit-Limit` | 120 | Maximum number of requests per minute |
-| `X-RateLimit-Remaining` | 115 | Remaining number of requests before reset |
-| `X-RateLimit-Reset` | _Unix timestamp_ | Time (ms) when the limit will be reset |
-| `Retry-After` | 45 | Seconds until limit reset (only on 429 error) |
+## Cloudflare protection
 
-<Tip>
-  Always use the rate limit headers returned in each response to dynamically adjust your request frequency. **Do not hardcode limit values in your code — they may change and vary depending on the service.**
-</Tip>
-
-
-## Command Queue
-
-`*/command` endpoints use a queue system:
-
-- **Maximum queue size:** 100 commands
-- **Execution interval:** 1 command every 5 seconds
-
-When the queue is full, you will receive:
-
-```json
-{
-  "code": 5015,
-  "message": "Command Queue Full"
-}
-```
-
-## Anti-Spam Protection
-
-After exceeding the limit, the counter **does not stop** but continues counting **excess requests**.
-
-Upon reaching **400 excess requests**, a **5-minute ban** is issued. If spam continues, the ban duration increases.
-<Tip>
-  **Stats API V2:** Use a token to increase the limit from 40 to 120 requests/min. Pass the token via the `Authorization: Bearer <token>` header.
-</Tip>
-
-## Repeat Offenders
-
-Applications that continue sending requests after receiving `429` responses may be blocked for increasingly longer periods.
-
-<Danger>
-  Applications that systematically violate rate limits will be **blocked via Cloudflare**. If you encounter a Cloudflare block page, you need to contact us by opening an API ticket on the ER:LC Discord server to have the block lifted.
-</Danger>
-
-
-## Shared IP Hostings
-
-The ER:LC Russia API does not support BotGhost and similar hostings with shared IP addresses. When many different applications run under one IP, they constantly hit each other's rate limits, and there is no way to resolve this issue. For stable API access, host your service on a dedicated IP.
+Cloudflare may also reject or block requests independently of API limits, including high traffic from a single IP address. There is no universal guaranteed threshold of 10,000 requests per second: behavior depends on security rules and traffic characteristics. [Cloudflare](https://developers.cloudflare.com/waf/rate-limiting-rules/).

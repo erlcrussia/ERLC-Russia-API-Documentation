@@ -1,0 +1,41 @@
+---
+title: 'API V3: start of integration'
+description: Authorization, response formats and custom route selection.
+icon: code
+---
+
+API base URL: `https://api.erlcrussia.com/v3`.
+
+## Authorization
+
+Server integration passes the user key to `erlcrussia-api-key`. Managing CDN and redirects requires linking a key to an organization and permission from the key owner to the corresponding service. Secret keys are not placed in browser JavaScript. The user's profile and subscription routes use the erlc_auth session, and incoming PRC webhooks use the signature.
+
+## Route selection
+
+| Problem | Route |
+|---|---|
+| Game server status | `GET /erlc/server` |
+| Discord/Roblox connections | `GET /users`, `POST /users` |
+| Organizational files and folders | `/cdn/assets`, `/cdn/folders` |
+| Custom CDN domains | `/cdn/custom-domains` |
+| Organization redirects | `/teams/{teamId}/redirects` |
+| Owner's keys | `GET /keys?api=true` |
+| Service status | `GET /health` |
+
+## Response formats
+
+Response formats depend on the method. GET users with a single discordId returns `{ "robloxId": "123456789" }`; plural and POST parameters return an array of pairs. A single connection not found gives 404, an empty batch gives 200 and []. Pass IDs in strings and match batch by ID, not by position.
+
+GET cdn/assets returns assets, pagination and stats. The exact path without ids/prefix returns asset. GET cdn/custom-domains returns an array without success. GET keys returns an array for one type and an api/websocket object for two types. The restrictions field is not a complete effective access policy.
+
+GET keys returns the owner's secret key values, including his other servers. Use it only in a trusted server environment and do not log the response. Binding a key to an organization should not be considered a limitation on all other resources of the owner.
+
+## Errors and repeated requests
+
+Errors include `code` and `message`; additional fields depend on the cause. For HTTP 429, follow `Retry-After` and the rate-limit headers. Limits may change; see [request limits](/en/documentation/rate-limits) for baseline values and retry guidance.
+
+Loading a CDN returns 200. Repeating a busy explicit path returns 409 and does not overwrite the object. For releases, use the new prefix; Do not repeat the modifying operation blindly after a network failure. Purge is scheduled asynchronously: success does not confirm completion of purge of all cache levels.
+
+GET health can return 200 with status=degraded if there is a problem with Redis or the game cache; an inaccessible database gives 503. Check the HTTP status and JSON at the same time.
+
+See [CDN integrations](/en/other/cdn-integration) and [Next.js and CDN](/en/tutorials/nextjs-cdn-integration). JSON fields, HTTP headers, and example values ​​are not translated to preserve the contract.

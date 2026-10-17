@@ -1,0 +1,11 @@
+---
+title: Простір імен CDN
+description: Як вибрати namespace організації або кастомний домен для завантаження.
+icon: folder-tree
+---
+
+Загальний CDN використовує namespace організації: `https://cdn.erlcrussia.com/YOUR_TEAM_SLUG/path/file.png`. У multipart domain передайте YOUR_TEAM_SLUG. Кореневий namespace default доступний лише основний організації.
+
+Для підтвердженого кастомного домену надайте повне ім'я без схеми: domain=files.example.com. Файл буде доступний як `https://files.example.com/path/file.png`; це окремий об'єкт від файлу в загальному namespace.
+
+Прив'язка ключа виконується за допомогою `PUT /v3/cdn/team`. Реєстрація namespace виконується системою управління організаціями, а не master-ключом користувача. Додавання кастомного домену не вимагає окремого конфігу Nginx: загальний ingress перевіряє Host через реєстр CDN.

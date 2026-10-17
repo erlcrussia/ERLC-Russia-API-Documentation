@@ -1,0 +1,78 @@
+---
+title: CDN API Error Codes
+description: A complete reference of error codes and body formats for CDN endpoints.
+icon: triangle-alert
+---
+
+# Error format
+
+CDN errors are returned in the same format as all other V3 API errors:
+
+```json
+{
+  "code": 5007,
+  "message": "Missing Token"
+}
+```
+
+| Field | Type | Description |
+|---|---|---|
+| `code` | integer | numeric error code |
+| `message` | string | brief description in English |
+
+Depending on the error, error, details, and retry_after may be present. Technical reasons are written to the service log,
+and not in response - they can be viewed in the API logs.
+
+<Note>
+The key, request parameters and file contents are never returned in the response.
+</Note>
+
+## Authorization
+
+| HTTP | Code | Message | When |
+|---|---|---|---|
+| 401 | 5007 | `Missing Token` | header `erlcrussia-api-key` not sent |
+| 401 | 5008 | `Invalid Token` | key not found or disabled |
+| 403 | 5009 | `Forbidden` | there is a key, but there is no required endpoint/action right |
+
+The key in the query parameters (`?apiKey=`, `?token=`) is **not supported** and gives 5007.
+
+## Request parameters
+
+| HTTP | Code | Message | When |
+|---|---|---|---|
+| 400 | 5002 | `Missing Parameters` | there is no required field, or there is neither `ids` nor `path` |
+| 400 | 5004 | `Invalid Param Name` | parameter value was not validated |
+| 400 | 5034 | `Invalid Json` | body is not valid JSON |
+
+## Resources
+
+| HTTP | Code | Message | When |
+|---|---|---|---|
+| 404 | 5041 | `Asset Not Found` | there is no asset with this `domain` + `path` |
+| 404 | 5137 | `CDN Folder Not Found` | there is no folder with this `id` |
+| 409 | 5136 | `CDN Folder Slug Already Exists` | slug folder is already taken |
+| 409 | 5135 | `CDN Path Already Exists` | the explicit path is already taken; automatic rewrite does not occur |
+
+## Storage and source
+
+| HTTP | Code | Message | When |
+|---|---|---|---|
+| 502 | 5139 | `CDN Source Unavailable` | external source did not return the file when importing |
+| 503 | 5138 | `CDN Storage Unavailable` | MinIO not available or download failed |
+
+## Related codes
+
+| HTTP | Code | Message | When |
+|---|---|---|---|
+| 401 | 5006 | `Invalid Master Key` | `/v3/admin/cdn/*` is not called by the master key |
+| 503 | — | `INTERNAL_SECRET не настроен, /v3/* отключён` | edge service launched without `INTERNAL_SECRET` |
+
+## How to distinguish errors from each other
+
+| What to do | Where to look in the logs |
+|---|---|
+| 5135 | `storage: путь занят, подбирается суффикс` to `cdn_db.go` |
+| 5136 | text with a busy slug is written in `[CDN Rename Folder Error]` |
+| 5138 | `[CDN Upload Error]` with MinIO error text |
+| 5139 | `[CDN External Import Error]` with source response code |

@@ -1,84 +1,51 @@
 ---
-title: "Limiti di Richiesta"
-description: "L'API di ER:LC Russia utilizza limiti sulla frequenza delle richieste (rate limit) per proteggere i server dal sovraccarico e garantire un funzionamento stabile per tutti. Comprendere il funzionamento di questi limiti e gestirli correttamente è essenziale per costruire un'integrazione affidabile."
-icon: "gauge-high"
+title: Limiti delle richieste
+description: Finestre correnti, contatori condivisi, header e gestione di HTTP 429.
+icon: gauge-high
 ---
 
-## Tabella dei Limiti
+I limiti possono cambiare e variare in base all’indirizzo IP e alla chiave API. La tabella riporta i valori di base; gli header di risposta indicano i limiti applicati. Rispetta `X-RateLimit-Limit`, `X-RateLimit-Remaining`, `X-RateLimit-Reset` e `Retry-After`.
 
-| Endpoint | Limite | Descrizione |
-| --------- | ----- | -------- |
-| `/v1/*` | **120 richieste/min** | Tutti gli endpoint API V1 |
-| `/v2/*` | **120 richieste/min** | Tutti gli endpoint API V2 |
-| `/v1/*/stats/*` | **20 richieste/min** | API Statistiche V1 |
-| `/v2/*/stats/*` | **40/120 richieste/min** | API Statistiche V2 (senza token / con token) |
+## Route standard
 
-### Esempio di Risposta per Superamento del Limite
+| Gruppo | Limite |
+|---|---|
+| `/v3/cdn/*`, `/v3/users`, `/v3/keys`, `/v3/points/*`, `/v3/health` | 20 richieste al minuto |
+| `/v3/erlc/*`, `/v3/civops/*`, `/v3/subscriptions/*`, `/v3/admin/*` | 120 richieste al minuto |
+| `/v3/stats` senza chiave API | 40 richieste al minuto |
+| `/v3/stats` con chiave API | 120 richieste al minuto |
+| `/v3/ai/*`, `/v1/chat*`, `/v1/models*`, `/v1/audio/*` | 120 richieste al secondo |
+
+Le route standard condividono un contatore per chiave tra metodi e route; senza credenziali viene usato l’IP. AI ha una finestra separata di un secondo. La verifica di un file con GET e il caricamento con POST contano come richieste distinte. Raggiunto il limite, interrompere l’invio e ripetere soltanto la richiesta rifiutata dopo l’attesa indicata.
+
+## Autorizzazione
+
+L’accesso OAuth, i callback e session/init consentono 10 richieste al minuto per visitatore con cookie firmato o sessione verificata. Le altre route di autenticazione dell’utente consentono 250 richieste per sessione oppure 60 per visitatore anonimo.
+
+Le richieste anonime hanno anche un limite condiviso per IP: 120 al minuto per l’accesso e 240 per le altre route di autenticazione. Il visitatore viene identificato dal cookie HttpOnly firmato erlc_auth_visitor. La finestra si azzera all’inizio di ogni minuto. Queste route non applicano il blocco di cinque minuti del limitatore standard.
+
+## Header e risposta 429
+
+| Header | Valore |
+|---|---|
+| `X-RateLimit-Limit` | Limite della finestra corrente |
+| `X-RateLimit-Remaining` | Richieste rimanenti |
+| `X-RateLimit-Reset` | Timestamp Unix in millisecondi |
+| `Retry-After` | Secondi da attendere dopo un 429 |
 
 ```json
 {
   "code": 5016,
   "message": "Rate Limit Exceeded",
-  "retry_after": 45,
-  "details": {
-    "limit": 120,
-    "count": 125,
-    "excess": 5,
-    "reset_at": 1740339600000
-  }
+  "retry_after": 30,
+  "details": {"limit": 20, "count": 21, "excess": 1, "reset_at": 1792083600000}
 }
 ```
 
-## Header di Rate Limit
+Il limitatore di autenticazione omette details. Un blocco per spam del middleware standard restituisce code=5039, message=spam_blocked, blocked_until e remaining_seconds. La finestra standard ha una soglia di 400 richieste in eccesso e un blocco base di cinque minuti; AI usa una soglia di 200 richieste in eccesso al secondo.
 
-L'API restituisce gli header informativi sui limiti di frequenza in **ogni risposta**:
+Il limitatore non rende idempotenti le operazioni di modifica. Dopo un’interruzione di rete, verificare prima lo stato della risorsa. Un conflitto di percorso esplicito nella CDN restituisce 409; non è una risposta 429 né conferma una sovrascrittura riuscita.
 
-| Header | Valore di Esempio | Descrizione |
-| --------- | --------------- | -------- |
-| `X-RateLimit-Limit` | 120 | Numero massimo di richieste al minuto |
-| `X-RateLimit-Remaining` | 115 | Numero di richieste rimanenti prima del reset |
-| `X-RateLimit-Reset` | _Timestamp Unix_ | Orario (ms) in cui il limite verrà reimpostato |
-| `Retry-After` | 45 | Secondi fino al reset del limite (solo in caso di errore 429) |
+## Protezione Cloudflare
 
-<Tip>
-  Utilizza sempre gli header di rate limit restituiti in ciascuna risposta per regolare dinamicamente la frequenza delle richieste. **Non inserire valori fissi (hardcoded) nel tuo codice: possono variare e dipendere dal servizio specifico.**
-</Tip>
-
-
-## Coda dei Comandi
-
-Gli endpoint `*/command` utilizzano un sistema a coda:
-
-- **Dimensione massima della coda:** 100 comandi
-- **Intervallo di esecuzione:** 1 comando ogni 5 secondi
-
-Quando la coda è piena, riceverai:
-
-```json
-{
-  "code": 5015,
-  "message": "Command Queue Full"
-}
-```
-
-## Protezione Anti-Spam
-
-Dopo aver superato il limite, il contatore **non si arresta**, ma continua a conteggiare le **richieste in eccesso**.
-
-Al raggiungimento di **400 richieste in eccesso**, viene applicato un **blocco di 5 minuti**. Se lo spam continua, la durata del blocco aumenterà.
-<Tip>
-  **API Statistiche V2:** Utilizza un token per aumentare il limite da 40 a 120 richieste/min. Passa il token tramite l'header `Authorization: Bearer <token>`.
-</Tip>
-
-## Violazioni Ripetute
-
-Le applicazioni che continuano a inviare richieste dopo aver ricevuto risposte `429` possono essere bloccate per periodi progressivamente più lunghi.
-
-<Danger>
-  Le applicazioni che violano sistematicamente i limiti di frequenza verranno **bloccate tramite Cloudflare**. Se visualizzi una pagina di blocco di Cloudflare, dovrai contattarci aprendo un ticket API sul server Discord di ER:LC Russia per richiedere lo sblocco.
-</Danger>
-
-
-## Hosting con IP Condiviso
-
-L'API di ER:LC Russia non supporta BotGhost e servizi di hosting simili che utilizzano indirizzi IP condivisi. Quando molte applicazioni diverse operano dallo stesso IP, raggiungono costantemente i limiti di frequenza a vicenda e non è possibile risolvere questo problema. Per un accesso stabile all'API, ospita il tuo servizio su un IP dedicato.
+Cloudflare può anche rifiutare o bloccare richieste indipendentemente dai limiti dell’API, incluso un traffico elevato da un solo IP. Non esiste una soglia universale garantita di 10.000 richieste al secondo: il comportamento dipende dalle regole di sicurezza e dalle caratteristiche del traffico. [Cloudflare](https://developers.cloudflare.com/waf/rate-limiting-rules/).

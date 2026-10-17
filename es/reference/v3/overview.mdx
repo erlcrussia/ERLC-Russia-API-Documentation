@@ -1,0 +1,41 @@
+---
+title: 'API V3: inicio de la integración'
+description: Autorización, formatos de respuesta y selección de ruta personalizada.
+icon: code
+---
+
+URL base de la API: `https://api.erlcrussia.com/v3`.
+
+## Autorización
+
+La integración del servidor pasa la clave de usuario a `erlcrussia-api-key`. La gestión de CDN y redireccionamientos requiere vincular una clave a una organización y el permiso del propietario de la clave al servicio correspondiente. Las claves secretas no se colocan en el JavaScript del navegador. El perfil del usuario y las rutas de suscripción utilizan la sesión erlc_auth y los webhooks entrantes de PRC utilizan la firma.
+
+## Selección de ruta
+
+| Problema | Ruta |
+|---|---|
+| Estado del servidor de juegos | `GET /erlc/server` |
+| Conexiones de Discord/Roblox | `GET /users`, `POST /users` |
+| Archivos y carpetas organizacionales | `/cdn/assets`, `/cdn/folders` |
+| Dominios CDN personalizados | `/cdn/custom-domains` |
+| Redirecciones de organización | `/teams/{teamId}/redirects` |
+| Llaves del propietario | `GET /keys?api=true` |
+| Estado del servicio | `GET /health` |
+
+## Formatos de respuesta
+
+El formato de respuesta depende del método. Los usuarios GET con un único discordId devuelven `{ "robloxId": "123456789" }`; Los parámetros plural y POST devuelven una matriz de pares. Una sola conexión no encontrada da 404, un lote vacío da 200 y []. Pase los ID en cadenas y haga coincidir el lote por ID, no por posición.
+
+GET cdn/assets devuelve activos, paginación y estadísticas. La ruta exacta sin identificadores/prefijo devuelve el activo. GET cdn/custom-domains devuelve una matriz sin éxito. GET claves devuelve una matriz para un tipo y un objeto api/websocket para dos tipos. El campo de restricciones no es una política de acceso completa y efectiva.
+
+GET claves devuelve los valores de las claves secretas del propietario, incluidos sus otros servidores. Úselo sólo en un entorno de servidor confiable y no registre la respuesta. Vincular una clave a una organización no debe considerarse una limitación de todos los demás recursos del propietario.
+
+## Errores y solicitudes repetidas
+
+Los principales campos de error son código y mensaje; Los errores adicionales, los detalles y retry_after dependen del motivo. En 429, considere Retry-After y retry_after. CDN, usuarios y claves tienen actualmente un límite total de 20 solicitudes por minuto por clave. El contador es común a los métodos, por lo que también incluye comprobaciones de existencia de archivos.
+
+Cargar una CDN devuelve 200. Repetir una ruta explícita ocupada devuelve 409 y no sobrescribe el objeto. Para lanzamientos, utilice el nuevo prefijo; No repita la operación de modificación a ciegas después de una falla en la red. La purga se programa de forma asincrónica: el éxito no confirma la finalización de la purga de todos los niveles de caché.
+
+GET Health puede devolver 200 con estado = degradado si hay un problema con Redis o el caché del juego; una base de datos inaccesible da 503. Verifique el estado HTTP y JSON al mismo tiempo.
+
+Consulte [Integraciones CDN](/en/other/cdn-integration) y [Next.js y CDN](/en/tutorials/nextjs-cdn-integration). Los campos JSON, los encabezados HTTP y los valores de ejemplo no se traducen para preservar el contrato.
