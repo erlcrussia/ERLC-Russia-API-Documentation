@@ -211,6 +211,7 @@
                       "group": "Assets and Namespaces",
                       "icon": "file",
                       "pages": [
+                        "en/reference/v3/cdn/namespaces",
                         "en/reference/v3/cdn/get-assets",
                         "en/reference/v3/cdn/upload-asset",
                         "en/reference/v3/cdn/external-asset",
@@ -262,6 +263,7 @@
                 },
                 {
                   "group": "Redirects",
+                  "icon": "arrow-right-arrow-left",
                   "pages": [
                     {
                       "group": "Settings and summary",
@@ -321,7 +323,34 @@
                     "en/reference/v3/points/get-user-points",
                     "en/reference/v3/points/get-user-history",
                     "en/reference/v3/points/add-user-points",
-                    "en/reference/v3/points/remove-user-points"
+                    "en/reference/v3/points/remove-user-points",
+                    "en/reference/v3/points/get-points-serverid-robloxid",
+                    "en/reference/v3/points/get-points-serverid-robloxid-history",
+                    "en/reference/v3/points/post-points-serverid-robloxid-add",
+                    "en/reference/v3/points/post-points-serverid-robloxid-remove"
+                  ]
+                },
+                {
+                  "group": "Keys API V3",
+                  "icon": "key",
+                  "pages": [
+                    "en/reference/v3/keys/get-keys",
+                    "en/reference/v3/keys/post-keys"
+                  ]
+                },
+                {
+                  "group": "Webhooks API V3",
+                  "icon": "diagram-project",
+                  "pages": [
+                    "en/reference/v3/webhooks/get-webhooks",
+                    "en/reference/v3/webhooks/get-webhooks-status",
+                    "en/reference/v3/webhooks/post-webhooks-add-url",
+                    "en/reference/v3/webhooks/put-webhooks-url",
+                    "en/reference/v3/webhooks/patch-webhooks-url-status",
+                    "en/reference/v3/webhooks/patch-webhooks-set-active",
+                    "en/reference/v3/webhooks/post-webhooks-test",
+                    "en/reference/v3/webhooks/delete-webhooks-remove-url",
+                    "en/reference/v3/webhooks/delete-webhooks"
                   ]
                 },
                 {
@@ -332,24 +361,51 @@
                     "en/reference/v3/subscriptions/get-plans",
                     "en/reference/v3/subscriptions/get-user-subscriptions",
                     "en/reference/v3/subscriptions/get-user-benefits",
+                    "en/reference/v3/subscriptions/get-subscriptions-coins-balance",
                     "en/reference/v3/subscriptions/create-funpay-order",
                     "en/reference/v3/subscriptions/get-funpay-order-status",
-                    "en/reference/v3/subscriptions/purchase-with-coins"
+                    "en/reference/v3/subscriptions/purchase-with-coins",
+                    "en/reference/v3/subscriptions/get-subscriptions-store",
+                    "en/reference/v3/subscriptions/get-subscriptions-user-limits",
+                    "en/reference/v3/subscriptions/get-subscriptions-user-limits-discordid"
                   ]
                 },
                 {
-                  "group": "Ads V3",
-                  "icon": "rectangle-ad",
+                  "group": "AI API V3",
+                  "icon": "sparkles",
                   "pages": [
-                    "en/reference/v3/ads/post-ads-upload",
-                    "en/reference/v3/ads/post-ads-campaigns",
-                    "en/reference/v3/ads/get-ads-campaigns",
-                    "en/reference/v3/ads/get-ads-campaigns-id",
-                    "en/reference/v3/ads/post-ads-campaigns-id-buy",
-                    "en/reference/v3/ads/post-ads-campaigns-id-toggle",
-                    "en/reference/v3/ads/get-ads-packages",
-                    "en/reference/v3/ads/get-ads-serve",
-                    "en/reference/v3/ads/post-ads-id-click"
+                    "en/reference/v3/ai/get-ai-credits-balance",
+                    "en/reference/v3/ai/post-ai-credits-exchange",
+                    "en/reference/v3/ai/get-ai-keys",
+                    "en/reference/v3/ai/post-ai-keys",
+                    "en/reference/v3/ai/patch-ai-keys",
+                    "en/reference/v3/ai/patch-ai-keys-id",
+                    "en/reference/v3/ai/delete-ai-keys",
+                    "en/reference/v3/ai/delete-ai-keys-id",
+                    "en/reference/v3/ai/post-ai-title",
+                    "en/reference/v3/ai/get-audio-pricing",
+                    "en/reference/v3/ai/post-audio-transcription"
+                  ]
+                },
+                {
+                  "group": "Authorization API V3",
+                  "icon": "shield-halved",
+                  "pages": [
+                    "en/reference/v3/auth/get-auth-me",
+                    "en/reference/v3/auth/get-auth-discord",
+                    "en/reference/v3/auth/get-auth-discord-callback",
+                    "en/reference/v3/auth/get-auth-roblox",
+                    "en/reference/v3/auth/get-auth-roblox-callback",
+                    "en/reference/v3/auth/get-auth-session",
+                    "en/reference/v3/auth/get-auth-user-sessions",
+                    "en/reference/v3/auth/patch-auth-user-profile",
+                    "en/reference/v3/auth/patch-auth-user-roblox-refresh",
+                    "en/reference/v3/auth/patch-auth-user-roblox-reverify",
+                    "en/reference/v3/auth/post-auth-user-roblox",
+                    "en/reference/v3/auth/delete-auth-user-roblox",
+                    "en/reference/v3/auth/delete-auth-user-sessions",
+                    "en/reference/v3/auth/delete-auth-user-sessions-id",
+                    "en/reference/v3/auth/post-auth-logout"
                   ]
                 },
                 {
@@ -358,182 +414,7 @@
                   "pages": [
                     "en/reference/v3/health/get-health"
                   ]
-                }
-              ]
-            },
-            {
-              "group": "AI API V3",
-              "pages": [
-                "en/reference/v3/ai/delete-ai-keys",
-                "en/reference/v3/ai/delete-ai-keys-id",
-                "en/reference/v3/ai/get-ai-credits-balance",
-                "en/reference/v3/ai/get-ai-keys",
-                "en/reference/v3/ai/post-ai-credits-exchange",
-                "en/reference/v3/ai/post-ai-keys",
-                "en/reference/v3/ai/post-ai-title",
-                {
-                  "group": "Ads V3",
-                  "icon": "rectangle-ad",
-                  "pages": [
-                    "en/reference/v3/ads/post-ads-upload",
-                    "en/reference/v3/ads/post-ads-campaigns",
-                    "en/reference/v3/ads/get-ads-campaigns",
-                    "en/reference/v3/ads/get-ads-campaigns-id",
-                    "en/reference/v3/ads/post-ads-campaigns-id-buy",
-                    "en/reference/v3/ads/post-ads-campaigns-id-toggle",
-                    "en/reference/v3/ads/get-ads-packages",
-                    "en/reference/v3/ads/get-ads-serve",
-                    "en/reference/v3/ads/post-ads-id-click"
-                  ]
-                }
-              ]
-            },
-            {
-              "group": "User authorization",
-              "pages": [
-                "en/reference/v3/auth/delete-auth-user-roblox",
-                "en/reference/v3/auth/delete-auth-user-sessions",
-                "en/reference/v3/auth/delete-auth-user-sessions-id",
-                "en/reference/v3/auth/get-auth-discord",
-                "en/reference/v3/auth/get-auth-discord-callback",
-                "en/reference/v3/auth/get-auth-me",
-                "en/reference/v3/auth/get-auth-roblox",
-                "en/reference/v3/auth/get-auth-roblox-callback",
-                "en/reference/v3/auth/get-auth-session",
-                "en/reference/v3/auth/get-auth-user-sessions",
-                "en/reference/v3/auth/patch-auth-user-profile",
-                "en/reference/v3/auth/patch-auth-user-roblox-refresh",
-                "en/reference/v3/auth/patch-auth-user-roblox-reverify",
-                "en/reference/v3/auth/post-auth-logout",
-                "en/reference/v3/auth/post-auth-user-roblox",
-                {
-                  "group": "Ads V3",
-                  "icon": "rectangle-ad",
-                  "pages": [
-                    "en/reference/v3/ads/post-ads-upload",
-                    "en/reference/v3/ads/post-ads-campaigns",
-                    "en/reference/v3/ads/get-ads-campaigns",
-                    "en/reference/v3/ads/get-ads-campaigns-id",
-                    "en/reference/v3/ads/post-ads-campaigns-id-buy",
-                    "en/reference/v3/ads/post-ads-campaigns-id-toggle",
-                    "en/reference/v3/ads/get-ads-packages",
-                    "en/reference/v3/ads/get-ads-serve",
-                    "en/reference/v3/ads/post-ads-id-click"
-                  ]
-                }
-              ]
-            },
-            {
-              "group": "Custom CDN domains",
-              "pages": [
-                "en/reference/v3/cdn/delete-cdn-custom-domains-id",
-                "en/reference/v3/cdn/get-cdn-custom-domains",
-                "en/reference/v3/cdn/get-cdn-custom-domains-id",
-                "en/reference/v3/cdn/patch-cdn-custom-domains-id",
-                "en/reference/v3/cdn/post-cdn-custom-domains",
-                "en/reference/v3/cdn/post-cdn-custom-domains-id-purge",
-                "en/reference/v3/cdn/post-cdn-custom-domains-id-regenerate-token",
-                "en/reference/v3/cdn/post-cdn-custom-domains-id-verify",
-                "en/reference/v3/cdn/post-cdn-webhook-purge",
-                {
-                  "group": "Ads V3",
-                  "icon": "rectangle-ad",
-                  "pages": [
-                    "en/reference/v3/ads/post-ads-upload",
-                    "en/reference/v3/ads/post-ads-campaigns",
-                    "en/reference/v3/ads/get-ads-campaigns",
-                    "en/reference/v3/ads/get-ads-campaigns-id",
-                    "en/reference/v3/ads/post-ads-campaigns-id-buy",
-                    "en/reference/v3/ads/post-ads-campaigns-id-toggle",
-                    "en/reference/v3/ads/get-ads-packages",
-                    "en/reference/v3/ads/get-ads-serve",
-                    "en/reference/v3/ads/post-ads-id-click"
-                  ]
-                }
-              ]
-            },
-            {
-              "group": "API Keys",
-              "pages": [
-                "en/reference/v3/keys/get-keys",
-                "en/reference/v3/keys/post-keys",
-                {
-                  "group": "Ads V3",
-                  "icon": "rectangle-ad",
-                  "pages": [
-                    "en/reference/v3/ads/post-ads-upload",
-                    "en/reference/v3/ads/post-ads-campaigns",
-                    "en/reference/v3/ads/get-ads-campaigns",
-                    "en/reference/v3/ads/get-ads-campaigns-id",
-                    "en/reference/v3/ads/post-ads-campaigns-id-buy",
-                    "en/reference/v3/ads/post-ads-campaigns-id-toggle",
-                    "en/reference/v3/ads/get-ads-packages",
-                    "en/reference/v3/ads/get-ads-serve",
-                    "en/reference/v3/ads/post-ads-id-click"
-                  ]
-                }
-              ]
-            },
-            {
-              "group": "Server scores",
-              "pages": [
-                "en/reference/v3/points/get-points-serverid-robloxid",
-                "en/reference/v3/points/get-points-serverid-robloxid-history",
-                "en/reference/v3/points/post-points-serverid-robloxid-add",
-                "en/reference/v3/points/post-points-serverid-robloxid-remove",
-                {
-                  "group": "Ads V3",
-                  "icon": "rectangle-ad",
-                  "pages": [
-                    "en/reference/v3/ads/post-ads-upload",
-                    "en/reference/v3/ads/post-ads-campaigns",
-                    "en/reference/v3/ads/get-ads-campaigns",
-                    "en/reference/v3/ads/get-ads-campaigns-id",
-                    "en/reference/v3/ads/post-ads-campaigns-id-buy",
-                    "en/reference/v3/ads/post-ads-campaigns-id-toggle",
-                    "en/reference/v3/ads/get-ads-packages",
-                    "en/reference/v3/ads/get-ads-serve",
-                    "en/reference/v3/ads/post-ads-id-click"
-                  ]
-                }
-              ]
-            },
-            {
-              "group": "User Subscriptions",
-              "pages": [
-                "en/reference/v3/subscriptions/get-subscriptions-coins-balance",
-                "en/reference/v3/subscriptions/get-subscriptions-store",
-                "en/reference/v3/subscriptions/get-subscriptions-user-limits",
-                "en/reference/v3/subscriptions/get-subscriptions-user-limits-discordid",
-                {
-                  "group": "Ads V3",
-                  "icon": "rectangle-ad",
-                  "pages": [
-                    "en/reference/v3/ads/post-ads-upload",
-                    "en/reference/v3/ads/post-ads-campaigns",
-                    "en/reference/v3/ads/get-ads-campaigns",
-                    "en/reference/v3/ads/get-ads-campaigns-id",
-                    "en/reference/v3/ads/post-ads-campaigns-id-buy",
-                    "en/reference/v3/ads/post-ads-campaigns-id-toggle",
-                    "en/reference/v3/ads/get-ads-packages",
-                    "en/reference/v3/ads/get-ads-serve",
-                    "en/reference/v3/ads/post-ads-id-click"
-                  ]
-                }
-              ]
-            },
-            {
-              "group": "User webhooks",
-              "pages": [
-                "en/reference/v3/webhooks/delete-webhooks",
-                "en/reference/v3/webhooks/delete-webhooks-remove-url",
-                "en/reference/v3/webhooks/get-webhooks",
-                "en/reference/v3/webhooks/get-webhooks-status",
-                "en/reference/v3/webhooks/patch-webhooks-set-active",
-                "en/reference/v3/webhooks/patch-webhooks-url-status",
-                "en/reference/v3/webhooks/post-webhooks-add-url",
-                "en/reference/v3/webhooks/post-webhooks-test",
-                "en/reference/v3/webhooks/put-webhooks-url",
+                },
                 {
                   "group": "Ads V3",
                   "icon": "rectangle-ad",

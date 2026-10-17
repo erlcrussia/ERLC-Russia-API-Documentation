@@ -211,6 +211,7 @@
                       "group": "Асети та Простори Імен",
                       "icon": "file",
                       "pages": [
+                        "uk/reference/v3/cdn/namespaces",
                         "uk/reference/v3/cdn/get-assets",
                         "uk/reference/v3/cdn/upload-asset",
                         "uk/reference/v3/cdn/external-asset",
@@ -262,6 +263,7 @@
                 },
                 {
                   "group": "Редиректи",
+                  "icon": "arrow-right-arrow-left",
                   "pages": [
                     {
                       "group": "Налаштування та зведення",
@@ -321,7 +323,34 @@
                     "uk/reference/v3/points/get-user-points",
                     "uk/reference/v3/points/get-user-history",
                     "uk/reference/v3/points/add-user-points",
-                    "uk/reference/v3/points/remove-user-points"
+                    "uk/reference/v3/points/remove-user-points",
+                    "uk/reference/v3/points/get-points-serverid-robloxid",
+                    "uk/reference/v3/points/get-points-serverid-robloxid-history",
+                    "uk/reference/v3/points/post-points-serverid-robloxid-add",
+                    "uk/reference/v3/points/post-points-serverid-robloxid-remove"
+                  ]
+                },
+                {
+                  "group": "API Ключів V3",
+                  "icon": "key",
+                  "pages": [
+                    "uk/reference/v3/keys/get-keys",
+                    "uk/reference/v3/keys/post-keys"
+                  ]
+                },
+                {
+                  "group": "API Вебхуків V3",
+                  "icon": "diagram-project",
+                  "pages": [
+                    "uk/reference/v3/webhooks/get-webhooks",
+                    "uk/reference/v3/webhooks/get-webhooks-status",
+                    "uk/reference/v3/webhooks/post-webhooks-add-url",
+                    "uk/reference/v3/webhooks/put-webhooks-url",
+                    "uk/reference/v3/webhooks/patch-webhooks-url-status",
+                    "uk/reference/v3/webhooks/patch-webhooks-set-active",
+                    "uk/reference/v3/webhooks/post-webhooks-test",
+                    "uk/reference/v3/webhooks/delete-webhooks-remove-url",
+                    "uk/reference/v3/webhooks/delete-webhooks"
                   ]
                 },
                 {
@@ -332,9 +361,51 @@
                     "uk/reference/v3/subscriptions/get-plans",
                     "uk/reference/v3/subscriptions/get-user-subscriptions",
                     "uk/reference/v3/subscriptions/get-user-benefits",
+                    "uk/reference/v3/subscriptions/get-subscriptions-coins-balance",
                     "uk/reference/v3/subscriptions/create-funpay-order",
                     "uk/reference/v3/subscriptions/get-funpay-order-status",
-                    "uk/reference/v3/subscriptions/purchase-with-coins"
+                    "uk/reference/v3/subscriptions/purchase-with-coins",
+                    "uk/reference/v3/subscriptions/get-subscriptions-store",
+                    "uk/reference/v3/subscriptions/get-subscriptions-user-limits",
+                    "uk/reference/v3/subscriptions/get-subscriptions-user-limits-discordid"
+                  ]
+                },
+                {
+                  "group": "AI API V3",
+                  "icon": "sparkles",
+                  "pages": [
+                    "uk/reference/v3/ai/get-ai-credits-balance",
+                    "uk/reference/v3/ai/post-ai-credits-exchange",
+                    "uk/reference/v3/ai/get-ai-keys",
+                    "uk/reference/v3/ai/post-ai-keys",
+                    "uk/reference/v3/ai/patch-ai-keys",
+                    "uk/reference/v3/ai/patch-ai-keys-id",
+                    "uk/reference/v3/ai/delete-ai-keys",
+                    "uk/reference/v3/ai/delete-ai-keys-id",
+                    "uk/reference/v3/ai/post-ai-title",
+                    "uk/reference/v3/ai/get-audio-pricing",
+                    "uk/reference/v3/ai/post-audio-transcription"
+                  ]
+                },
+                {
+                  "group": "API Авторизації V3",
+                  "icon": "shield-halved",
+                  "pages": [
+                    "uk/reference/v3/auth/get-auth-me",
+                    "uk/reference/v3/auth/get-auth-discord",
+                    "uk/reference/v3/auth/get-auth-discord-callback",
+                    "uk/reference/v3/auth/get-auth-roblox",
+                    "uk/reference/v3/auth/get-auth-roblox-callback",
+                    "uk/reference/v3/auth/get-auth-session",
+                    "uk/reference/v3/auth/get-auth-user-sessions",
+                    "uk/reference/v3/auth/patch-auth-user-profile",
+                    "uk/reference/v3/auth/patch-auth-user-roblox-refresh",
+                    "uk/reference/v3/auth/patch-auth-user-roblox-reverify",
+                    "uk/reference/v3/auth/post-auth-user-roblox",
+                    "uk/reference/v3/auth/delete-auth-user-roblox",
+                    "uk/reference/v3/auth/delete-auth-user-sessions",
+                    "uk/reference/v3/auth/delete-auth-user-sessions-id",
+                    "uk/reference/v3/auth/post-auth-logout"
                   ]
                 },
                 {
@@ -344,196 +415,6 @@
                     "uk/reference/v3/health/get-health"
                   ]
                 },
-                {
-                  "group": "Реклама V3",
-                  "icon": "rectangle-ad",
-                  "pages": [
-                    "uk/reference/v3/ads/post-ads-upload",
-                    "uk/reference/v3/ads/post-ads-campaigns",
-                    "uk/reference/v3/ads/get-ads-campaigns",
-                    "uk/reference/v3/ads/get-ads-campaigns-id",
-                    "uk/reference/v3/ads/post-ads-campaigns-id-buy",
-                    "uk/reference/v3/ads/post-ads-campaigns-id-toggle",
-                    "uk/reference/v3/ads/get-ads-packages",
-                    "uk/reference/v3/ads/get-ads-serve",
-                    "uk/reference/v3/ads/post-ads-id-click"
-                  ]
-                }
-              ]
-            },
-            {
-              "group": "AI API V3",
-              "pages": [
-                "uk/reference/v3/ai/delete-ai-keys",
-                "uk/reference/v3/ai/delete-ai-keys-id",
-                "uk/reference/v3/ai/get-ai-credits-balance",
-                "uk/reference/v3/ai/get-ai-keys",
-                "uk/reference/v3/ai/post-ai-credits-exchange",
-                "uk/reference/v3/ai/post-ai-keys",
-                "uk/reference/v3/ai/post-ai-title",
-                {
-                  "group": "Реклама V3",
-                  "icon": "rectangle-ad",
-                  "pages": [
-                    "uk/reference/v3/ads/post-ads-upload",
-                    "uk/reference/v3/ads/post-ads-campaigns",
-                    "uk/reference/v3/ads/get-ads-campaigns",
-                    "uk/reference/v3/ads/get-ads-campaigns-id",
-                    "uk/reference/v3/ads/post-ads-campaigns-id-buy",
-                    "uk/reference/v3/ads/post-ads-campaigns-id-toggle",
-                    "uk/reference/v3/ads/get-ads-packages",
-                    "uk/reference/v3/ads/get-ads-serve",
-                    "uk/reference/v3/ads/post-ads-id-click"
-                  ]
-                }
-              ]
-            },
-            {
-              "group": "Авторизація користувача",
-              "pages": [
-                "uk/reference/v3/auth/delete-auth-user-roblox",
-                "uk/reference/v3/auth/delete-auth-user-sessions",
-                "uk/reference/v3/auth/delete-auth-user-sessions-id",
-                "uk/reference/v3/auth/get-auth-discord",
-                "uk/reference/v3/auth/get-auth-discord-callback",
-                "uk/reference/v3/auth/get-auth-me",
-                "uk/reference/v3/auth/get-auth-roblox",
-                "uk/reference/v3/auth/get-auth-roblox-callback",
-                "uk/reference/v3/auth/get-auth-session",
-                "uk/reference/v3/auth/get-auth-user-sessions",
-                "uk/reference/v3/auth/patch-auth-user-profile",
-                "uk/reference/v3/auth/patch-auth-user-roblox-refresh",
-                "uk/reference/v3/auth/patch-auth-user-roblox-reverify",
-                "uk/reference/v3/auth/post-auth-logout",
-                "uk/reference/v3/auth/post-auth-user-roblox",
-                {
-                  "group": "Реклама V3",
-                  "icon": "rectangle-ad",
-                  "pages": [
-                    "uk/reference/v3/ads/post-ads-upload",
-                    "uk/reference/v3/ads/post-ads-campaigns",
-                    "uk/reference/v3/ads/get-ads-campaigns",
-                    "uk/reference/v3/ads/get-ads-campaigns-id",
-                    "uk/reference/v3/ads/post-ads-campaigns-id-buy",
-                    "uk/reference/v3/ads/post-ads-campaigns-id-toggle",
-                    "uk/reference/v3/ads/get-ads-packages",
-                    "uk/reference/v3/ads/get-ads-serve",
-                    "uk/reference/v3/ads/post-ads-id-click"
-                  ]
-                }
-              ]
-            },
-            {
-              "group": "Кастомні домени CDN",
-              "pages": [
-                "uk/reference/v3/cdn/delete-cdn-custom-domains-id",
-                "uk/reference/v3/cdn/get-cdn-custom-domains",
-                "uk/reference/v3/cdn/get-cdn-custom-domains-id",
-                "uk/reference/v3/cdn/patch-cdn-custom-domains-id",
-                "uk/reference/v3/cdn/post-cdn-custom-domains",
-                "uk/reference/v3/cdn/post-cdn-custom-domains-id-purge",
-                "uk/reference/v3/cdn/post-cdn-custom-domains-id-regenerate-token",
-                "uk/reference/v3/cdn/post-cdn-custom-domains-id-verify",
-                "uk/reference/v3/cdn/post-cdn-webhook-purge",
-                {
-                  "group": "Реклама V3",
-                  "icon": "rectangle-ad",
-                  "pages": [
-                    "uk/reference/v3/ads/post-ads-upload",
-                    "uk/reference/v3/ads/post-ads-campaigns",
-                    "uk/reference/v3/ads/get-ads-campaigns",
-                    "uk/reference/v3/ads/get-ads-campaigns-id",
-                    "uk/reference/v3/ads/post-ads-campaigns-id-buy",
-                    "uk/reference/v3/ads/post-ads-campaigns-id-toggle",
-                    "uk/reference/v3/ads/get-ads-packages",
-                    "uk/reference/v3/ads/get-ads-serve",
-                    "uk/reference/v3/ads/post-ads-id-click"
-                  ]
-                }
-              ]
-            },
-            {
-              "group": "Ключі API",
-              "pages": [
-                "uk/reference/v3/keys/get-keys",
-                "uk/reference/v3/keys/post-keys",
-                {
-                  "group": "Реклама V3",
-                  "icon": "rectangle-ad",
-                  "pages": [
-                    "uk/reference/v3/ads/post-ads-upload",
-                    "uk/reference/v3/ads/post-ads-campaigns",
-                    "uk/reference/v3/ads/get-ads-campaigns",
-                    "uk/reference/v3/ads/get-ads-campaigns-id",
-                    "uk/reference/v3/ads/post-ads-campaigns-id-buy",
-                    "uk/reference/v3/ads/post-ads-campaigns-id-toggle",
-                    "uk/reference/v3/ads/get-ads-packages",
-                    "uk/reference/v3/ads/get-ads-serve",
-                    "uk/reference/v3/ads/post-ads-id-click"
-                  ]
-                }
-              ]
-            },
-            {
-              "group": "Бали по серверу",
-              "pages": [
-                "uk/reference/v3/points/get-points-serverid-robloxid",
-                "uk/reference/v3/points/get-points-serverid-robloxid-history",
-                "uk/reference/v3/points/post-points-serverid-robloxid-add",
-                "uk/reference/v3/points/post-points-serverid-robloxid-remove",
-                {
-                  "group": "Реклама V3",
-                  "icon": "rectangle-ad",
-                  "pages": [
-                    "uk/reference/v3/ads/post-ads-upload",
-                    "uk/reference/v3/ads/post-ads-campaigns",
-                    "uk/reference/v3/ads/get-ads-campaigns",
-                    "uk/reference/v3/ads/get-ads-campaigns-id",
-                    "uk/reference/v3/ads/post-ads-campaigns-id-buy",
-                    "uk/reference/v3/ads/post-ads-campaigns-id-toggle",
-                    "uk/reference/v3/ads/get-ads-packages",
-                    "uk/reference/v3/ads/get-ads-serve",
-                    "uk/reference/v3/ads/post-ads-id-click"
-                  ]
-                }
-              ]
-            },
-            {
-              "group": "Передплати користувача",
-              "pages": [
-                "uk/reference/v3/subscriptions/get-subscriptions-coins-balance",
-                "uk/reference/v3/subscriptions/get-subscriptions-store",
-                "uk/reference/v3/subscriptions/get-subscriptions-user-limits",
-                "uk/reference/v3/subscriptions/get-subscriptions-user-limits-discordid",
-                {
-                  "group": "Реклама V3",
-                  "icon": "rectangle-ad",
-                  "pages": [
-                    "uk/reference/v3/ads/post-ads-upload",
-                    "uk/reference/v3/ads/post-ads-campaigns",
-                    "uk/reference/v3/ads/get-ads-campaigns",
-                    "uk/reference/v3/ads/get-ads-campaigns-id",
-                    "uk/reference/v3/ads/post-ads-campaigns-id-buy",
-                    "uk/reference/v3/ads/post-ads-campaigns-id-toggle",
-                    "uk/reference/v3/ads/get-ads-packages",
-                    "uk/reference/v3/ads/get-ads-serve",
-                    "uk/reference/v3/ads/post-ads-id-click"
-                  ]
-                }
-              ]
-            },
-            {
-              "group": "Вебхуки користувача",
-              "pages": [
-                "uk/reference/v3/webhooks/delete-webhooks",
-                "uk/reference/v3/webhooks/delete-webhooks-remove-url",
-                "uk/reference/v3/webhooks/get-webhooks",
-                "uk/reference/v3/webhooks/get-webhooks-status",
-                "uk/reference/v3/webhooks/patch-webhooks-set-active",
-                "uk/reference/v3/webhooks/patch-webhooks-url-status",
-                "uk/reference/v3/webhooks/post-webhooks-add-url",
-                "uk/reference/v3/webhooks/post-webhooks-test",
-                "uk/reference/v3/webhooks/put-webhooks-url",
                 {
                   "group": "Реклама V3",
                   "icon": "rectangle-ad",
