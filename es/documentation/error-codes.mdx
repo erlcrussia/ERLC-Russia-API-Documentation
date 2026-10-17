@@ -20,7 +20,7 @@ Todos los errores se devuelven en formato JSON con los campos `code` y `message`
 ## Tabla de errores de API ER:LC Rusia
 
 <AccordionGroup>
-<Accordion title="Внутренние ошибки API (5001–5037)">
+<Accordion title="Errores internos de API (5001–5050)">
 | Código | Descripción | Significado |
     | --- | -------- | ------- |
 | `5001` | Falta la identificación de Discord | Falta `discord_id`. Agregue el campo `discord_id` al cuerpo de la solicitud |
@@ -53,6 +53,19 @@ Todos los errores se devuelven en formato JSON con los campos `code` y `message`
 | `5035` | Encabezados de firma faltantes | Faltan encabezados de firma (`X-Signature-Ed25519`, `X-Signature-Timestamp`) |
 | `5036` | Marca de tiempo demasiado antigua | La marca de tiempo de la solicitud es demasiado antigua (más de 5 minutos) |
 | `5037` | Firma no válida | Firma de solicitud no válida |
+| `5038` | Insufficient AI Credits | Créditos de IA insuficientes para completar la solicitud |
+| `5039` | Spam Blocked | La solicitud fue bloqueada por el filtro antispam |
+| `5040` | Model Not Found | El modelo de IA especificado no fue encontrado |
+| `5041` | Asset Not Found | El recurso CDN no fue encontrado |
+| `5042` | Folder Not Found | La carpeta no fue encontrada |
+| `5043` | Item Not Found | El elemento solicitado no fue encontrado |
+| `5044` | User Not Found | Usuario no encontrado |
+| `5045` | Insufficient Balance | Saldo insuficiente para completar la operación |
+| `5046` | Order Not Found | Pedido no encontrado |
+| `5047` | Points Limit Exceeded | Límite de puntos excedido |
+| `5048` | Insufficient Points | Puntos insuficientes para la operación |
+| `5049` | Bad Gateway | Error de gateway al consultar el servicio ascendente |
+| `5050` | Roblox Account Not Linked | La cuenta de Roblox no está vinculada |
   </Accordion>
 
 <Accordion title="Ошибки WebSocket Gateway (5101–5134)">
@@ -72,6 +85,17 @@ Todos los errores se devuelven en formato JSON con los campos `code` y `message`
 | `5132` | Cancelar suscripción | Código de información, no se requiere acción |
 | `5133` | Caché vacía | Los datos aún no se han cargado, espere |
 | `5134` | Instantánea vacía | Hay caché, pero no hay datos para tus suscripciones |
+  </Accordion>
+
+  <Accordion title="Errores de CDN y AI Gateway (5135–5140)">
+| Código | Descripción | Significado |
+| --- | -------- | ------- |
+| `5135` | CDN Path Already Exists | La ruta del archivo CDN ya existe. La sobrescritura automática está deshabilitada |
+| `5136` | CDN Folder Slug Already Exists | El slug de la carpeta ya está en uso. Elija otro slug |
+| `5137` | CDN Folder Not Found | La carpeta CDN con el ID especificado no fue encontrada |
+| `5138` | CDN Storage Unavailable | El almacenamiento MinIO / S3 no está disponible temporalmente |
+| `5139` | CDN Source Unavailable | La fuente externa no devolvió el archivo durante la importación |
+| `5140` | AI Response Unavailable | El modelo de IA no generó una respuesta utilizable |
   </Accordion>
 
 <Accordion title="Ошибки API Экономики (6000–6021)">

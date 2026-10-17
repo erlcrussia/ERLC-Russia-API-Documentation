@@ -207,7 +207,6 @@
                   "pages": [
                     "uk/reference/v3/cdn/overview",
                     "uk/reference/v3/cdn/bind-team",
-                    "uk/reference/v3/cdn/errors",
                     {
                       "group": "Асети та Простори Імен",
                       "icon": "file",

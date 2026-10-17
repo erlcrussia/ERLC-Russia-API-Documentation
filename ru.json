@@ -207,7 +207,6 @@
                   "pages": [
                     "ru/reference/v3/cdn/overview",
                     "ru/reference/v3/cdn/bind-team",
-                    "ru/reference/v3/cdn/errors",
                     {
                       "group": "Ассеты и Пространства Имён",
                       "icon": "file",

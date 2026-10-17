@@ -207,7 +207,6 @@
                   "pages": [
                     "it/reference/v3/cdn/overview",
                     "it/reference/v3/cdn/bind-team",
-                    "it/reference/v3/cdn/errors",
                     {
                       "group": "Asset e spazi dei nomi",
                       "icon": "file",

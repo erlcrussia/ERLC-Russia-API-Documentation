@@ -207,7 +207,6 @@
                   "pages": [
                     "es/reference/v3/cdn/overview",
                     "es/reference/v3/cdn/bind-team",
-                    "es/reference/v3/cdn/errors",
                     {
                       "group": "Activos y espacios de nombres",
                       "icon": "file",

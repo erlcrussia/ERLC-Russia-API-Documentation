@@ -20,7 +20,7 @@ All errors are returned in JSON format with fields `code` and `message`.
 ## API Error Table ER:LC Russia
 
 <AccordionGroup>
-<Accordion title="Внутренние ошибки API (5001–5037)">
+<Accordion title="Internal API Errors (5001–5050)">
 | Code | Description | Meaning |
     | --- | -------- | ------- |
 | `5001` | Missing Discord Id | `discord_id` is missing. Add the `discord_id` field to the request body |
@@ -53,6 +53,19 @@ All errors are returned in JSON format with fields `code` and `message`.
 | `5035` | Missing Signature Headers | Signature headers are missing (`X-Signature-Ed25519`, `X-Signature-Timestamp`) |
 | `5036` | Timestamp Too Old | Request timestamp is too old (more than 5 minutes) |
 | `5037` | Invalid Signature | Invalid request signature |
+| `5038` | Insufficient AI Credits | Insufficient AI credits to perform the request |
+| `5039` | Spam Blocked | Request was blocked by the anti-spam filter |
+| `5040` | Model Not Found | The specified AI model was not found |
+| `5041` | Asset Not Found | The CDN asset was not found |
+| `5042` | Folder Not Found | The folder was not found |
+| `5043` | Item Not Found | The requested item was not found |
+| `5044` | User Not Found | User not found |
+| `5045` | Insufficient Balance | Insufficient balance to complete the operation |
+| `5046` | Order Not Found | Order not found |
+| `5047` | Points Limit Exceeded | Points limit exceeded |
+| `5048` | Insufficient Points | Insufficient points for the operation |
+| `5049` | Bad Gateway | Gateway error when contacting upstream service |
+| `5050` | Roblox Account Not Linked | Roblox account is not linked to the profile |
   </Accordion>
 
 <Accordion title="Ошибки WebSocket Gateway (5101–5134)">
@@ -72,6 +85,17 @@ All errors are returned in JSON format with fields `code` and `message`.
 | `5132` | Unsubscribed | Information code, no action required |
 | `5133` | Cache Empty | Data has not been loaded yet, please wait |
 | `5134` | Empty Snapshot | There is cache, but there is no data for your subscriptions |
+  </Accordion>
+
+  <Accordion title="CDN and AI Gateway Errors (5135–5140)">
+| Code | Description | Meaning |
+| --- | -------- | ------- |
+| `5135` | CDN Path Already Exists | CDN file path already exists. Automatic overwrite is disabled |
+| `5136` | CDN Folder Slug Already Exists | Folder slug is already in use. Choose another slug |
+| `5137` | CDN Folder Not Found | CDN folder with specified ID was not found |
+| `5138` | CDN Storage Unavailable | MinIO / S3 storage is temporarily unavailable |
+| `5139` | CDN Source Unavailable | External source failed to return file during import |
+| `5140` | AI Response Unavailable | AI model produced no usable response |
   </Accordion>
 
 <Accordion title="Ошибки API Экономики (6000–6021)">

@@ -20,7 +20,7 @@ icon: triangle-exclamation
 ## Таблиця Помилок API ER:LC Росія
 
 <AccordionGroup>
-<Accordion title="Внутренние ошибки API (5001–5037)">
+<Accordion title="Внутрішні помилки API (5001–5050)">
 | Код | Опис | значення |
     | --- | -------- | ------- |
 | `5001` | Missing Discord Id | Немає `discord_id`. Додати поле `discord_id` до тіла запиту |
@@ -53,6 +53,19 @@ icon: triangle-exclamation
 | `5035` | Missing Signature Headers | Відсутні заголовки підпису (`X-Signature-Ed25519`, `X-Signature-Timestamp`)
 | `5036` | Timestamp Too Old | Таймстамп запиту занадто старий (понад 5 хвилин) |
 | `5037` | Invalid Signature | Невірний підпис запиту |
+    | `5038` | Insufficient AI Credits | Недостатньо кредитів AI для виконання запиту |
+    | `5039` | Spam Blocked | Запит заблоковано спам-фільтром |
+    | `5040` | Model Not Found | Вказану модель AI не знайдено |
+    | `5041` | Asset Not Found | CDN-асет не знайдено |
+    | `5042` | Folder Not Found | Папку не знайдено |
+    | `5043` | Item Not Found | Елемент не знайдено |
+    | `5044` | User Not Found | Користувача не знайдено |
+    | `5045` | Insufficient Balance | Недостатньо коштів на балансі |
+    | `5046` | Order Not Found | Замовлення не знайдено |
+    | `5047` | Points Limit Exceeded | Перевищено ліміт балів |
+    | `5048` | Insufficient Points | Недостатньо балів для операції |
+    | `5049` | Bad Gateway | Помилка шлюзу під час звернення до висхідного сервісу |
+    | `5050` | Roblox Account Not Linked | Акаунт Roblox не прив'язано до профілю |
   </Accordion>
 
 <Accordion title="Ошибки WebSocket Gateway (5101–5134)">
@@ -72,6 +85,17 @@ icon: triangle-exclamation
 | `5132` | Unsubscribed | |Інформаційний код, дій не потрібно |
 | `5133` | Cache Empty | Дані ще не завантажені, зачекайте |
 | `5134` | Empty Snapshot | Кеш є, але немає даних для ваших передплат |
+  </Accordion>
+
+  <Accordion title="Помилки CDN та AI Gateway (5135–5140)">
+    | Код | Опис | Значення |
+    | --- | ---- | -------- |
+    | `5135` | CDN Path Already Exists | Шлях до файлу вже зайнятий. Автоматичний перезапис вимкнено |
+    | `5136` | CDN Folder Slug Already Exists | Slug папки вже зайнятий. Оберіть інший ідентифікатор папки |
+    | `5137` | CDN Folder Not Found | Папку CDN із зазначеним ID не знайдено |
+    | `5138` | CDN Storage Unavailable | Сховище MinIO / S3 тимчасово недоступне |
+    | `5139` | CDN Source Unavailable | Зовнішнє джерело не повернуло файл під час імпорту |
+    | `5140` | AI Response Unavailable | Модель AI не повернула коректну відповідь |
   </Accordion>
 
 <Accordion title="Ошибки API Экономики (6000–6021)">
