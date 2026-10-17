@@ -22,7 +22,6 @@ Tutti gli errori vengono restituiti in formato JSON con i campi `code` e `messag
   <Accordion title="Errori di Autenticazione e Token">
     | Codice | Descrizione | Significato |
     | :---: | :--- | :--- |
-    | `5006` | Invalid Master Key | Chiave master non valida. Controlla l'intestazione `erlcrussia-api-master-key` |
     | `5007` | Missing Token | Token di autorizzazione mancante. Aggiungi l'intestazione `Authorization: Bearer <token>` o `erlcrussia-api-key: <token>` |
     | `5008` | Invalid Token | Il token non è valido, è disattivato o mancante nel database |
     | `5009` | Forbidden | Accesso negato a questo endpoint o azione per il tuo token |

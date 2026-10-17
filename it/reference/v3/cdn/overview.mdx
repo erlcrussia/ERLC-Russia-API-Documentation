@@ -83,11 +83,9 @@ EDGE → удаляет файлы с SSD и записи из SQLite
 
 ## Autorizzazione
 
-| Titolo | Dove è accettato |
+| Intestazione | Dove è accettato |
 |---|---|
-| `erlcrussia-api-key` | tutte le tratte pubbliche `/v3/cdn/*` |
-| `erlcrussia-api-master-key` | `/v3/admin/cdn/*` per interfaccia |
-| `erlcrussia-api-edge-key` | solo servizio `/v3/*` Go Edge, non utilizzato in V3 |
+| `erlcrussia-api-key` | Tutte le route `/v3/cdn/*` (supporta anche `X-API-Key` e `Authorization: Bearer <token>`) |
 
 La chiave viene trasmessa esclusivamente nell'intestazione. I parametri di query `?apiKey=` e `?token=` non sono supportati.
 

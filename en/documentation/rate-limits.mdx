@@ -4,34 +4,38 @@ description: Current windows, shared counters, headers, and HTTP 429 handling.
 icon: gauge-high
 ---
 
-Limits may change and may differ by IP address and API key. The table lists baseline values; response headers describe the limits applied to your requests. Follow `X-RateLimit-Limit`, `X-RateLimit-Remaining`, `X-RateLimit-Reset`, and `Retry-After`.
+Rate limits in the ER:LC Russia API are **custom and dynamic**: they are configured via the policy engine, can vary depending on IP address and API key tier, and automatically scale with active subscription benefits.
+
+The table below lists **baseline default values**. The actual limits enforced for your application are defined exclusively by server response headers. Clients and bots should avoid hardcoding static limits and should instead inspect the `X-RateLimit-*` headers dynamically.
 
 ## Standard routes
 
-| Group | Limit |
+| Group | Baseline limit |
 |---|---|
-| `/v3/cdn/*`, `/v3/users`, `/v3/keys`, `/v3/points/*`, `/v3/health` | 20 requests per minute |
-| `/v3/erlc/*`, `/v3/civops/*`, `/v3/subscriptions/*`, `/v3/admin/*` | 120 requests per minute |
+| `/v3/cdn/*`, `/v3/user-assets/*`, `/v3/users`, `/v3/keys`, `/v3/points/*`, `/v3/health` | 20 requests per minute |
+| `/v3/erlc/*`, `/v3/civops/*`, `/v3/subscriptions/*`, `/v3/ads/*` | 120 requests per minute |
 | `/v3/stats` without an API key | 40 requests per minute |
 | `/v3/stats` with an API key | 120 requests per minute |
-| `/v3/ai/*`, `/v1/chat*`, `/v1/models*`, `/v1/audio/*` | 120 requests per second |
+| `/v3/ai/*` | 120 requests per second |
 
-Standard routes share a counter per key across methods and routes; requests without credentials use the IP address. AI has a separate one-second window. Checking a file with GET and uploading it with POST count as separate requests. Stop sending requests when limited, then retry only the rejected request after the specified wait.
+Standard routes share a counter per key across methods and routes; requests without credentials use the IP address. AI has a separate one-second window. Checking a file with GET and uploading it with POST count as separate requests. When rate-limited, pause requests and retry after the period indicated in headers.
 
 ## Authorization
 
-OAuth login and callbacks, and session/init: 10 requests per minute per signed visitor or verified session. Other user auth routes allow 250 requests per session or 60 per anonymous visitor.
+OAuth login and callbacks: 10 requests per minute per signed session cookie. Other user auth routes allow 250 requests per session or 60 per anonymous visitor.
 
-Anonymous requests also have a shared IP limit: 120 per minute for login and 240 for other auth routes. A visitor is identified by the signed HttpOnly cookie erlc_auth_visitor. The window resets at the start of each calendar minute. These auth routes do not use the standard limiter's five-minute ban.
+Anonymous requests also have a shared IP limit: 120 per minute for login and 240 for other auth routes. The window resets at the start of each calendar minute.
 
-## Headers and the 429 response
+## How to navigate using response headers (HTTP Headers)
 
-| Header | Value |
-|---|---|
-| `X-RateLimit-Limit` | Limit for the current window |
-| `X-RateLimit-Remaining` | Requests remaining |
-| `X-RateLimit-Reset` | Unix timestamp in milliseconds |
-| `Retry-After` | Seconds to wait after a 429 response |
+Every API response includes rate-limit headers to help client applications track current quota status:
+
+| Header | Description | How client should use it |
+|---|---|---|
+| `X-RateLimit-Limit` | Request ceiling for the active window | Shows your key's personalized limit based on policies and subscription |
+| `X-RateLimit-Remaining` | Remaining requests available | When approaching `0`, the client should slow down request dispatch (client-side throttling) |
+| `X-RateLimit-Reset` | Window reset timestamp (Unix ms) | Exact point in time when the `Remaining` quota fully resets |
+| `Retry-After` | Required backoff delay in seconds (on `429`) | Mandatory delay before retrying the rejected request |
 
 ```json
 {

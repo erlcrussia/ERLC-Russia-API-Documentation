@@ -4,34 +4,38 @@ description: Finestre correnti, contatori condivisi, header e gestione di HTTP 4
 icon: gauge-high
 ---
 
-I limiti possono cambiare e variare in base all’indirizzo IP e alla chiave API. La tabella riporta i valori di base; gli header di risposta indicano i limiti applicati. Rispetta `X-RateLimit-Limit`, `X-RateLimit-Remaining`, `X-RateLimit-Reset` e `Retry-After`.
+I limiti delle richieste nell'API di ER:LC Russia sono **personalizzati e dinamici**: vengono configurati tramite il motore delle policy, possono variare in base all'indirizzo IP e al tier della chiave API e aumentano automaticamente con i vantaggi degli abbonamenti attivi.
+
+La tabella seguente mostra i **valori di base predefiniti**. I limiti effettivi applicati alla tua applicazione sono definiti esclusivamente dagli header di risposta del server. Si raccomanda a client e bot di non hardcodare valori statici, ma di orientarsi dinamicamente tramite gli header `X-RateLimit-*`.
 
 ## Route standard
 
-| Gruppo | Limite |
+| Gruppo | Limite di base |
 |---|---|
-| `/v3/cdn/*`, `/v3/users`, `/v3/keys`, `/v3/points/*`, `/v3/health` | 20 richieste al minuto |
-| `/v3/erlc/*`, `/v3/civops/*`, `/v3/subscriptions/*`, `/v3/admin/*` | 120 richieste al minuto |
+| `/v3/cdn/*`, `/v3/user-assets/*`, `/v3/users`, `/v3/keys`, `/v3/points/*`, `/v3/health` | 20 richieste al minuto |
+| `/v3/erlc/*`, `/v3/civops/*`, `/v3/subscriptions/*`, `/v3/ads/*` | 120 richieste al minuto |
 | `/v3/stats` senza chiave API | 40 richieste al minuto |
 | `/v3/stats` con chiave API | 120 richieste al minuto |
-| `/v3/ai/*`, `/v1/chat*`, `/v1/models*`, `/v1/audio/*` | 120 richieste al secondo |
+| `/v3/ai/*` | 120 richieste al secondo |
 
-Le route standard condividono un contatore per chiave tra metodi e route; senza credenziali viene usato l’IP. AI ha una finestra separata di un secondo. La verifica di un file con GET e il caricamento con POST contano come richieste distinte. Raggiunto il limite, interrompere l’invio e ripetere soltanto la richiesta rifiutata dopo l’attesa indicata.
+Le route standard condividono un contatore per chiave tra metodi e route; senza credenziali viene usato l’IP. AI ha una finestra separata di un secondo. La verifica di un file con GET e il caricamento con POST contano come richieste distinte. Raggiunto il limite, interrompere l’invio e ripetere soltanto la richiesta rifiutata dopo l’attesa indicata negli header.
 
 ## Autorizzazione
 
-L’accesso OAuth, i callback e session/init consentono 10 richieste al minuto per visitatore con cookie firmato o sessione verificata. Le altre route di autenticazione dell’utente consentono 250 richieste per sessione oppure 60 per visitatore anonimo.
+L’accesso OAuth e i callback consentono 10 richieste al minuto per utente con cookie di sessione firmato. Le altre route di autenticazione dell’utente consentono 250 richieste per sessione oppure 60 per visitatore anonimo.
 
-Le richieste anonime hanno anche un limite condiviso per IP: 120 al minuto per l’accesso e 240 per le altre route di autenticazione. Il visitatore viene identificato dal cookie HttpOnly firmato erlc_auth_visitor. La finestra si azzera all’inizio di ogni minuto. Queste route non applicano il blocco di cinque minuti del limitatore standard.
+Le richieste anonime hanno anche un limite condiviso per IP: 120 al minuto per l’accesso e 240 per le altre route di autenticazione. La finestra si azzera all’inizio di ogni minuto.
 
-## Header e risposta 429
+## Come orientarsi con gli header di risposta (HTTP Headers)
 
-| Header | Valore |
-|---|---|
-| `X-RateLimit-Limit` | Limite della finestra corrente |
-| `X-RateLimit-Remaining` | Richieste rimanenti |
-| `X-RateLimit-Reset` | Timestamp Unix in millisecondi |
-| `Retry-After` | Secondi da attendere dopo un 429 |
+A ogni richiesta, l'API restituisce un set di header che descrive lo stato della tua quota:
+
+| Header | Descrizione | Come utilizzarlo |
+|---|---|---|
+| `X-RateLimit-Limit` | Tetto massimo di richieste nella finestra attiva | Mostra il limite personalizzato della tua chiave in base a policy e abbonamenti |
+| `X-RateLimit-Remaining` | Numero di richieste rimanenti | Se si avvicina a `0`, il client deve rallentare la frequenza di invio (client-side throttling) |
+| `X-RateLimit-Reset` | Timestamp di reset della finestra (Unix ms) | Momento esatto in cui la quota `Remaining` viene completamente ripristinata |
+| `Retry-After` | Secondi di attesa obbligatori (con codice `429`) | Pausa obbligatoria prima di riprovare la richiesta rifiutata |
 
 ```json
 {

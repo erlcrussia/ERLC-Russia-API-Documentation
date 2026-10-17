@@ -4,34 +4,38 @@ description: Ventanas actuales, contadores compartidos, cabeceras y tratamiento 
 icon: gauge-high
 ---
 
-Los límites pueden cambiar y variar según la dirección IP y la clave API. La tabla muestra valores de referencia; las cabeceras de respuesta indican los límites aplicados. Respeta `X-RateLimit-Limit`, `X-RateLimit-Remaining`, `X-RateLimit-Reset` y `Retry-After`.
+Los límites de solicitudes en la API de ER:LC Rusia son **personalizados y dinámicos**: se configuran mediante el sistema de políticas, pueden variar según la dirección IP o el nivel de la clave API, y aumentan automáticamente con los beneficios de suscripciones activas.
+
+La tabla a continuación muestra los **valores base predeterminados**. Los límites reales aplicados a su aplicación se definen exclusivamente a través de las cabeceras de respuesta del servidor. Se recomienda a clientes y bots no fijar números estáticos en el código, sino orientarse dinámicamente por las cabeceras `X-RateLimit-*`.
 
 ## Rutas estándar
 
-| Grupo | Límite |
+| Grupo | Límite base |
 |---|---|
-| `/v3/cdn/*`, `/v3/users`, `/v3/keys`, `/v3/points/*`, `/v3/health` | 20 solicitudes por minuto |
-| `/v3/erlc/*`, `/v3/civops/*`, `/v3/subscriptions/*`, `/v3/admin/*` | 120 solicitudes por minuto |
+| `/v3/cdn/*`, `/v3/user-assets/*`, `/v3/users`, `/v3/keys`, `/v3/points/*`, `/v3/health` | 20 solicitudes por minuto |
+| `/v3/erlc/*`, `/v3/civops/*`, `/v3/subscriptions/*`, `/v3/ads/*` | 120 solicitudes por minuto |
 | `/v3/stats` sin clave de API | 40 solicitudes por minuto |
 | `/v3/stats` con clave de API | 120 solicitudes por minuto |
-| `/v3/ai/*`, `/v1/chat*`, `/v1/models*`, `/v1/audio/*` | 120 solicitudes por segundo |
+| `/v3/ai/*` | 120 solicitudes por segundo |
 
-Las rutas estándar comparten un contador por clave entre métodos y rutas; sin credenciales se usa la IP. AI tiene una ventana independiente de un segundo. Comprobar un archivo mediante GET y subirlo mediante POST cuenta como dos solicitudes. Al alcanzar el límite, detenga el envío y repita únicamente la solicitud rechazada tras la espera indicada.
+Las rutas estándar comparten un contador por clave entre métodos y rutas; sin credenciales se usa la IP. AI tiene una ventana independiente de un segundo. Comprobar un archivo mediante GET y subirlo mediante POST cuenta como dos solicitudes. Al alcanzar el límite, detenga el envío y repita únicamente la solicitud rechazada tras la espera indicada en las cabeceras.
 
 ## Autorización
 
-El inicio de sesión OAuth, sus callbacks y session/init permiten 10 solicitudes por minuto por visitante con cookie firmada o sesión verificada. Las demás rutas de autenticación del usuario permiten 250 por sesión o 60 por visitante anónimo.
+El inicio de sesión OAuth y sus callbacks permiten 10 solicitudes por minuto por usuario con cookie de sesión firmada. Las demás rutas de autenticación del usuario permiten 250 por sesión o 60 por visitante anónimo.
 
-Las solicitudes anónimas tienen además un límite compartido por IP: 120 por minuto para iniciar sesión y 240 para las demás rutas de autenticación. El visitante se identifica mediante la cookie HttpOnly firmada erlc_auth_visitor. La ventana se reinicia al comenzar cada minuto. Estas rutas no aplican el bloqueo de cinco minutos del limitador estándar.
+Las solicitudes anónimas tienen además un límite compartido por IP: 120 por minuto para iniciar sesión y 240 para las demás rutas de autenticación. La ventana se reinicia al comenzar cada minuto.
 
-## Cabeceras y respuesta 429
+## Cómo orientarse por las cabeceras (HTTP Headers)
 
-| Cabecera | Valor |
-|---|---|
-| `X-RateLimit-Limit` | Límite de la ventana actual |
-| `X-RateLimit-Remaining` | Solicitudes restantes |
-| `X-RateLimit-Reset` | Marca de tiempo Unix en milisegundos |
-| `Retry-After` | Segundos de espera tras un 429 |
+En cada solicitud, la API devuelve un conjunto de cabeceras que describen el estado de su cuota:
+
+| Cabecera | Descripción | Cómo debe usarla el cliente |
+|---|---|---|
+| `X-RateLimit-Limit` | Límite asignado para la ventana activa | Muestra el límite personalizado de su clave según políticas y suscripciones |
+| `X-RateLimit-Remaining` | Número de solicitudes restantes | Si se acerca a `0`, el cliente debe ralentizar el envío de solicitudes (client-side throttling) |
+| `X-RateLimit-Reset` | Momento de reinicio (marca de tiempo Unix en ms) | Indica el instante exacto en que la cuota `Remaining` se restablece por completo |
+| `Retry-After` | Tiempo de espera requerido en segundos (con `429`) | Pausa obligatoria antes de reintentar la solicitud rechazada |
 
 ```json
 {
