@@ -1,0 +1,56 @@
+---
+title: "Modo de voz (Realtime)"
+description: "WebSocket para respuestas habladas del modelo emmy-voice-1 con el protocolo OpenAI Realtime."
+icon: "waveform-lines"
+---
+
+Dirección: `wss://api.erlcrussia.com/v1/realtime?model=emmy-voice-1`. El parámetro `model` es opcional.
+
+La autenticación funciona como en OpenAI:
+
+* en un servidor, con la cabecera `Authorization: Bearer sk-voice-…`;
+* en el navegador, con los subprotocolos WebSocket `realtime` y `openai-insecure-api-key.sk-voice-…`.
+
+Funciona con el [SDK de OpenAI Realtime](https://platform.openai.com/docs/guides/realtime): envías texto o voz y el modelo responde con voz y una transcripción. Los campos que la API no usa (como `instructions` o `tools`) se ignoran.
+
+## Sesión
+
+Al conectarte, el servidor envía `session.created`. Los ajustes se cambian con `session.update`:
+
+```json
+{"type":"session.update","session":{"type":"realtime","language":"es","audio":{"input":{"format":{"type":"audio/pcm","rate":24000},"turn_detection":null},"output":{"voice":"F1","format":{"type":"audio/pcm","rate":24000}}}}}
+```
+
+Idiomas: `ru`, `en`, `uk`, `be`, `es`, `it`, `fr`, `zh`, `ja`, `ko`. Voces: `F1`, `F2`. El audio de entrada y de salida es PCM16, mono, 24 kHz.
+
+Los turnos son manuales: `turn_detection` debe ser `null` y el evento `input_audio_buffer.commit` cierra el turno. La detección automática de voz (`server_vad`) no está disponible.
+
+## Solicitud de texto
+
+```json
+{"type":"conversation.item.create","item":{"type":"message","role":"user","content":[{"type":"input_text","text":"¿Qué significa RD?"}]}}
+{"type":"response.create"}
+```
+
+El `id` del elemento es opcional. El rol puede ser `user` o `system`.
+
+## Solicitud de voz
+
+```json
+{"type":"input_audio_buffer.append","audio":"<PCM16 24 kHz en base64>"}
+{"type":"input_audio_buffer.commit"}
+{"type":"response.create"}
+```
+
+Tras `commit`, el servidor envía `input_audio_buffer.committed` y `conversation.item.added`. Cuando se reconoce la voz llegan `conversation.item.input_audio_transcription.completed` con el texto y `conversation.item.done`. Si el reconocimiento falla, llega `conversation.item.input_audio_transcription.failed`. Puedes enviar `response.create` justo después de `commit`: la respuesta empieza cuando termina el reconocimiento.
+
+`input_audio_buffer.clear` vacía el búfer. La voz también se puede enviar como un único elemento `conversation.item.create` con una parte `input_audio`.
+
+## Respuesta
+
+El servidor envía `response.created`, luego `response.output_audio_transcript.delta` (texto) y `response.output_audio.delta` (PCM en base64), y al final `response.done` con el consumo en `usage`.
+
+* El reconocimiento de voz cuesta lo mismo que el [reconocimiento de voz por archivo](/es/openai-api/v1/transcriptions).
+* `event_id` es opcional (hasta 128 caracteres). Si se envía, un evento repetido con el mismo `event_id` se ignora.
+* Solo una respuesta a la vez. El texto va de 1 a 12 000 caracteres; la voz, de 100 ms a 120 segundos.
+* Tras 100 intercambios o 4096 eventos, abre una conexión nueva.

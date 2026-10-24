@@ -1,4 +1,6 @@
 ---
-title: Reset CDN domain cache
+title: "Purge domain cache"
+description: "Purges the CDN domain cache. Pass paths in `paths`; without them the whole domain is purged. Check `success`: a 200 response can still mean a partial failure."
+icon: "broom"
 openapi: /en/openapi/en-api-v3-openapi.yaml POST /cdn/custom-domains/{id}/purge
 ---

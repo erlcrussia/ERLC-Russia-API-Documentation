@@ -11,7 +11,7 @@ El WebSocket Gateway te permite recibir datos del servidor de ER:LC en tiempo re
 
 Al conectarse al endpoint HTTP (no WebSocket), se devuelve un error `426` con código `5020`.
 
-## Inicio Rápido
+## Inicio rápido
 
 ```js
 const ws = new WebSocket('wss://api.erlcrussia.com/v2/gateway');
@@ -26,7 +26,7 @@ ws.on('message', (data) => {
 });
 ```
 
-## Ciclo de Vida de la Conexión
+## Ciclo de vida de la conexión
 
 1. **Conectar** — establecer una conexión WebSocket
 2. **Autenticar** — enviar `auth` con tu token
@@ -37,7 +37,7 @@ ws.on('message', (data) => {
 
 ---
 
-## Mensajes del Cliente
+## Mensajes del cliente
 
 Todos los mensajes se envían en formato JSON con un campo `action`.
 
@@ -52,7 +52,7 @@ El primer mensaje que debe enviarse tras conectarse. Sin autenticación, todas l
 }
 ```
 
-### Respuesta Exitosa
+### Respuesta exitosa
 
 ```json
 {
@@ -66,7 +66,7 @@ Tras una autenticación exitosa, se envía automáticamente una instantánea (sn
 
 ---
 
-## Suscripción a Canales
+## Suscripción a canales
 
 Suscríbete a uno o más canales de datos.
 
@@ -95,7 +95,7 @@ También se admite un solo canal a través del campo `channel`:
 }
 ```
 
-### Suscripción Denegada
+### Suscripción denegada
 
 Si no tienes acceso a un canal específico:
 
@@ -109,7 +109,7 @@ Si no tienes acceso a un canal específico:
 
 ---
 
-## Cancelación de Suscripción a Canales
+## Cancelación de suscripción a canales
 
 Cancela la suscripción a los canales que ya no necesites.
 
@@ -131,7 +131,7 @@ Cancela la suscripción a los canales que ya no necesites.
 
 ---
 
-## Obtención de Caché
+## Obtención de caché
 
 Solicita la instantánea actual de la caché para tus suscripciones.
 
@@ -166,7 +166,7 @@ Comprobación de la conexión.
 
 ---
 
-## Canales de Datos
+## Canales de datos
 
 | Canal | Descripción |
 | --- | --- |
@@ -183,7 +183,7 @@ Comprobación de la conexión.
 
 ---
 
-## Estructura de Datos de los Canales
+## Estructura de datos de los canales
 
 ### `Server`
 
@@ -326,9 +326,9 @@ Comprobación de la conexión.
 
 ---
 
-## Mensajes del Servidor
+## Mensajes del servidor
 
-### Evento de Conexión
+### Evento de conexión
 
 Enviado inmediatamente después de establecer la conexión:
 
@@ -340,7 +340,7 @@ Enviado inmediatamente después de establecer la conexión:
 }
 ```
 
-### Actualización de Caché
+### Actualización de caché
 
 Cuando los datos del servidor cambian, se envía una instantánea actualizada a todos los clientes suscritos:
 
@@ -355,7 +355,7 @@ Cuando los datos del servidor cambian, se envía una instantánea actualizada a 
 
 > Los datos se devuelven únicamente para los canales a los que el cliente está suscrito.
 
-### Caché Vacía
+### Caché vacía
 
 Si la caché no está disponible:
 
@@ -366,7 +366,7 @@ Si la caché no está disponible:
 }
 ```
 
-### Instantánea Vacía
+### Instantánea vacía
 
 Si la caché existe pero no hay datos para tus suscripciones:
 
@@ -402,7 +402,7 @@ Para la comprobación manual de la conexión, utiliza la acción `ping`:
 
 ---
 
-## Ejemplo Completo
+## Ejemplo completo
 
 ```js
 const WebSocket = require('ws');

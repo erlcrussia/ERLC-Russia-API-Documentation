@@ -1,113 +1,81 @@
 ---
-title: "Event Webhook"
+title: "Event webhook"
+description: "How to receive game events on your URL and verify the signature."
 icon: "webhook"
 ---
 
-To receive webhooks from the game:
+The API forwards game server events to your URL. Every request is signed with Ed25519, and your handler must verify the signature.
 
-1. You can configure webhooks in two ways:
-   - In your personal account on the website: go to **Tokens -> Webhooks** (`/my/tokens?tab=webhooks`).
-   - On our Discord server: run the `/webhook manage` command.
-2. Specify the URL of your **custom** webhook and select servers:
-   - **All servers** (default) — the webhook will receive events from all project servers.
-   - **Specific servers** — the webhook will only receive events from the selected game servers.
-3. Before saving the URL, make sure to click "Test":
-   - The system will send a signed ping request. If your endpoint responds with HTTP `200 OK`, the webhook is verified and ready.
-4. After successful verification, activate data reception.
+## Setup
 
-<Danger>
-   **We do NOT support direct Discord webhooks. The system works exclusively with custom webhooks (your own handlers/endpoints).**
-</Danger>
+<Steps>
+  <Step title="Open the webhooks page">
+    Sign in and open [erlcrussia.com/my/tokens/webhooks](https://erlcrussia.com/my/tokens/webhooks). Access is granted through a ticket; see [How to get a key](/en/tutorials/how-to-get-api-key).
+  </Step>
+  <Step title="Add a URL">
+    Enter your handler address and click "Check". The API sends two test requests: one with a valid signature and one with a forged one.
+  </Step>
+  <Step title="Pass the check">
+    The URL is saved only if the handler answers 2xx to the valid request and 4xx to the forged one.
+  </Step>
+</Steps>
 
-Your endpoint must verify Ed25519 signatures on every request. The game will only save URLs that pass verification.
+<Warning>
+  Discord webhook links do not work: you need your own handler.
+</Warning>
 
----
+## Handler requirements
 
-### Headers & Multi-Server Routing
+1. Accept `POST` with a JSON body.
+2. Read the `X-Signature-Timestamp` (Unix time as a string) and `X-Signature-Ed25519` (hex signature) headers.
+3. Verify the signature of `timestamp + raw body`: the UTF-8 bytes of the timestamp followed directly by the unchanged body bytes.
+4. Answer 2xx only for a valid signature, otherwise 4xx.
 
-Every outgoing webhook includes information about the origin server:
+## Public key
 
-#### HTTP Headers:
-* `X-Signature-Ed25519` — hex-encoded Ed25519 signature.
-* `X-Signature-Timestamp` — Unix timestamp (in seconds).
-* `X-Server-ID` — ID of the game server where the event occurred.
-* `X-Server-Name` — human-friendly server alias/name (e.g., `MRP 1`, `MVD`), if configured by administrators.
-
-#### Request Body (JSON):
-* `server_id` (string) — game server ID.
-* `server_name` (string) — server alias/name.
-* Event payload (chat commands, emergency call data, etc.).
-
----
-
-### Requirements
-
-#### Your endpoint must accept
-
-* `POST` requests with a JSON body.
-* These headers on every signed request:
-  * `X-Signature-Ed25519` (hex-encoded Ed25519 signature).
-  * `X-Signature-Timestamp` (Unix timestamp string).
-  * `X-Server-ID` (game server ID).
-  * `X-Server-Name` (game server name/alias).
-
-#### Your Endpoint Must:
-
-1. Read the **raw bytes of the request body** exactly as received (do not re-serialize JSON).
-2. Read `X-Signature-Timestamp`.
-3. Read `X-Signature-Ed25519`.
-4. Verify the signature for:
-
-   `message = timestamp + raw_body`
-
-   Where `timestamp` is the header value as a string, concatenated directly with the raw body bytes.
-5. Return:
-   * **2xx** only if the signature is valid.
-   * **4xx** if headers are missing, invalid, or signature verification fails.
-
----
-
-### Public Key
-
-Use this Ed25519 public key (base64, SubjectPublicKeyInfo / SPKI):
+Ed25519, base64, SPKI format:
 
 ```
 MCowBQYDK2VwAyEArbRTkyh3A035YUWWZdyF3vck4QN3I7uU8cp7YaxocFE=
 ```
 
----
+## Node.js example
 
-### Implementation Details
+```javascript
+import crypto from "node:crypto";
+import express from "express";
 
-#### Input Data
+const publicKey = crypto.createPublicKey({
+  key: Buffer.from("MCowBQYDK2VwAyEArbRTkyh3A035YUWWZdyF3vck4QN3I7uU8cp7YaxocFE=", "base64"),
+  format: "der",
+  type: "spki",
+});
 
-* `timestamp`: exact string from `X-Signature-Timestamp`.
-* `sigHex`: exact string from `X-Signature-Ed25519` (hex).
-* `rawBody`: raw bytes of the request body.
+const app = express();
+app.post("/erlc-webhook", express.raw({ type: "*/*" }), (req, res) => {
+  const timestamp = req.get("X-Signature-Timestamp");
+  const signature = req.get("X-Signature-Ed25519");
+  if (!timestamp || !signature) return res.sendStatus(401);
 
-#### Steps
+  const message = Buffer.concat([Buffer.from(timestamp, "utf8"), req.body]);
+  const ok = crypto.verify(null, message, publicKey, Buffer.from(signature, "hex"));
+  if (!ok) return res.sendStatus(401);
 
-1. Decode `sigHex` from hex to bytes.
-2. Construct `message` as:
-   * `timestamp` bytes in UTF-8
-   * Immediately followed by `rawBody`
-3. Verify the Ed25519 signature using the public key above.
+  const event = JSON.parse(req.body.toString("utf8"));
+  res.sendStatus(204);
+});
+```
 
-#### Common Mistakes
+Common mistakes:
 
-* Do not use a parsed JSON object for verification. Use only raw body bytes.
-* Do not add separators or spaces between the timestamp and body.
-* Treat the signature as hex, not base64.
-* Make sure your framework doesn't consume the body before you capture it.
+* verifying parsed and re-serialized JSON instead of the raw bytes;
+* adding a space or separator between the timestamp and the body;
+* decoding the signature as base64 instead of hex;
+* the framework consumes the body before you get the raw bytes.
 
----
+## Which events are sent
 
-### What events are sent?
+* in-game messages starting with `;`, for your own in-game commands;
+* emergency calls.
 
-Currently, the game sends webhooks for:
-
-* Messages starting with **;**
-  * This allows creating custom in-game commands!
-* Emergency Calls
-
-New events may be added in the future. Note: the webhook system is not intended to replace HTTP API polling or WebSocket.
+More events may be added. Webhooks do not replace the HTTP API or the [WebSocket](/en/other/websocket-gateway).

@@ -3,21 +3,23 @@ info:
   title: ER:LC Россия API V1 - Moscow RolePlay API Статистики V1
   version: 1.0.0
 servers:
-  - url: https://api.erlcrussia.xyz/v1
-    description: Production API V1 (xyz)
-  - url: https://api.erlcrussia.com/v1
-    description: Production API V1 (com)
+- url: https://api.erlcrussia.com/v1
+  description: Production API V1 (com)
+- url: https://api.erlcrussia.xyz/v1
+  description: Production API V1 (xyz)
 tags:
-  - name: Moscow RolePlay API Статистики V1
-    description: Открытая статистика Moscow RolePlay.
+- name: Moscow RolePlay API Статистики V1
+  description: Открытая статистика Moscow RolePlay.
 paths:
   /moscowroleplay/stats/playercount:
     get:
       tags:
-        - Moscow RolePlay API Статистики V1
+      - Moscow RolePlay API Статистики V1
       summary: Текущее Количество Игроков ER:LC
-      description: |
-        Возвращает текущее количество игроков на сервере ER:LC в виде простого текста.
+      description: '**Устарел.** Отвечает ошибкой `5028`. Используйте `GET /v3/stats`.
+
+
+        Возвращает текущее количество игроков на сервере ER:LC в виде простого текста.'
       security: []
       responses:
         '200':
@@ -33,16 +35,19 @@ paths:
           $ref: '#/components/responses/TooManyRequests'
         '500':
           $ref: '#/components/responses/InternalServerError'
+      deprecated: true
   /moscowroleplay/stats/{server}/membercount:
     get:
       tags:
-        - Moscow RolePlay API Статистики V1
+      - Moscow RolePlay API Статистики V1
       summary: Количество Участников Discord Сервера
-      description: |
-        Возвращает количество участников в Discord для указанного сервера.
+      description: '**Устарел.** Отвечает ошибкой `5028`. Используйте `GET /v3/stats`.
+
+
+        Возвращает количество участников в Discord для указанного сервера.'
       security: []
       parameters:
-        - $ref: '#/components/parameters/ServerParam'
+      - $ref: '#/components/parameters/ServerParam'
       responses:
         '200':
           description: Количество участников в виде строки.
@@ -57,21 +62,24 @@ paths:
             text/plain:
               schema:
                 type: string
-                example: 'Запрашиваемый тип статистики недоступен для данного сервера'
+                example: Запрашиваемый тип статистики недоступен для данного сервера
         '429':
           $ref: '#/components/responses/TooManyRequests'
         '500':
           $ref: '#/components/responses/InternalServerError'
+      deprecated: true
   /moscowroleplay/stats/{server}/allmembercount:
     get:
       tags:
-        - Moscow RolePlay API Статистики V1
+      - Moscow RolePlay API Статистики V1
       summary: Общее Количество Участников (Включая Ботов)
-      description: |
-        Возвращает общее количество всех участников в Discord (включая ботов) для указанного сервера.
+      description: '**Устарел.** Отвечает ошибкой `5028`. Используйте `GET /v3/stats`.
+
+
+        Возвращает общее количество всех участников в Discord (включая ботов) для указанного сервера.'
       security: []
       parameters:
-        - $ref: '#/components/parameters/ServerParam'
+      - $ref: '#/components/parameters/ServerParam'
       responses:
         '200':
           description: Общее количество участников в виде строки.
@@ -86,21 +94,24 @@ paths:
             text/plain:
               schema:
                 type: string
-                example: 'Запрашиваемый тип статистики недоступен для данного сервера'
+                example: Запрашиваемый тип статистики недоступен для данного сервера
         '429':
           $ref: '#/components/responses/TooManyRequests'
         '500':
           $ref: '#/components/responses/InternalServerError'
+      deprecated: true
   /moscowroleplay/stats/{server}/botcount:
     get:
       tags:
-        - Moscow RolePlay API Статистики V1
+      - Moscow RolePlay API Статистики V1
       summary: Количество Ботов Discord Сервера
-      description: |
-        Возвращает количество ботов в Discord для указанного сервера.
+      description: '**Устарел.** Отвечает ошибкой `5028`. Используйте `GET /v3/stats`.
+
+
+        Возвращает количество ботов в Discord для указанного сервера.'
       security: []
       parameters:
-        - $ref: '#/components/parameters/ServerParam'
+      - $ref: '#/components/parameters/ServerParam'
       responses:
         '200':
           description: Количество ботов в виде строки.
@@ -115,29 +126,31 @@ paths:
             text/plain:
               schema:
                 type: string
-                example: 'Запрашиваемый тип статистики недоступен для данного сервера'
+                example: Запрашиваемый тип статистики недоступен для данного сервера
         '429':
           $ref: '#/components/responses/TooManyRequests'
         '500':
           $ref: '#/components/responses/InternalServerError'
+      deprecated: true
 components:
   parameters:
     ServerParam:
       name: server
       in: path
       required: true
-      description: |
-        Имя сервера Discord.
+      description: 'Имя сервера Discord.
+
+        '
       schema:
         type: string
         enum:
-          - MVD
-          - FSB
-          - MCHS
-          - MZ
-          - '112'
-          - DOT
-          - MRP
+        - MVD
+        - FSB
+        - MCHS
+        - MZ
+        - '112'
+        - DOT
+        - MRP
   responses:
     BadRequest:
       description: Неверный запрос.
@@ -201,8 +214,8 @@ components:
       type: object
       description: Стандартный формат ошибки.
       required:
-        - code
-        - message
+      - code
+      - message
       properties:
         code:
           type: integer

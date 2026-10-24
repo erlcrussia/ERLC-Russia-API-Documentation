@@ -1,15 +1,32 @@
 ---
-title: Domini CDN personalizzati
-description: Registrazione, controllo DNS/TLS e instradamento delle richieste su Go Edge.
-icon: globe
+title: "Domini CDN personalizzati"
+description: "Come collegare il tuo dominio alla CDN del team."
+icon: "globe"
 ---
 
-1. Collega la chiave API all'organizzazione tramite `PUT /v3/cdn/team`.
-2. Esegui `POST /v3/cdn/custom-domains` con JSON `{ "domain": "files.example.com", "s3Backup": true }`. La risposta 201 è un oggetto di dominio senza wrapper di successo.
-3. Aggiungi i record DNS dalla verifica, esegui `POST /v3/cdn/custom-domains/{id}/verify`. Dai un'occhiata a isVerified, cnameVerified, cfStatus e cfSslStatus.
-4. L'ingresso generale salva l'Host e accede prima a Go Edge. Edge definisce un dominio CDN tramite il registro API. Solo l'HTTP 421 per un dominio esterno al registro CDN viene inviato a Redirect; Gli errori CDN 403/404/502 rimangono nella CDN. Non è richiesto un blocco server separato per ciascun dominio personalizzato.
-5. Carica il file tramite `POST /v3/cdn/assets` passando multipart domain=files.example.com e path=images/logo.png. Apri `https://files.example.com/images/logo.png`.
+Un dominio personalizzato serve i file del team a indirizzi come `https://files.example.com/images/logo.png`. Tutte le operazioni sui domini richiedono il permesso di gestione della CDN del team.
 
-`GET /v3/cdn/custom-domains` restituisce un array. Tutte queste operazioni, inclusa la lettura, richiedono la gestione della CDN. È vietato eliminare un dominio con asset. PATCH accetta originUrl e s3Backup; vuoto originUrl disabilita l'origine esterna. Il segreto deployHookToken è destinato a CI/CD lato server.
+<Steps>
+  <Step title="Collega la chiave al team">
+    Chiama `PUT /v3/cdn/team` con il `teamId` del tuo team.
+  </Step>
+  <Step title="Aggiungi il dominio">
+    Chiama `POST /v3/cdn/custom-domains` con `{ "domain": "files.example.com", "s3Backup": true }`. La risposta contiene i record DNS da verificare.
+  </Step>
+  <Step title="Configura il DNS">
+    Aggiungi presso il registrar i record della risposta: un CNAME del dominio verso `cname.erlcrussia.com` e il record di proprietà.
+  </Step>
+  <Step title="Verifica il dominio">
+    Chiama `POST /v3/cdn/custom-domains/{id}/verify`. Il dominio è pronto quando `isVerified` è `true` e `cfSslStatus` è `active`.
+  </Step>
+  <Step title="Carica un file">
+    Passa `domain=files.example.com` al caricamento con `POST /v3/cdn/assets` e apri il file sul tuo dominio.
+  </Step>
+</Steps>
 
-Se il dominio HTTP 400 non è verificato, controlla quale servizio ha generato l'HTML. Per HTTP 502, controlla l'accesso di Edge all'API Go e al registro del dominio MinIO. Non modificare isVerified manualmente per ignorare il controllo.
+## Gestione
+
+* `PATCH /v3/cdn/custom-domains/{id}` modifica l'origine esterna (`originUrl`) e il backup (`s3Backup`). Un `originUrl` vuoto disattiva l'origine esterna.
+* Un dominio con file non si può eliminare: elimina prima i file.
+* Il `deployHookToken` serve per [svuotare la cache dalla CI/CD](/it/tutorials/cdn-cache-purge-cicd). Conservalo nei segreti della CI.
+* Se la verifica non riesce, controlla che i record DNS coincidano con la risposta e si siano propagati.

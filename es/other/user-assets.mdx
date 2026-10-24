@@ -1,60 +1,46 @@
 ---
-title: "Archivos privados y biblioteca"
-description: "Adjuntos privados del chat y audio en userassets.erlcrussia.com."
+title: "Archivos personales"
+description: "Adjuntos privados del chat de IA y audio del usuario."
 icon: "folder-closed"
 ---
 
-Solo el propietario con una sesión activa puede acceder. Una clave de empresa o un enlace firmado no sustituyen la sesión. El dominio debe estar registrado y verificado para la empresa.
+Los archivos personales son adjuntos del chat de IA, grabaciones del micrófono y voz sintetizada. Solo los ve su propietario con una sesión activa en el sitio; una clave de equipo o un enlace no dan acceso.
 
-El sitio envía los bytes originales mediante Backend. Go API identifica al propietario por la sesión y almacena el original en MinIO privado. Los mensajes guardan el ID del adjunto; volver a adjuntarlo no duplica el archivo.
+## Límites
 
-Hasta 25 MiB por archivo, 1 GiB y 1000 archivos no eliminados por usuario. El contenido determina el tipo MIME. Los archivos comprimidos no se extraen automáticamente. Los modelos reciben imágenes compatibles, PDF y texto; almacenar un archivo comprimido no significa que la IA lo haya leído.
+* hasta 25 MB por archivo, hasta 1 GB y 1000 archivos por usuario;
+* los archivos subidos se guardan hasta eliminarlos; grabaciones y voz sintetizada, 24 horas;
+* la IA lee imágenes, PDF y texto; los archivos comprimidos se guardan sin descomprimir;
+* HTML, SVG y otros documentos activos siempre se descargan, nunca se abren en el navegador.
 
 ## Rutas
 
-| Go API | Site Backend | |
+| API V3 | Sitio | |
 |---|---|---|
-| `GET /v3/user-assets` | `/api/v3/ai/files` | Listar archivos privados |
-| `POST /v3/user-assets?name=example.png` | `/api/v3/ai/files?name=example.png` | Subir un archivo privado |
-| `GET /v3/user-assets/{id}` | `—` | Obtener metadatos privados |
-| `DELETE /v3/user-assets/{id}` | `/api/v3/ai/files/{id}` | Eliminar un archivo privado |
-| `GET / HEAD /v3/user-assets/{id}/content` | `/api/v3/ai/files/{id}/content` | Leer el contenido privado |
+| `GET /v3/user-assets` | `GET /api/v3/ai/files` | Lista |
+| `POST /v3/user-assets?name=…` | `POST /api/v3/ai/files?name=…` | Subida |
+| `GET /v3/user-assets/{id}` | — | Datos del archivo |
+| `GET`/`HEAD /v3/user-assets/{id}/content` | `GET /api/v3/ai/files/{id}/content` | Contenido |
+| `DELETE /v3/user-assets/{id}` | `DELETE /api/v3/ai/files/{id}` | Eliminación |
 
 ```javascript
-const uploaded = await fetch(`${backendUrl}/api/v3/ai/files?${new URLSearchParams({ name: file.name })}`, {
-  method: "POST", credentials: "include",
-  headers: { "Content-Type": "application/octet-stream" }, body: file
+const res = await fetch(`/api/v3/ai/files?${new URLSearchParams({ name: file.name })}`, {
+  method: "POST",
+  credentials: "include",
+  headers: { "Content-Type": "application/octet-stream" },
+  body: file,
 });
-if (!uploaded.ok) throw new Error(`Upload failed: ${uploaded.status}`);
-const asset = await uploaded.json();
-// POST /api/v3/ai/chat
-const attachment = { assetId: asset.id };
+const asset = await res.json();
+// asset.id is then sent as an attachment in POST /api/v3/ai/chat
 ```
 
-```json
-{
-  "id": "0123456789abcdef0123456789abcdef",
-  "domain": "userassets.erlcrussia.com",
-  "path": "_private/users/123456789012345678/upload/0123456789abcdef0123456789abcdef/original",
-  "name": "example.png",
-  "mimeType": "image/png",
-  "size": 68,
-  "kind": "upload",
-  "status": "ready",
-  "createdAt": "2026-10-15T19:00:00Z",
-  "expiresAt": null,
-  "url": "https://userassets.erlcrussia.com/_private/users/123456789012345678/upload/0123456789abcdef0123456789abcdef/original"
-}
-```
+## Errores
 
-401: sin sesión activa; 404: otro propietario, eliminado o caducado; 413: tamaño o cuota; 415: audio no válido; 429: límite de solicitudes; 503: dominio sin verificar o dependencia no disponible.
-
-## Operación
-
-El CDN público y la limpieza automática del SSD no cambian. Las respuestas privadas usan private, no-store y omiten la caché compartida de Cloudflare. La sesión, el propietario y la caducidad se validan antes de cada lectura, incluidos SSD HIT, HEAD, Range y el dominio CDN compartido. El TTL no garantiza la conservación del original.
-
-Los archivos upload permanecen hasta su eliminación. recording (micrófono) y speech (voz del servidor) caducan a las 24 horas. El acceso termina en expiresAt; una tarea cada minuto elimina las copias de MinIO y SSD y reintenta los fallos. No se pueden revocar copias descargadas. La síntesis o el reconocimiento del navegador sin un archivo de audio no crean una grabación.
-
-HTML, SVG y otros documentos activos se descargan con Content-Disposition: attachment y sandbox. MinIO no permite acceso público directo. El prefijo _private está reservado y no admite cargas mediante el CDN ordinario.
-
-Los Hosts sin registrar o verificar devuelven 421 y el Nginx compartido los envía a Redirect, que muestra la página de dominio sin vincular. Un fallo del registro devuelve 502; un archivo inexistente de un dominio verificado sigue siendo un error del CDN.
+| Respuesta | Significado |
+|---|---|
+| 401 | No hay sesión activa |
+| 404 | El archivo es de otro usuario, se eliminó o caducó |
+| 413 | Tamaño o cuota superados |
+| 415 | Formato de audio no compatible |
+| 429 | Límite de solicitudes superado |
+| 503 | Almacenamiento no disponible temporalmente |

@@ -1,18 +1,33 @@
 ---
-title: "Overview and Access"
-description: "Learn what the ER:LC Russia API is, what capabilities it provides, and how to obtain an authentication key for your requests."
+title: "Overview and access"
+description: "How to start working with the ER:LC Russia API."
 icon: "book-open"
 ---
-**ER:LC Russia API** is a powerful developer interface that provides access to our community features and allows real-time interaction with the project's technical system, including game server management, economy, and other capabilities.
 
+The ER:LC Russia API gives access to project data and features: ER:LC game servers, violation points, the economy, webhooks, the CDN, short links and AI models.
 
-## Who can use it?
+<Steps>
+  <Step title="Get a key">
+    Sign in with Discord on the [keys page](https://erlcrussia.com/my/tokens). It shows the permissions and keys issued to your account. Contact project administrators in Discord if access is missing; view commands do not grant new permissions.
+  </Step>
+  <Step title="Choose an API">
+    The main one is **API V3** in the "API documentation" tab. For AI models use the **AI API**, compatible with the OpenAI SDK. For real-time events use the [WebSocket](/en/other/websocket-gateway) and the [event webhook](/en/other/event-webhook).
+  </Step>
+  <Step title="Make your first request">
+    Send the key in the `erlcrussia-api-key` header:
 
-Any developer working with the ER:LC Russia API can gain access after their ticket is reviewed. An authentication key is issued after the request is approved.
+    ```bash
+    curl https://api.erlcrussia.com/v3/erlc/server \
+      -H "erlcrussia-api-key: YOUR_API_KEY"
+    ```
+  </Step>
+  <Step title="Handle errors and limits">
+    An error has `code` and `message`; all codes are in [Error codes](/en/documentation/error-codes). Watch the limit headers; see [Rate limits](/en/documentation/rate-limits).
+  </Step>
+</Steps>
+
 <Note>
-  **If you are not a developer and do not work with APIs, this documentation is not for you. Instead, use one of the ready-made partner applications listed below.**
+  Older versions. API V2 still works. API V1 is deprecated: all its routes except `GET /v1/erlc/server/bans` respond with error `5028`. Build new integrations on V3.
 </Note>
 
-## Not a developer? Use a partner application!
-
-Check out our public documentation for community members [here](/en/api-clients).
+Not a developer? Check the [partner services](/en/api-clients): they already work with the API.

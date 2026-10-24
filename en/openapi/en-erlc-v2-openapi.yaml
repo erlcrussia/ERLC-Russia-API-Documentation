@@ -1,147 +1,87 @@
 openapi: 3.1.0
 info:
   title: Moscow RolePlay API - ERLC v2 Endpoints
-  description: |
-    Endpoints for ERLC v2 API server management.
-
-    ## What's new in v2 API?
-
-    PRC API v2 provides a more consistent and simpler request model for developers.
-    Also includes requested data such as player locations and vehicle colors!
-
-    API v1 continues to work without significant changes.
-
-    ## Rate Limits
-
-    | Endpoint | Limit |
-    |----------|-------|
-    | `/erlc/server/*` (except command) | 120 requests/min |
-    | `/erlc/server/command` | Queue: 100 commands |
-
-    Returns **HTTP 429** when limit is exceeded.
-
-    ## Error Response Format
-
-    All errors are returned in JSON format with `code` and `message` fields:
-
-    ```json
-    {
-        "code": 5007,
-        "message": "missing_token"
-    }
-    ```
-
-    ## Error Codes
-
-    ### Authentication and Access Errors
-
-    | Code | Status | Description |
-    |-----|--------|----------|
-    | 5006 | 401 | invalid_master_key |
-    | 5007 | 401 | missing_token |
-    | 5008 | 401 | invalid_token |
-    | 5009 | 403 | forbidden |
-    | 5010 | 403 | api_version_forbidden |
-    | 5011 | 403 | query_param_forbidden |
-
-    ### PRC API Errors
-
-    Endpoints use external PRC API and may return errors:
-
-    | PRC Code | Description |
-    |---------|----------|
-    | 2002 | Invalid or expired server-key |
-    | 3002 | Server is offline |
-    | 4001 | Rate limited |
-    | 9999 | Module out of date |
-
-    When PRC API error occurs, returns:
-
-    ```json
-    {
-        "code": 5019,
-        "message": "prc_api_error",
-        "prc_code": 2002,
-        "prc_message": "Invalid or expired server-key"
-    }
-    ```
-
-    Base URL: `https://api.erlcrussia.xyz/v2`
+  description: "Endpoints for ERLC v2 API server management.\n\n## What's new in v2 API?\n\nPRC API v2 provides a more consistent and simpler request model for developers.\nAlso includes requested data such as player locations and vehicle colors!\n\nAPI v1 continues to work without significant changes.\n\n## Rate Limits\n\n| Endpoint | Limit |\n|----------|-------|\n| `/erlc/server/*` (except command) | 120 requests/min |\n| `/erlc/server/command` | Queue: 100 commands |\n\nReturns **HTTP 429** when limit is exceeded.\n\n## Error Response Format\n\nAll errors are returned in JSON format with `code` and `message` fields:\n\n```json\n{\n    \"code\": 5007,\n    \"message\": \"missing_token\"\n}\n```\n\n## Error Codes\n\n### Authentication and Access Errors\n\n| Code | Status | Description |\n|-----|--------|----------|\n| 5006 | 401 | invalid_master_key |\n| 5007 | 401 | missing_token |\n| 5008 | 401 | invalid_token |\n| 5009 | 403 | forbidden |\n| 5010 | 403 | api_version_forbidden |\n| 5011 | 403 | query_param_forbidden |\n\n### PRC API Errors\n\nEndpoints use external PRC API and may return errors:\n\n| PRC Code | Description |\n|---------|----------|\n| 2002 | Invalid or expired server-key |\n| 3002 | Server is offline |\n| 4001 | Rate limited |\n| 9999 | Module out of date |\n\nWhen PRC API error occurs, returns:\n\n```json\n{\n    \"code\": 5019,\n    \"message\": \"prc_api_error\",\n    \"prc_code\": 2002,\n    \"prc_message\": \"Invalid or expired server-key\"\n}\n```\n\nBase URL: `https://api.erlcrussia.xyz/v2`\n"
   version: 2.0.0
 servers:
-  - url: https://api.erlcrussia.xyz/v2
-    description: Production
+- url: https://api.erlcrussia.com/v2
+  description: Production API V2 (com)
+- url: https://api.erlcrussia.xyz/v2
+  description: Production API V2 (xyz)
 tags:
-  - name: ERLC v2
-    description: ER:LC v2 API game server data and management.
+- name: ERLC v2
+  description: ER:LC v2 API game server data and management.
 paths:
   /erlc/server:
     get:
       tags:
-        - ERLC v2
+      - ERLC v2
       summary: ER:LC Server Information
-      description: |
-        Get general information about ER:LC server.
+      description: 'Get general information about ER:LC server.
 
-        Additional fields can be included by setting query parameters to 'true'.
+
+        Additional fields can be included by setting query parameters to ''true''.
+
         All query parameters are optional.
+
+        '
       security:
-        - MRPAPIKey: []
+      - MRPAPIKey: []
       parameters:
-        - name: Players
-          in: query
-          description: Include player list in response.
-          required: false
-          schema:
-            type: boolean
-        - name: Staff
-          in: query
-          description: Include staff list (Admins, Mods, Helpers) in response.
-          required: false
-          schema:
-            type: boolean
-        - name: JoinLogs
-          in: query
-          description: Include join/leave logs in response.
-          required: false
-          schema:
-            type: boolean
-        - name: Queue
-          in: query
-          description: Include queue data in response.
-          required: false
-          schema:
-            type: boolean
-        - name: KillLogs
-          in: query
-          description: Include kill logs in response.
-          required: false
-          schema:
-            type: boolean
-        - name: CommandLogs
-          in: query
-          description: Include command logs in response.
-          required: false
-          schema:
-            type: boolean
-        - name: ModCalls
-          in: query
-          description: Include moderator call logs in response.
-          required: false
-          schema:
-            type: boolean
-        - name: EmergencyCalls
-          in: query
-          description: Include emergency call logs in response.
-          required: false
-          schema:
-            type: boolean
-        - name: Vehicles
-          in: query
-          description: Include vehicle list in response.
-          required: false
-          schema:
-            type: boolean
+      - name: Players
+        in: query
+        description: Include player list in response.
+        required: false
+        schema:
+          type: boolean
+      - name: Staff
+        in: query
+        description: Include staff list (Admins, Mods, Helpers) in response.
+        required: false
+        schema:
+          type: boolean
+      - name: JoinLogs
+        in: query
+        description: Include join/leave logs in response.
+        required: false
+        schema:
+          type: boolean
+      - name: Queue
+        in: query
+        description: Include queue data in response.
+        required: false
+        schema:
+          type: boolean
+      - name: KillLogs
+        in: query
+        description: Include kill logs in response.
+        required: false
+        schema:
+          type: boolean
+      - name: CommandLogs
+        in: query
+        description: Include command logs in response.
+        required: false
+        schema:
+          type: boolean
+      - name: ModCalls
+        in: query
+        description: Include moderator call logs in response.
+        required: false
+        schema:
+          type: boolean
+      - name: EmergencyCalls
+        in: query
+        description: Include emergency call logs in response.
+        required: false
+        schema:
+          type: boolean
+      - name: Vehicles
+        in: query
+        description: Include vehicle list in response.
+        required: false
+        schema:
+          type: boolean
       responses:
         '200':
           description: Successful response with server information. Additional fields included only with corresponding query parameters.
@@ -156,76 +96,76 @@ paths:
                     Name: API Test
                     OwnerId: 1
                     CoOwnerIds:
-                      - 1
+                    - 1
                     CurrentPlayers: 1
                     MaxPlayers: 1
                     JoinKey: APIServer
                     AccVerifiedReq: Disabled
                     TeamBalance: true
                     Players:
-                      - Team: Sheriff
-                        Player: PlayerName:Id
-                        Callsign: 5D-550
-                        Location:
-                          LocationX: 1084.965
-                          LocationZ: 2302.28
-                          PostalCode: "218"
-                          StreetName: Park Street
-                          BuildingNumber: "2083"
-                        Permission: Normal / Server Administrator / Server Owner / Server Co-Owner / Server Moderator
-                        WantedStars: 0
+                    - Team: Sheriff
+                      Player: PlayerName:Id
+                      Callsign: 5D-550
+                      Location:
+                        LocationX: 1084.965
+                        LocationZ: 2302.28
+                        PostalCode: '218'
+                        StreetName: Park Street
+                        BuildingNumber: '2083'
+                      Permission: Normal / Server Administrator / Server Owner / Server Co-Owner / Server Moderator
+                      WantedStars: 0
                     Staff:
                       Admins:
-                        "54249787": Black_Hallow
-                        "77573259": sli_ckk
+                        '54249787': Black_Hallow
+                        '77573259': sli_ckk
                       Mods:
-                        "2": JohnDoe
-                        "3": JaneDoe
+                        '2': JohnDoe
+                        '3': JaneDoe
                       Helpers:
-                        "168691872": Flat_bird
+                        '168691872': Flat_bird
                     JoinLogs:
-                      - Join: true
-                        Timestamp: 1704614400
-                        Player: PlayerName:Id
+                    - Join: true
+                      Timestamp: 1704614400
+                      Player: PlayerName:Id
                     Queue:
-                      - 1
+                    - 1
                     KillLogs:
-                      - Killed: PlayerName:Id
-                        Timestamp: 1704614400
-                        Killer: PlayerName:Id
+                    - Killed: PlayerName:Id
+                      Timestamp: 1704614400
+                      Killer: PlayerName:Id
                     CommandLogs:
-                      - Player: PlayerName:Id
-                        Timestamp: 1704614400
-                        Command: ":h"
+                    - Player: PlayerName:Id
+                      Timestamp: 1704614400
+                      Command: :h
                     ModCalls:
-                      - Caller: PlayerName:Id
-                        Moderator: PlayerName:Id
-                        Timestamp: 1704614400
+                    - Caller: PlayerName:Id
+                      Moderator: PlayerName:Id
+                      Timestamp: 1704614400
                     EmergencyCalls:
-                        - Team: Police
-                          Caller: 68691872
-                          Players:
-                            - 789012
-                          Position:
-                            - -654.6
-                            - 666.5
-                          StartedAt: 1774216563
-                          CallNumber: 43
-                          Description: stg
-                          PositionDescriptor: sdfsdfsdf
+                    - Team: Police
+                      Caller: 68691872
+                      Players:
+                      - 789012
+                      Position:
+                      - -654.6
+                      - 666.5
+                      StartedAt: 1774216563
+                      CallNumber: 43
+                      Description: stg
+                      PositionDescriptor: sdfsdfsdf
                     Vehicles:
-                      - Name: Redline Fire Engine
-                        Owner: Shawnyg
-                        Texture: Livery Name
-                        ColorHex: "#ff4444"
-                        ColorName: Super Red
+                    - Name: Redline Fire Engine
+                      Owner: Shawnyg
+                      Texture: Livery Name
+                      ColorHex: '#ff4444'
+                      ColorName: Super Red
                 BasicInfo:
                   summary: Basic server information.
                   value:
                     Name: API Test
                     OwnerId: 1
                     CoOwnerIds:
-                      - 1
+                    - 1
                     CurrentPlayers: 1
                     MaxPlayers: 1
                     JoinKey: APIServer
@@ -237,36 +177,36 @@ paths:
                     Name: Moscow RolePlay
                     OwnerId: 123456
                     CoOwnerIds:
-                      - 789012
+                    - 789012
                     CurrentPlayers: 50
                     MaxPlayers: 100
                     JoinKey: MRPServer
                     AccVerifiedReq: Email
                     TeamBalance: true
                     Players:
-                      - Team: Police
-                        Player: OfficerName:123456
-                        Callsign: Alpha-1
-                        Location:
-                          LocationX: 123.45
-                          LocationZ: 67.89
-                          PostalCode: "101000"
-                          StreetName: Park Street
-                          BuildingNumber: "1"
-                        Permission: Normal / Server Administrator / Server Owner / Server Co-Owner / Server Moderator
-                        WantedStars: 0
-                      - Team: Civilian
-                        Player: PlayerName:789012
-                        Callsign: null
-                        Permission: Normal / Server Administrator / Server Owner / Server Co-Owner / Server Moderator
-                        WantedStars: 0
+                    - Team: Police
+                      Player: OfficerName:123456
+                      Callsign: Alpha-1
+                      Location:
+                        LocationX: 123.45
+                        LocationZ: 67.89
+                        PostalCode: '101000'
+                        StreetName: Park Street
+                        BuildingNumber: '1'
+                      Permission: Normal / Server Administrator / Server Owner / Server Co-Owner / Server Moderator
+                      WantedStars: 0
+                    - Team: Civilian
+                      Player: PlayerName:789012
+                      Callsign: null
+                      Permission: Normal / Server Administrator / Server Owner / Server Co-Owner / Server Moderator
+                      WantedStars: 0
                 WithStaff:
                   summary: With staff information.
                   value:
                     Name: Moscow RolePlay
                     OwnerId: 123456
                     CoOwnerIds:
-                      - 789012
+                    - 789012
                     CurrentPlayers: 50
                     MaxPlayers: 100
                     JoinKey: MRPServer
@@ -274,163 +214,163 @@ paths:
                     TeamBalance: true
                     Staff:
                       Admins:
-                        "54249787": Black_Hallow
-                        "77573259": sli_ckk
+                        '54249787': Black_Hallow
+                        '77573259': sli_ckk
                       Mods:
-                        "123456": ModeratorName
+                        '123456': ModeratorName
                       Helpers:
-                        "789012": HelperName
+                        '789012': HelperName
                 WithJoinLogs:
                   summary: With join/leave logs.
                   value:
                     Name: Moscow RolePlay
                     OwnerId: 123456
                     CoOwnerIds:
-                      - 789012
+                    - 789012
                     CurrentPlayers: 50
                     MaxPlayers: 100
                     JoinKey: MRPServer
                     AccVerifiedReq: Email
                     TeamBalance: true
                     JoinLogs:
-                      - Join: true
-                        Timestamp: 1704614400
-                        Player: PlayerName:123456
-                      - Join: false
-                        Timestamp: 1704614500
-                        Player: OfficerName:789012
+                    - Join: true
+                      Timestamp: 1704614400
+                      Player: PlayerName:123456
+                    - Join: false
+                      Timestamp: 1704614500
+                      Player: OfficerName:789012
                 WithQueue:
                   summary: With queue information.
                   value:
                     Name: Moscow RolePlay
                     OwnerId: 123456
                     CoOwnerIds:
-                      - 789012
+                    - 789012
                     CurrentPlayers: 100
                     MaxPlayers: 100
                     JoinKey: MRPServer
                     AccVerifiedReq: Email
                     TeamBalance: true
                     Queue:
-                      - 1
-                      - 2
-                      - 3
+                    - 1
+                    - 2
+                    - 3
                 WithKillLogs:
                   summary: With kill logs.
                   value:
                     Name: Moscow RolePlay
                     OwnerId: 123456
                     CoOwnerIds:
-                      - 789012
+                    - 789012
                     CurrentPlayers: 50
                     MaxPlayers: 100
                     JoinKey: MRPServer
                     AccVerifiedReq: Email
                     TeamBalance: true
                     KillLogs:
-                      - Killed: PlayerName:123456
-                        Timestamp: 1704614400
-                        Killer: PlayerName:789012
-                      - Killed: OfficerName:111111
-                        Timestamp: 1704614500
-                        Killer: AttackerName:222222
+                    - Killed: PlayerName:123456
+                      Timestamp: 1704614400
+                      Killer: PlayerName:789012
+                    - Killed: OfficerName:111111
+                      Timestamp: 1704614500
+                      Killer: AttackerName:222222
                 WithCommandLogs:
                   summary: With command logs.
                   value:
                     Name: Moscow RolePlay
                     OwnerId: 123456
                     CoOwnerIds:
-                      - 789012
+                    - 789012
                     CurrentPlayers: 50
                     MaxPlayers: 100
                     JoinKey: MRPServer
                     AccVerifiedReq: Email
                     TeamBalance: true
                     CommandLogs:
-                      - Player: PlayerName:123456
-                        Timestamp: 1704614400
-                        Command: ":h Hello"
-                      - Player: OfficerName:789012
-                        Timestamp: 1704614500
-                        Command: ":kick PlayerName"
+                    - Player: PlayerName:123456
+                      Timestamp: 1704614400
+                      Command: :h Hello
+                    - Player: OfficerName:789012
+                      Timestamp: 1704614500
+                      Command: :kick PlayerName
                 WithModCalls:
                   summary: With moderator call logs.
                   value:
                     Name: Moscow RolePlay
                     OwnerId: 123456
                     CoOwnerIds:
-                      - 789012
+                    - 789012
                     CurrentPlayers: 50
                     MaxPlayers: 100
                     JoinKey: MRPServer
                     AccVerifiedReq: Email
                     TeamBalance: true
                     ModCalls:
-                      - Caller: PlayerName:123456
-                        Moderator: ModeratorName:789012
-                        Timestamp: 1704614400
-                      - Caller: PlayerName:222222
-                        Moderator: null
-                        Timestamp: 1704614500
+                    - Caller: PlayerName:123456
+                      Moderator: ModeratorName:789012
+                      Timestamp: 1704614400
+                    - Caller: PlayerName:222222
+                      Moderator: null
+                      Timestamp: 1704614500
                 WithEmergencyCalls:
                   summary: With emergency call logs.
                   value:
                     Name: Moscow RolePlay
                     OwnerId: 123456
                     CoOwnerIds:
-                      - 789012
+                    - 789012
                     CurrentPlayers: 50
                     MaxPlayers: 100
                     JoinKey: MRPServer
                     AccVerifiedReq: Email
                     TeamBalance: true
                     EmergencyCalls:
-                      - Team: Sheriff
-                        Caller: 123456
-                        Players:
-                          - 123456
-                          - 789012
-                        Position:
-                          - 1084.965
-                          - 2302.28
-                        StartedAt: 1704614400
-                        CallNumber: 42
-                        Description: Robbery in progress
-                        PositionDescriptor: Near Police Department
-                      - Team: Police
-                        Caller: 789012
-                        Players:
-                          - 789012
-                        Position:
-                          - 123.45
-                          - 67.89
-                        StartedAt: 1704614500
-                        CallNumber: 43
-                        Description: Traffic accident
-                        PositionDescriptor: Main Street intersection
+                    - Team: Sheriff
+                      Caller: 123456
+                      Players:
+                      - 123456
+                      - 789012
+                      Position:
+                      - 1084.965
+                      - 2302.28
+                      StartedAt: 1704614400
+                      CallNumber: 42
+                      Description: Robbery in progress
+                      PositionDescriptor: Near Police Department
+                    - Team: Police
+                      Caller: 789012
+                      Players:
+                      - 789012
+                      Position:
+                      - 123.45
+                      - 67.89
+                      StartedAt: 1704614500
+                      CallNumber: 43
+                      Description: Traffic accident
+                      PositionDescriptor: Main Street intersection
                 WithVehicles:
                   summary: With vehicle information.
                   value:
                     Name: Moscow RolePlay
                     OwnerId: 123456
                     CoOwnerIds:
-                      - 789012
+                    - 789012
                     CurrentPlayers: 50
                     MaxPlayers: 100
                     JoinKey: MRPServer
                     AccVerifiedReq: Email
                     TeamBalance: true
                     Vehicles:
-                      - Name: 2024 Falcon Interceptor Utility
-                        Owner: Pancakeboyman_8
-                        Texture: Standard
-                        ColorHex: "#FF0000"
-                        ColorName: Red
-                      - Name: 2023 Chevrolet Tahoe PPV
-                        Owner: OfficerName:123456
-                        Texture: Police
-                        ColorHex: "#000000"
-                        ColorName: Black
+                    - Name: 2024 Falcon Interceptor Utility
+                      Owner: Pancakeboyman_8
+                      Texture: Standard
+                      ColorHex: '#FF0000'
+                      ColorName: Red
+                    - Name: 2023 Chevrolet Tahoe PPV
+                      Owner: OfficerName:123456
+                      Texture: Police
+                      ColorHex: '#000000'
+                      ColorName: Black
         '401':
           $ref: '#/components/responses/UnauthorizedMissingOrInvalidToken'
         '403':
@@ -441,22 +381,24 @@ paths:
           $ref: '#/components/responses/InternalServerError'
         '400':
           $ref: '#/components/responses/PRCAPIError'
-
   /erlc/server/command:
     post:
       tags:
-        - ERLC v2
+      - ERLC v2
       summary: Execute Command on Server
-      description: |
-        Sends a command for execution on ER:LC server.
+      description: 'Sends a command for execution on ER:LC server.
+
 
 
         Commands are added to global queue with maximum command limit.
 
 
+
         **Note:** This endpoint is **not subject** to Rate Limiting (120 requests/min).
+
+        '
       security:
-        - MRPAPIKey: []
+      - MRPAPIKey: []
       requestBody:
         required: true
         content:
@@ -464,12 +406,12 @@ paths:
             schema:
               type: object
               required:
-                - command
+              - command
               properties:
                 command:
                   type: string
                   description: Command to execute on server.
-                  example: ":h Hello Everyone"
+                  example: :h Hello Everyone
       responses:
         '200':
           description: Command successfully added to queue.
@@ -522,19 +464,21 @@ paths:
                     message: CommandQueueFull
         '500':
           $ref: '#/components/responses/InternalServerError'
-
 components:
   securitySchemes:
     MRPAPIKey:
       type: http
       scheme: bearer
       bearerFormat: API Key
-      description: |
-        Standard API key for accessing ER:LC endpoints.
+      description: 'Standard API key for accessing ER:LC endpoints.
+
 
         Passed in `Authorization: Bearer <key>` header.
 
+
         REQUIRED FOR ALL ER:LC ENDPOINTS.
+
+        '
   responses:
     UnauthorizedMissingOrInvalidToken:
       description: Authentication error.
@@ -607,8 +551,8 @@ components:
         application/json:
           schema:
             oneOf:
-              - $ref: '#/components/schemas/RateLimitError'
-              - $ref: '#/components/schemas/SpamBlockedError'
+            - $ref: '#/components/schemas/RateLimitError'
+            - $ref: '#/components/schemas/SpamBlockedError'
           examples:
             rate_limit_exceeded:
               summary: Exceeded 120 requests/min limit.
@@ -686,8 +630,8 @@ components:
       type: object
       description: Standard error format.
       required:
-        - code
-        - message
+      - code
+      - message
       properties:
         code:
           type: integer
@@ -701,8 +645,8 @@ components:
       type: object
       description: Authentication error (missing or invalid token).
       required:
-        - code
-        - message
+      - code
+      - message
       properties:
         code:
           type: integer
@@ -714,8 +658,8 @@ components:
       type: object
       description: Access error (forbidden).
       required:
-        - code
-        - message
+      - code
+      - message
       properties:
         code:
           type: integer
@@ -727,8 +671,8 @@ components:
       type: object
       description: Error when command is missing in request.
       required:
-        - code
-        - message
+      - code
+      - message
       properties:
         code:
           type: integer
@@ -740,8 +684,8 @@ components:
       type: object
       description: Error when command queue is full. Returned when trying to send command with full queue.
       required:
-        - code
-        - message
+      - code
+      - message
       properties:
         code:
           type: integer
@@ -753,10 +697,10 @@ components:
       type: object
       description: Request limit exceeded error (120/min). Returns details with counter info.
       required:
-        - code
-        - message
-        - retry_after
-        - details
+      - code
+      - message
+      - retry_after
+      - details
       properties:
         code:
           type: integer
@@ -791,10 +735,10 @@ components:
       type: object
       description: Spam ban. Issued at 400+ excess requests. 5 minute ban + additional minutes for continued spam.
       required:
-        - code
-        - message
-        - blocked_until
-        - remaining_seconds
+      - code
+      - message
+      - blocked_until
+      - remaining_seconds
       properties:
         code:
           type: integer
@@ -812,20 +756,23 @@ components:
           example: 300
     ServerInfoV2:
       type: object
-      description: |
-        ER:LC v2 API server information.
+      description: 'ER:LC v2 API server information.
+
 
         Additional fields (Players, Staff, JoinLogs, Queue, KillLogs, CommandLogs, ModCalls, Vehicles)
+
         are included only with corresponding query parameters.
+
+        '
       required:
-        - Name
-        - OwnerId
-        - CoOwnerIds
-        - CurrentPlayers
-        - MaxPlayers
-        - JoinKey
-        - AccVerifiedReq
-        - TeamBalance
+      - Name
+      - OwnerId
+      - CoOwnerIds
+      - CurrentPlayers
+      - MaxPlayers
+      - JoinKey
+      - AccVerifiedReq
+      - TeamBalance
       properties:
         Name:
           type: string
@@ -841,7 +788,7 @@ components:
           items:
             type: integer
           example:
-            - 789012
+          - 789012
         CurrentPlayers:
           type: integer
           description: Current player count on server.
@@ -880,9 +827,9 @@ components:
           items:
             type: integer
           example:
-            - 1
-            - 2
-            - 3
+          - 1
+          - 2
+          - 3
         KillLogs:
           type: array
           description: Kill logs. Included only with KillLogs=true query parameter.
@@ -922,8 +869,8 @@ components:
           example: OfficerName:123456
         Callsign:
           type:
-            - string
-            - 'null'
+          - string
+          - 'null'
           description: Player callsign (only available if player is not in civilian team).
           example: Alpha-1
         Location:
@@ -932,11 +879,11 @@ components:
           type: string
           description: Player permission level.
           enum:
-            - Normal
-            - Server Administrator
-            - Server Owner
-            - Server Co-Owner
-            - Server Moderator
+          - Normal
+          - Server Administrator
+          - Server Owner
+          - Server Co-Owner
+          - Server Moderator
         WantedStars:
           type: integer
           description: Number of wanted stars.
@@ -956,7 +903,7 @@ components:
         PostalCode:
           type: string
           description: Postal code.
-          example: "101000"
+          example: '101000'
         StreetName:
           type: string
           description: Street name.
@@ -964,7 +911,7 @@ components:
         BuildingNumber:
           type: string
           description: Building number.
-          example: "1"
+          example: '1'
     Staff:
       type: object
       description: Server staff information.
@@ -978,8 +925,8 @@ components:
               type: string
               description: Roblox player name.
           example:
-            "54249787": Black_Hallow
-            "77573259": sli_ckk
+            '54249787': Black_Hallow
+            '77573259': sli_ckk
         Mods:
           type: object
           description: Map of Roblox user IDs to names for server moderators.
@@ -989,7 +936,7 @@ components:
               type: string
               description: Roblox player name.
           example:
-            "123456": ModeratorName
+            '123456': ModeratorName
         Helpers:
           type: object
           description: Map of Roblox user IDs to names for server helpers.
@@ -999,7 +946,7 @@ components:
               type: string
               description: Roblox player name.
           example:
-            "789012": HelperName
+            '789012': HelperName
     JoinLog:
       type: object
       properties:
@@ -1044,7 +991,7 @@ components:
         Command:
           type: string
           description: Executed command.
-          example: ":h Hello"
+          example: :h Hello
     ModCallLog:
       type: object
       properties:
@@ -1054,8 +1001,8 @@ components:
           example: PlayerName:123456
         Moderator:
           type:
-            - string
-            - 'null'
+          - string
+          - 'null'
           description: Moderator name and ID in PlayerName:Id format, or null if no one responded.
           example: ModeratorName:789012
         Timestamp:
@@ -1080,8 +1027,8 @@ components:
           items:
             type: integer
           example:
-            - 123456
-            - 789012
+          - 123456
+          - 789012
         Position:
           type: array
           description: Call position coordinates [X, Z].
@@ -1090,8 +1037,8 @@ components:
           minItems: 2
           maxItems: 2
           example:
-            - 1084.965
-            - 2302.28
+          - 1084.965
+          - 2302.28
         StartedAt:
           type: integer
           description: Unix timestamp of call start.
@@ -1122,14 +1069,14 @@ components:
           example: Pancakeboyman_8
         Texture:
           type:
-            - string
-            - 'null'
+          - string
+          - 'null'
           description: Vehicle texture.
           example: Standard
         ColorHex:
           type: string
           description: Vehicle color HEX code.
-          example: "#FF0000"
+          example: '#FF0000'
         ColorName:
           type: string
           description: Vehicle color name.

@@ -2,10 +2,9 @@
   "language": "uk",
   "tabs": [
     {
-      "tab": "Інформація та Правила",
+      "tab": "Інформація та правила",
       "icon": "circle-info",
       "pages": [
-        "uk/index",
         {
           "group": "Початок",
           "icon": "rocket",
@@ -37,37 +36,305 @@
       "icon": "code",
       "versions": [
         {
-          "version": "API V1",
+          "version": "API V3",
+          "default": true,
           "pages": [
             {
-              "group": "Документація API V1",
+              "group": "Документація API V3",
               "icon": "file-code",
               "pages": [
                 {
-                  "group": "ER:LC API V1",
+                  "group": "ER:LC Сервер",
                   "icon": "gamepad",
                   "pages": [
-                    "uk/reference/v1/erlc-api-v1/get-erlc-server-bans",
-                    "uk/reference/v1/erlc-api-v1/get-erlc-server",
-                    "uk/reference/v1/erlc-api-v1/get-erlc-server-players",
-                    "uk/reference/v1/erlc-api-v1/get-erlc-server-joinlogs",
-                    "uk/reference/v1/erlc-api-v1/get-erlc-server-queue",
-                    "uk/reference/v1/erlc-api-v1/get-erlc-server-killlogs",
-                    "uk/reference/v1/erlc-api-v1/get-erlc-server-commandlogs",
-                    "uk/reference/v1/erlc-api-v1/get-erlc-server-modcalls",
-                    "uk/reference/v1/erlc-api-v1/get-erlc-server-vehicles",
-                    "uk/reference/v1/erlc-api-v1/get-erlc-server-staff",
-                    "uk/reference/v1/erlc-api-v1/post-erlc-server-command"
+                    "uk/reference/v3/erlc/get-erlc-server",
+                    "uk/reference/v3/erlc/get-erlc-server-bans",
+                    "uk/reference/v3/erlc/post-erlc-server-command"
                   ]
                 },
                 {
-                  "group": "MRP API Статистика V1",
-                  "icon": "chart-bar",
+                  "group": "Статистика",
+                  "icon": "chart-simple",
                   "pages": [
-                    "uk/reference/v1/mrp-stats-api-v1/get-moscowroleplay-stats-playercount",
-                    "uk/reference/v1/mrp-stats-api-v1/get-moscowroleplay-stats-server-membercount",
-                    "uk/reference/v1/mrp-stats-api-v1/get-moscowroleplay-stats-server-allmembercount",
-                    "uk/reference/v1/mrp-stats-api-v1/get-moscowroleplay-stats-server-botcount"
+                    "uk/reference/v3/stats/get-stats"
+                  ]
+                },
+                {
+                  "group": "Верифікація",
+                  "icon": "id-badge",
+                  "pages": [
+                    "uk/reference/v3/users/get-users",
+                    "uk/reference/v3/users/post-users"
+                  ]
+                },
+                {
+                  "group": "Бали порушень",
+                  "icon": "gavel",
+                  "pages": [
+                    "uk/reference/v3/points/get-user-points",
+                    "uk/reference/v3/points/get-user-history",
+                    "uk/reference/v3/points/add-user-points",
+                    "uk/reference/v3/points/remove-user-points",
+                    "uk/reference/v3/points/get-server-user-points",
+                    "uk/reference/v3/points/get-server-user-history",
+                    "uk/reference/v3/points/add-server-user-points",
+                    "uk/reference/v3/points/remove-server-user-points"
+                  ]
+                },
+                {
+                  "group": "Економіка",
+                  "icon": "coins",
+                  "pages": [
+                    {
+                      "group": "Читання",
+                      "icon": "arrow-down",
+                      "pages": [
+                        "uk/reference/v3/civops/get-civops-economy",
+                        "uk/reference/v3/civops/get-civops-users",
+                        "uk/reference/v3/civops/get-civops-businesses",
+                        "uk/reference/v3/civops/get-civops-mafias",
+                        "uk/reference/v3/civops/get-civops-government",
+                        "uk/reference/v3/civops/get-civops-store",
+                        "uk/reference/v3/civops/get-civops-ads",
+                        "uk/reference/v3/civops/get-civops-system",
+                        "uk/reference/v3/civops/get-civops-health"
+                      ]
+                    },
+                    {
+                      "group": "Дії",
+                      "icon": "arrow-up",
+                      "pages": [
+                        "uk/reference/v3/civops/post-civops-economy",
+                        "uk/reference/v3/civops/post-civops-users",
+                        "uk/reference/v3/civops/post-civops-businesses",
+                        "uk/reference/v3/civops/post-civops-mafias",
+                        "uk/reference/v3/civops/post-civops-government",
+                        "uk/reference/v3/civops/post-civops-store",
+                        "uk/reference/v3/civops/post-civops-ads"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "group": "Ключі",
+                  "icon": "key",
+                  "pages": [
+                    "uk/reference/v3/keys/get-keys",
+                    "uk/reference/v3/keys/regenerate-keys"
+                  ]
+                },
+                {
+                  "group": "Вебхуки",
+                  "icon": "webhook",
+                  "pages": [
+                    "uk/reference/v3/webhooks/list-webhooks",
+                    "uk/reference/v3/webhooks/add-webhook-url",
+                    "uk/reference/v3/webhooks/update-webhook-url",
+                    "uk/reference/v3/webhooks/remove-webhook-url",
+                    "uk/reference/v3/webhooks/delete-all-webhooks",
+                    "uk/reference/v3/webhooks/test-webhook",
+                    "uk/reference/v3/webhooks/check-status",
+                    "uk/reference/v3/webhooks/set-active",
+                    "uk/reference/v3/webhooks/url-status",
+                    "uk/reference/v3/webhooks/post-webhooks"
+                  ]
+                },
+                {
+                  "group": "Підписки й магазин",
+                  "icon": "crown",
+                  "pages": [
+                    "uk/reference/v3/subscriptions/get-store",
+                    "uk/reference/v3/subscriptions/get-user-subscriptions",
+                    "uk/reference/v3/subscriptions/purchase-with-coins",
+                    "uk/reference/v3/subscriptions/get-user-limits"
+                  ]
+                },
+                {
+                  "group": "CDN",
+                  "icon": "cloud",
+                  "pages": [
+                    {
+                      "group": "Файли",
+                      "icon": "file",
+                      "pages": [
+                        "uk/reference/v3/cdn/bind-team",
+                        "uk/reference/v3/cdn/get-assets",
+                        "uk/reference/v3/cdn/upload-asset",
+                        "uk/reference/v3/cdn/external-asset",
+                        "uk/reference/v3/cdn/update-assets",
+                        "uk/reference/v3/cdn/delete-assets",
+                        "uk/reference/v3/cdn/purge-assets",
+                        "uk/reference/v3/cdn/get-manifest",
+                        "uk/reference/v3/cdn/list-domains"
+                      ]
+                    },
+                    {
+                      "group": "Папки",
+                      "icon": "folder",
+                      "pages": [
+                        "uk/reference/v3/cdn/get-folders",
+                        "uk/reference/v3/cdn/create-folder",
+                        "uk/reference/v3/cdn/update-folders",
+                        "uk/reference/v3/cdn/delete-folders"
+                      ]
+                    },
+                    {
+                      "group": "Свої домени",
+                      "icon": "globe",
+                      "pages": [
+                        "uk/reference/v3/cdn/delete-cdn-custom-domains-id",
+                        "uk/reference/v3/cdn/get-cdn-custom-domains",
+                        "uk/reference/v3/cdn/get-cdn-custom-domains-id",
+                        "uk/reference/v3/cdn/patch-cdn-custom-domains-id",
+                        "uk/reference/v3/cdn/post-cdn-custom-domains",
+                        "uk/reference/v3/cdn/post-cdn-custom-domains-id-purge",
+                        "uk/reference/v3/cdn/post-cdn-custom-domains-id-regenerate-token",
+                        "uk/reference/v3/cdn/post-cdn-custom-domains-id-verify",
+                        "uk/reference/v3/cdn/post-cdn-webhook-purge"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "group": "Особисті файли",
+                  "icon": "file-user",
+                  "pages": [
+                    "uk/reference/v3/user-assets/get-user-assets",
+                    "uk/reference/v3/user-assets/post-user-assets",
+                    "uk/reference/v3/user-assets/get-user-assets-id",
+                    "uk/reference/v3/user-assets/delete-user-assets-id",
+                    "uk/reference/v3/user-assets/get-user-assets-id-content",
+                    "uk/reference/v3/user-assets/head-user-assets-id-content",
+                    "uk/reference/v3/user-assets/get-user-assets-authorize"
+                  ]
+                },
+                {
+                  "group": "Короткі посилання",
+                  "icon": "link",
+                  "pages": [
+                    "uk/reference/v3/redirects/bind-key-team",
+                    "uk/reference/v3/redirects/get-redirects-summary",
+                    {
+                      "group": "Посилання",
+                      "icon": "shuffle",
+                      "pages": [
+                        "uk/reference/v3/redirects/get-redirects",
+                        "uk/reference/v3/redirects/post-redirects",
+                        "uk/reference/v3/redirects/put-redirects",
+                        "uk/reference/v3/redirects/delete-redirects",
+                        "uk/reference/v3/redirects/post-redirects-batch-delete",
+                        "uk/reference/v3/redirects/post-redirects-batch-group"
+                      ]
+                    },
+                    {
+                      "group": "Групи",
+                      "icon": "folder-tree",
+                      "pages": [
+                        "uk/reference/v3/redirects/get-redirects-groups",
+                        "uk/reference/v3/redirects/post-redirects-groups",
+                        "uk/reference/v3/redirects/put-redirects-groups-reorder",
+                        "uk/reference/v3/redirects/put-redirects-groups-id",
+                        "uk/reference/v3/redirects/delete-redirects-groups-id",
+                        "uk/reference/v3/redirects/post-redirects-groups-batch-delete"
+                      ]
+                    },
+                    {
+                      "group": "Домени",
+                      "icon": "globe",
+                      "pages": [
+                        "uk/reference/v3/redirects/get-redirect-domains",
+                        "uk/reference/v3/redirects/post-redirect-domains",
+                        "uk/reference/v3/redirects/get-redirect-domains-id",
+                        "uk/reference/v3/redirects/patch-redirect-domains-id",
+                        "uk/reference/v3/redirects/delete-redirect-domains-id",
+                        "uk/reference/v3/redirects/post-redirect-domains-id-verify"
+                      ]
+                    },
+                    {
+                      "group": "Аналітика",
+                      "icon": "chart-line",
+                      "pages": [
+                        "uk/reference/v3/redirects/get-redirect-analytics-overview",
+                        "uk/reference/v3/redirects/get-redirect-analytics-timeseries",
+                        "uk/reference/v3/redirects/get-redirect-analytics-geo",
+                        "uk/reference/v3/redirects/get-redirect-analytics-sources"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "group": "AI Studio",
+                  "icon": "sparkles",
+                  "pages": [
+                    "uk/reference/v3/ai/get-credits-balance",
+                    "uk/reference/v3/ai/exchange-credits",
+                    "uk/reference/v3/ai/list-studio-keys",
+                    "uk/reference/v3/ai/create-studio-key",
+                    "uk/reference/v3/ai/delete-ai-keys-id",
+                    "uk/reference/v3/ai/generate-title",
+                    "uk/reference/v3/ai/patch-studio-key-id",
+                    "uk/reference/v3/ai/get-audio-pricing"
+                  ]
+                },
+                {
+                  "group": "Реклама",
+                  "icon": "rectangle-ad",
+                  "pages": [
+                    "uk/reference/v3/ads/post-ads-upload",
+                    "uk/reference/v3/ads/post-ads-campaigns",
+                    "uk/reference/v3/ads/get-ads-campaigns",
+                    "uk/reference/v3/ads/get-ads-campaigns-id",
+                    "uk/reference/v3/ads/post-ads-campaigns-id-buy",
+                    "uk/reference/v3/ads/post-ads-campaigns-id-toggle",
+                    "uk/reference/v3/ads/get-ads-packages",
+                    "uk/reference/v3/ads/get-ads-serve"
+                  ]
+                },
+                {
+                  "group": "Авторизація",
+                  "icon": "shield-halved",
+                  "pages": [
+                    {
+                      "group": "Вхід",
+                      "icon": "arrow-right-to-bracket",
+                      "pages": [
+                        "uk/reference/v3/auth/discord-login",
+                        "uk/reference/v3/auth/discord-callback",
+                        "uk/reference/v3/auth/session-init",
+                        "uk/reference/v3/auth/session-init-post",
+                        "uk/reference/v3/auth/session-token",
+                        "uk/reference/v3/auth/get-session",
+                        "uk/reference/v3/auth/logout"
+                      ]
+                    },
+                    {
+                      "group": "Сесії",
+                      "icon": "fingerprint",
+                      "pages": [
+                        "uk/reference/v3/auth/get-user-sessions",
+                        "uk/reference/v3/auth/delete-user-session",
+                        "uk/reference/v3/auth/delete-all-user-sessions"
+                      ]
+                    },
+                    {
+                      "group": "Roblox і профіль",
+                      "icon": "link",
+                      "pages": [
+                        "uk/reference/v3/auth/roblox-login",
+                        "uk/reference/v3/auth/roblox-callback",
+                        "uk/reference/v3/auth/link-roblox",
+                        "uk/reference/v3/auth/unlink-roblox",
+                        "uk/reference/v3/auth/refresh-roblox",
+                        "uk/reference/v3/auth/refresh-profile"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "group": "Стан",
+                  "icon": "heart-pulse",
+                  "pages": [
+                    "uk/reference/v3/health/get-health"
                   ]
                 }
               ]
@@ -135,299 +402,37 @@
           ]
         },
         {
-          "version": "API V3",
-          "default": true,
+          "version": "API V1",
           "pages": [
-            "uk/reference/v3/overview",
             {
-              "group": "Документація API V3",
+              "group": "Документація API V1",
               "icon": "file-code",
               "pages": [
                 {
-                  "group": "ER:LC API V3",
+                  "group": "ER:LC API V1",
                   "icon": "gamepad",
                   "pages": [
-                    "uk/reference/v3/erlc/get-erlc-server",
-                    "uk/reference/v3/erlc/get-erlc-server-bans",
-                    "uk/reference/v3/erlc/post-erlc-server-command"
+                    "uk/reference/v1/erlc-api-v1/get-erlc-server-bans",
+                    "uk/reference/v1/erlc-api-v1/get-erlc-server",
+                    "uk/reference/v1/erlc-api-v1/get-erlc-server-players",
+                    "uk/reference/v1/erlc-api-v1/get-erlc-server-joinlogs",
+                    "uk/reference/v1/erlc-api-v1/get-erlc-server-queue",
+                    "uk/reference/v1/erlc-api-v1/get-erlc-server-killlogs",
+                    "uk/reference/v1/erlc-api-v1/get-erlc-server-commandlogs",
+                    "uk/reference/v1/erlc-api-v1/get-erlc-server-modcalls",
+                    "uk/reference/v1/erlc-api-v1/get-erlc-server-vehicles",
+                    "uk/reference/v1/erlc-api-v1/get-erlc-server-staff",
+                    "uk/reference/v1/erlc-api-v1/post-erlc-server-command"
                   ]
                 },
                 {
-                  "group": "API Економіки V3",
-                  "icon": "coins",
+                  "group": "MRP API Статистика V1",
+                  "icon": "chart-bar",
                   "pages": [
-                    {
-                      "group": "GET-Ендпоінти Економіки",
-                      "icon": "arrow-down",
-                      "pages": [
-                        "uk/reference/v3/civops/get-civops-economy",
-                        "uk/reference/v3/civops/get-civops-users",
-                        "uk/reference/v3/civops/get-civops-businesses",
-                        "uk/reference/v3/civops/get-civops-mafias",
-                        "uk/reference/v3/civops/get-civops-government",
-                        "uk/reference/v3/civops/get-civops-store",
-                        "uk/reference/v3/civops/get-civops-ads",
-                        "uk/reference/v3/civops/get-civops-system",
-                        "uk/reference/v3/civops/get-civops-health"
-                      ]
-                    },
-                    {
-                      "group": "POST-Ендпоінти Економіки",
-                      "icon": "arrow-up",
-                      "pages": [
-                        "uk/reference/v3/civops/post-civops-economy",
-                        "uk/reference/v3/civops/post-civops-users",
-                        "uk/reference/v3/civops/post-civops-businesses",
-                        "uk/reference/v3/civops/post-civops-mafias",
-                        "uk/reference/v3/civops/post-civops-government",
-                        "uk/reference/v3/civops/post-civops-store",
-                        "uk/reference/v3/civops/post-civops-ads"
-                      ]
-                    }
-                  ]
-                },
-                {
-                  "group": "API Статистики V3",
-                  "icon": "chart-line",
-                  "pages": [
-                    "uk/reference/v3/stats/get-stats"
-                  ]
-                },
-                {
-                  "group": "API Верифікації V3",
-                  "icon": "id-badge",
-                  "pages": [
-                    "uk/reference/v3/users/get-users",
-                    "uk/reference/v3/users/post-users"
-                  ]
-                },
-                {
-                  "group": "CDN API V3",
-                  "icon": "server",
-                  "pages": [
-                    "uk/reference/v3/cdn/overview",
-                    "uk/reference/v3/cdn/bind-team",
-                    {
-                      "group": "Асети та Простори Імен",
-                      "icon": "file",
-                      "pages": [
-                        "uk/reference/v3/cdn/namespaces",
-                        "uk/reference/v3/cdn/get-assets",
-                        "uk/reference/v3/cdn/upload-asset",
-                        "uk/reference/v3/cdn/external-asset",
-                        "uk/reference/v3/cdn/update-assets",
-                        "uk/reference/v3/cdn/delete-assets",
-                        "uk/reference/v3/cdn/purge-assets",
-                        "uk/reference/v3/cdn/list-domains",
-                        "uk/reference/v3/cdn/get-manifest"
-                      ]
-                    },
-                    {
-                      "group": "Папки Інтерфейсу",
-                      "icon": "folder",
-                      "pages": [
-                        "uk/reference/v3/cdn/get-folders",
-                        "uk/reference/v3/cdn/create-folder",
-                        "uk/reference/v3/cdn/update-folders",
-                        "uk/reference/v3/cdn/delete-folders"
-                      ]
-                    },
-                    {
-                      "group": "Користувацькі домени CDN",
-                      "pages": [
-                        "uk/reference/v3/cdn/delete-cdn-custom-domains-id",
-                        "uk/reference/v3/cdn/get-cdn-custom-domains",
-                        "uk/reference/v3/cdn/get-cdn-custom-domains-id",
-                        "uk/reference/v3/cdn/patch-cdn-custom-domains-id",
-                        "uk/reference/v3/cdn/post-cdn-custom-domains",
-                        "uk/reference/v3/cdn/post-cdn-custom-domains-id-purge",
-                        "uk/reference/v3/cdn/post-cdn-custom-domains-id-regenerate-token",
-                        "uk/reference/v3/cdn/post-cdn-custom-domains-id-verify",
-                        "uk/reference/v3/cdn/post-cdn-webhook-purge"
-                      ]
-                    },
-                    {
-                      "group": "Особисті файли",
-                      "icon": "file-user",
-                      "pages": [
-                        "uk/reference/v3/user-assets/get-user-assets",
-                        "uk/reference/v3/user-assets/post-user-assets",
-                        "uk/reference/v3/user-assets/get-user-assets-id",
-                        "uk/reference/v3/user-assets/get-user-assets-authorize",
-                        "uk/reference/v3/user-assets/get-user-assets-id-content",
-                        "uk/reference/v3/user-assets/head-user-assets-id-content",
-                        "uk/reference/v3/user-assets/delete-user-assets-id"
-                      ]
-                    }
-                  ]
-                },
-                {
-                  "group": "Редиректи",
-                  "icon": "arrow-right-arrow-left",
-                  "pages": [
-                    {
-                      "group": "Налаштування та зведення",
-                      "pages": [
-                        "uk/reference/v3/redirects/bind-key-team",
-                        "uk/reference/v3/redirects/get-redirects-summary"
-                      ]
-                    },
-                    {
-                      "group": "Редиректи",
-                      "pages": [
-                        "uk/reference/v3/redirects/get-redirects",
-                        "uk/reference/v3/redirects/post-redirects",
-                        "uk/reference/v3/redirects/put-redirects",
-                        "uk/reference/v3/redirects/delete-redirects",
-                        "uk/reference/v3/redirects/post-redirects-batch-delete"
-                      ]
-                    },
-                    {
-                      "group": "Групи редиректів",
-                      "pages": [
-                        "uk/reference/v3/redirects/get-redirects-groups",
-                        "uk/reference/v3/redirects/post-redirects-groups",
-                        "uk/reference/v3/redirects/put-redirects-groups-reorder",
-                        "uk/reference/v3/redirects/put-redirects-groups-id",
-                        "uk/reference/v3/redirects/delete-redirects-groups-id",
-                        "uk/reference/v3/redirects/post-redirects-groups-batch-delete",
-                        "uk/reference/v3/redirects/post-redirects-batch-group"
-                      ]
-                    },
-                    {
-                      "group": "Домени",
-                      "pages": [
-                        "uk/reference/v3/redirects/get-redirect-domains",
-                        "uk/reference/v3/redirects/post-redirect-domains",
-                        "uk/reference/v3/redirects/get-redirect-domains-id",
-                        "uk/reference/v3/redirects/patch-redirect-domains-id",
-                        "uk/reference/v3/redirects/delete-redirect-domains-id",
-                        "uk/reference/v3/redirects/post-redirect-domains-id-verify"
-                      ]
-                    },
-                    {
-                      "group": "Аналітика",
-                      "pages": [
-                        "uk/reference/v3/redirects/get-redirect-analytics-overview",
-                        "uk/reference/v3/redirects/get-redirect-analytics-timeseries",
-                        "uk/reference/v3/redirects/get-redirect-analytics-geo",
-                        "uk/reference/v3/redirects/get-redirect-analytics-sources"
-                      ]
-                    }
-                  ]
-                },
-                {
-                  "group": "API Покарань V3",
-                  "icon": "gavel",
-                  "pages": [
-                    "uk/reference/v3/points/get-user-points",
-                    "uk/reference/v3/points/get-user-history",
-                    "uk/reference/v3/points/add-user-points",
-                    "uk/reference/v3/points/remove-user-points",
-                    "uk/reference/v3/points/get-points-serverid-robloxid",
-                    "uk/reference/v3/points/get-points-serverid-robloxid-history",
-                    "uk/reference/v3/points/post-points-serverid-robloxid-add",
-                    "uk/reference/v3/points/post-points-serverid-robloxid-remove"
-                  ]
-                },
-                {
-                  "group": "API Ключів V3",
-                  "icon": "key",
-                  "pages": [
-                    "uk/reference/v3/keys/get-keys",
-                    "uk/reference/v3/keys/post-keys"
-                  ]
-                },
-                {
-                  "group": "API Вебхуків V3",
-                  "icon": "diagram-project",
-                  "pages": [
-                    "uk/reference/v3/webhooks/get-webhooks",
-                    "uk/reference/v3/webhooks/get-webhooks-status",
-                    "uk/reference/v3/webhooks/post-webhooks-add-url",
-                    "uk/reference/v3/webhooks/put-webhooks-url",
-                    "uk/reference/v3/webhooks/patch-webhooks-url-status",
-                    "uk/reference/v3/webhooks/patch-webhooks-set-active",
-                    "uk/reference/v3/webhooks/post-webhooks-test",
-                    "uk/reference/v3/webhooks/delete-webhooks-remove-url",
-                    "uk/reference/v3/webhooks/delete-webhooks"
-                  ]
-                },
-                {
-                  "group": "API Передплати V3",
-                  "icon": "crown",
-                  "pages": [
-                    "uk/reference/v3/subscriptions/get-funpay-config",
-                    "uk/reference/v3/subscriptions/get-plans",
-                    "uk/reference/v3/subscriptions/get-user-subscriptions",
-                    "uk/reference/v3/subscriptions/get-user-benefits",
-                    "uk/reference/v3/subscriptions/get-subscriptions-coins-balance",
-                    "uk/reference/v3/subscriptions/create-funpay-order",
-                    "uk/reference/v3/subscriptions/get-funpay-order-status",
-                    "uk/reference/v3/subscriptions/purchase-with-coins",
-                    "uk/reference/v3/subscriptions/get-subscriptions-store",
-                    "uk/reference/v3/subscriptions/get-subscriptions-user-limits",
-                    "uk/reference/v3/subscriptions/get-subscriptions-user-limits-discordid"
-                  ]
-                },
-                {
-                  "group": "AI API V3",
-                  "icon": "sparkles",
-                  "pages": [
-                    "uk/reference/v3/ai/get-ai-credits-balance",
-                    "uk/reference/v3/ai/post-ai-credits-exchange",
-                    "uk/reference/v3/ai/get-ai-keys",
-                    "uk/reference/v3/ai/post-ai-keys",
-                    "uk/reference/v3/ai/patch-ai-keys",
-                    "uk/reference/v3/ai/patch-ai-keys-id",
-                    "uk/reference/v3/ai/delete-ai-keys",
-                    "uk/reference/v3/ai/delete-ai-keys-id",
-                    "uk/reference/v3/ai/post-ai-title",
-                    "uk/reference/v3/ai/get-audio-pricing",
-                    "uk/reference/v3/ai/post-audio-transcription"
-                  ]
-                },
-                {
-                  "group": "API Авторизації V3",
-                  "icon": "shield-halved",
-                  "pages": [
-                    "uk/reference/v3/auth/get-auth-me",
-                    "uk/reference/v3/auth/get-auth-discord",
-                    "uk/reference/v3/auth/get-auth-discord-callback",
-                    "uk/reference/v3/auth/get-auth-roblox",
-                    "uk/reference/v3/auth/get-auth-roblox-callback",
-                    "uk/reference/v3/auth/get-auth-session",
-                    "uk/reference/v3/auth/get-auth-user-sessions",
-                    "uk/reference/v3/auth/patch-auth-user-profile",
-                    "uk/reference/v3/auth/patch-auth-user-roblox-refresh",
-                    "uk/reference/v3/auth/patch-auth-user-roblox-reverify",
-                    "uk/reference/v3/auth/post-auth-user-roblox",
-                    "uk/reference/v3/auth/delete-auth-user-roblox",
-                    "uk/reference/v3/auth/delete-auth-user-sessions",
-                    "uk/reference/v3/auth/delete-auth-user-sessions-id",
-                    "uk/reference/v3/auth/post-auth-logout"
-                  ]
-                },
-                {
-                  "group": "API Стану V3",
-                  "icon": "heart-pulse",
-                  "pages": [
-                    "uk/reference/v3/health/get-health"
-                  ]
-                },
-                {
-                  "group": "Реклама V3",
-                  "icon": "rectangle-ad",
-                  "pages": [
-                    "uk/reference/v3/ads/post-ads-upload",
-                    "uk/reference/v3/ads/post-ads-campaigns",
-                    "uk/reference/v3/ads/get-ads-campaigns",
-                    "uk/reference/v3/ads/get-ads-campaigns-id",
-                    "uk/reference/v3/ads/post-ads-campaigns-id-buy",
-                    "uk/reference/v3/ads/post-ads-campaigns-id-toggle",
-                    "uk/reference/v3/ads/get-ads-packages",
-                    "uk/reference/v3/ads/get-ads-serve",
-                    "uk/reference/v3/ads/post-ads-id-click"
+                    "uk/reference/v1/mrp-stats-api-v1/get-moscowroleplay-stats-playercount",
+                    "uk/reference/v1/mrp-stats-api-v1/get-moscowroleplay-stats-server-membercount",
+                    "uk/reference/v1/mrp-stats-api-v1/get-moscowroleplay-stats-server-allmembercount",
+                    "uk/reference/v1/mrp-stats-api-v1/get-moscowroleplay-stats-server-botcount"
                   ]
                 }
               ]
@@ -437,7 +442,44 @@
       ]
     },
     {
-      "tab": "Інші Варіанти Інтеграції",
+      "tab": "ER:LC Росія AI API",
+      "icon": "robot",
+      "pages": [
+        "uk/openai-api/v1/overview",
+        {
+          "group": "Документація AI API",
+          "icon": "file-code",
+          "pages": [
+            {
+              "group": "Моделі",
+              "icon": "microchip",
+              "pages": [
+                "uk/openai-api/v1/models",
+                "uk/openai-api/v1/get-model"
+              ]
+            },
+            {
+              "group": "Chat Completions",
+              "icon": "comments",
+              "pages": [
+                "uk/openai-api/v1/chat-completions"
+              ]
+            },
+            {
+              "group": "Аудіо",
+              "icon": "waveform-lines",
+              "pages": [
+                "uk/openai-api/v1/speech",
+                "uk/openai-api/v1/transcriptions",
+                "uk/openai-api/v1/realtime"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "tab": "Інші варіанти інтеграції",
       "icon": "puzzle-piece",
       "pages": [
         {
@@ -455,7 +497,7 @@
       "icon": "book-open",
       "pages": [
         {
-          "group": "Швидкий Старт",
+          "group": "Швидкий старт",
           "icon": "rocket",
           "pages": [
             "uk/tutorials/how-to-get-api-key"
@@ -475,11 +517,11 @@
       ]
     },
     {
-      "tab": "Можливості Документації",
+      "tab": "Можливості документації",
       "icon": "clipboard-list",
       "pages": [
         {
-          "group": "Інструменти Розробника",
+          "group": "Інструменти розробника",
           "icon": "terminal",
           "pages": [
             "uk/docs-features/mcp-server"
@@ -519,15 +561,15 @@
             "href": "https://wiki.erlcrussia.com/uk"
           },
           {
-            "label": "Історія Змін",
+            "label": "Історія змін",
             "href": "https://wiki.erlcrussia.com/uk/changelogs"
           },
           {
-            "label": "Правила Персоналу",
+            "label": "Правила персоналу",
             "href": "https://wiki.erlcrussia.com/uk/staff-rules"
           },
           {
-            "label": "Почати Грати",
+            "label": "Почати грати",
             "href": "https://wiki.erlcrussia.com/uk/guides"
           },
           {

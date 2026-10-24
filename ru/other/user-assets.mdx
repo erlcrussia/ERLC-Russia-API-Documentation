@@ -1,60 +1,46 @@
 ---
-title: "Личные файлы и библиотека"
-description: "Приватные вложения чата и аудио на userassets.erlcrussia.com."
+title: "Личные файлы"
+description: "Приватные вложения AI-чата и аудио пользователя."
 icon: "folder-closed"
 ---
 
-Файлы доступны только владельцу с действующей сессией. API-ключ компании и подписанная ссылка не заменяют пользовательскую сессию. Домен должен быть зарегистрирован и подтверждён в компании.
+Личные файлы — это вложения AI-чата, записи с микрофона и озвучка. Файл доступен только своему владельцу с действующей сессией сайта; API-ключ команды или ссылка на файл доступа не дают.
 
-Сайт загружает исходные байты через Backend. Go API определяет владельца по сессии и хранит оригинал в приватном MinIO. В сообщении сохраняется ID вложения; повторное прикрепление не создаёт новую копию.
+## Ограничения
 
-До 25 МиБ на файл, 1 ГиБ и 1000 неудалённых файлов на пользователя. Тип определяется по содержимому. Архивы сохраняются без автоматической распаковки. Модель получает изображения, PDF и текст; сохранённый архив не означает, что AI прочитал его содержимое.
+* до 25 МБ на файл, до 1 ГБ и 1000 файлов на пользователя;
+* загруженные файлы хранятся до удаления, записи с микрофона и озвучка — 24 часа;
+* AI читает изображения, PDF и текст; архивы сохраняются, но не распаковываются;
+* HTML, SVG и другие активные документы всегда скачиваются, а не открываются в браузере.
 
 ## Маршруты
 
-| Go API | Site Backend | |
+| API V3 | Сайт | |
 |---|---|---|
-| `GET /v3/user-assets` | `/api/v3/ai/files` | Список личных файлов |
-| `POST /v3/user-assets?name=example.png` | `/api/v3/ai/files?name=example.png` | Загрузить личный файл |
-| `GET /v3/user-assets/{id}` | `—` | Метаданные личного файла |
-| `DELETE /v3/user-assets/{id}` | `/api/v3/ai/files/{id}` | Удалить личный файл |
-| `GET / HEAD /v3/user-assets/{id}/content` | `/api/v3/ai/files/{id}/content` | Получить содержимое файла |
+| `GET /v3/user-assets` | `GET /api/v3/ai/files` | Список файлов |
+| `POST /v3/user-assets?name=…` | `POST /api/v3/ai/files?name=…` | Загрузка |
+| `GET /v3/user-assets/{id}` | — | Данные файла |
+| `GET`/`HEAD /v3/user-assets/{id}/content` | `GET /api/v3/ai/files/{id}/content` | Содержимое |
+| `DELETE /v3/user-assets/{id}` | `DELETE /api/v3/ai/files/{id}` | Удаление |
 
 ```javascript
-const uploaded = await fetch(`${backendUrl}/api/v3/ai/files?${new URLSearchParams({ name: file.name })}`, {
-  method: "POST", credentials: "include",
-  headers: { "Content-Type": "application/octet-stream" }, body: file
+const res = await fetch(`/api/v3/ai/files?${new URLSearchParams({ name: file.name })}`, {
+  method: "POST",
+  credentials: "include",
+  headers: { "Content-Type": "application/octet-stream" },
+  body: file,
 });
-if (!uploaded.ok) throw new Error(`Upload failed: ${uploaded.status}`);
-const asset = await uploaded.json();
-// POST /api/v3/ai/chat
-const attachment = { assetId: asset.id };
+const asset = await res.json();
+// asset.id is then sent as an attachment in POST /api/v3/ai/chat
 ```
 
-```json
-{
-  "id": "0123456789abcdef0123456789abcdef",
-  "domain": "userassets.erlcrussia.com",
-  "path": "_private/users/123456789012345678/upload/0123456789abcdef0123456789abcdef/original",
-  "name": "example.png",
-  "mimeType": "image/png",
-  "size": 68,
-  "kind": "upload",
-  "status": "ready",
-  "createdAt": "2026-10-15T19:00:00Z",
-  "expiresAt": null,
-  "url": "https://userassets.erlcrussia.com/_private/users/123456789012345678/upload/0123456789abcdef0123456789abcdef/original"
-}
-```
+## Ошибки
 
-401 — нет действующей сессии; 404 — чужой, удалённый или истёкший файл; 413 — размер или квота; 415 — неверный формат аудио; 429 — лимит запросов; 503 — домен не подтверждён или зависимость недоступна.
-
-## Эксплуатация
-
-Публичный CDN и автоматическая очистка SSD работают как раньше. Приватные ответы имеют private, no-store; общий кэш Cloudflare обходится. Проверка сессии, владельца и срока выполняется перед каждым чтением, включая SSD HIT, HEAD, Range и общий CDN-домен. TTL Cloudflare не является сроком хранения оригинала.
-
-upload хранится до удаления. recording (микрофон) и speech (серверная озвучка) истекают через 24 часа. После expiresAt доступ закрыт сразу; фоновая очистка раз в минуту удаляет MinIO и SSD с повтором при ошибках. Уже скачанные копии отозвать нельзя. Браузерный синтез и распознавание без полученного аудиофайла не создают запись.
-
-HTML, SVG и другие активные документы скачиваются с Content-Disposition: attachment и sandbox. Прямой MinIO не публичен. Префикс _private зарезервирован и недоступен для обычной загрузки через CDN API.
-
-Незарегистрированный и неподтверждённый кастомный Host возвращает 421 и передаётся общим Nginx ingress в Redirect со страницей непривязанного домена. Недоступный реестр возвращает 502; отсутствие файла у подтверждённого домена остаётся ошибкой CDN.
+| Ответ | Что значит |
+|---|---|
+| 401 | Нет действующей сессии |
+| 404 | Файл чужой, удалён или истёк |
+| 413 | Превышен размер файла или квота |
+| 415 | Неподдерживаемый формат аудио |
+| 429 | Превышен лимит запросов |
+| 503 | Хранилище временно недоступно |

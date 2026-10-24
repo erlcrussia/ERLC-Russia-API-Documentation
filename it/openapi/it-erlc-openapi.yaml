@@ -1,0 +1,679 @@
+openapi: 3.1.0
+info:
+  title: Moscow RolePlay API - ER:LC Endpoints
+  description: "**ATTENTION: This API v1 version is deprecated!**\nMost endpoints are disabled and return error 500. It is recommended to use the newer API version.\nOnly endpoint working: `/erlc/server/bans`\n\n## Rate Limits\n\n| Endpoint | Limit |\n|----------|-------|\n| `/erlc/server/*` (except command) | 120 requests/min |\n| `/erlc/server/command` | Queue: 100 commands |\n\nReturns **HTTP 429** when limit is exceeded.\n\n## Error Response Format\n\nAll errors are returned in JSON format with `code` and `message` fields:\n\n```json\n{\n\n    \"code\": 5007,\n\n    \"message\": \"missing_token\"\n\n}\n```\n\n## Error Codes\n\n### Authentication and Access Errors\n\n| Code | Status | Description |\n|-----|--------|----------|\n| 5006 | 401 | invalid_master_key |\n| 5007 | 401 | missing_token |\n| 5008 | 401 | invalid_token |\n| 5009 | 403 | forbidden |\n| 5010 | 403 | api_version_forbidden |\n| 5011 | 403 | query_param_forbidden |\n\n### PRC API Errors\n\nEndpoints use external PRC API and may return errors:\n\n| PRC Code | Description |\n|---------|----------|\n| 2002 | Invalid or expired server-key |\n| 3002 | Server is offline |\n| 4001 | Rate limited |\n| 9999 | Module out of date |\n\nWhen PRC API error occurs, returns:\n\n```json\n{\n\n    \"code\": 5019,\n\n    \"message\": \"prc_api_error\",\n\n    \"prc_code\": 2002,\n\n    \"prc_message\": \"Invalid or expired server-key\"\n\n}\n```\n\nBase URL: `https://api.erlcrussia.xyz/v1`\n"
+  version: 1.0.0
+servers:
+- url: https://api.erlcrussia.xyz/v1
+  description: Production
+tags:
+- name: ERLC
+  description: ER:LC game server data and management.
+paths:
+  /erlc/server:
+    get:
+      tags:
+      - ERLC
+      summary: ER:LC Server Information
+      description: '**Deprecato.** Risponde con l''errore `5028`. Usa `GET /v3/erlc/server`.
+
+
+        Get general information about ER:LC server (online, name, status, etc.).'
+      deprecated: true
+      security:
+      - MRPAPIKey: []
+      responses:
+        '500':
+          description: Endpoint disabled/deprecated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                code: 5018
+                message: Endpoint устарел. Используйте более новую версию API.
+  /erlc/server/players:
+    get:
+      tags:
+      - ERLC
+      summary: List of Players on Server
+      description: '**Deprecato.** Risponde con l''errore `5028`. Usa `GET /v3/erlc/server?Players=true`.
+
+
+        Returns current list of players on ER:LC server.'
+      deprecated: true
+      security:
+      - MRPAPIKey: []
+      responses:
+        '500':
+          description: Endpoint disabled/deprecated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                code: 5018
+                message: Endpoint устарел. Используйте более новую версию API.
+  /erlc/server/joinlogs:
+    get:
+      tags:
+      - ERLC
+      summary: Player Join/Leave Logs
+      description: '**Deprecato.** Risponde con l''errore `5028`. Usa `GET /v3/erlc/server?JoinLogs=true`.
+
+
+        Returns list of player join/leave logs on server.'
+      deprecated: true
+      security:
+      - MRPAPIKey: []
+      responses:
+        '500':
+          description: Endpoint disabled/deprecated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                code: 5018
+                message: Endpoint устарел. Используйте более новую версию API.
+  /erlc/server/queue:
+    get:
+      tags:
+      - ERLC
+      summary: Server Queue
+      description: '**Deprecato.** Risponde con l''errore `5028`. Usa `GET /v3/erlc/server?Queue=true`.
+
+
+        Returns information about ER:LC server queue.'
+      deprecated: true
+      security:
+      - MRPAPIKey: []
+      responses:
+        '500':
+          description: Endpoint disabled/deprecated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                code: 5018
+                message: Endpoint устарел. Используйте более новую версию API.
+  /erlc/server/killlogs:
+    get:
+      tags:
+      - ERLC
+      summary: Kill Logs
+      description: '**Deprecato.** Risponde con l''errore `5028`. Usa `GET /v3/erlc/server?KillLogs=true`.
+
+
+        Returns kill logs on ER:LC server.'
+      deprecated: true
+      security:
+      - MRPAPIKey: []
+      responses:
+        '500':
+          description: Endpoint disabled/deprecated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                code: 5018
+                message: Endpoint устарел. Используйте более новую версию API.
+  /erlc/server/commandlogs:
+    get:
+      tags:
+      - ERLC
+      summary: Command Logs
+      description: '**Deprecato.** Risponde con l''errore `5028`. Usa `POST /v3/erlc/server/command`.
+
+
+        Returns logs of executed commands on server.'
+      deprecated: true
+      security:
+      - MRPAPIKey: []
+      responses:
+        '500':
+          description: Endpoint disabled/deprecated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                code: 5018
+                message: Endpoint устарел. Используйте более новую версию API.
+  /erlc/server/modcalls:
+    get:
+      tags:
+      - ERLC
+      summary: Moderator Call Logs
+      description: '**Deprecato.** Risponde con l''errore `5028`. Usa `GET /v3/erlc/server?ModCalls=true`.
+
+
+        Returns moderator call logs on ER:LC server.'
+      deprecated: true
+      security:
+      - MRPAPIKey: []
+      responses:
+        '500':
+          description: Endpoint disabled/deprecated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                code: 5018
+                message: Endpoint устарел. Используйте более новую версию API.
+  /erlc/server/bans:
+    get:
+      tags:
+      - ERLC
+      summary: Server Ban List
+      description: 'Returns list of active bans on ER:LC server.
+
+
+        Funziona ancora. L''equivalente nell''API V3 è `GET /v3/erlc/server/bans`.'
+      security:
+      - MRPAPIKey: []
+      responses:
+        '200':
+          description: Ban list.
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties:
+                  type: string
+                description: Object where key is PlayerId, value is player name.
+                example:
+                  PlayerId: PlayerName
+        '401':
+          $ref: '#/components/responses/UnauthorizedMissingOrInvalidToken'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+        '400':
+          $ref: '#/components/responses/PRCAPIError'
+  /erlc/server/vehicles:
+    get:
+      tags:
+      - ERLC
+      summary: List of Vehicles on Server
+      description: '**Deprecato.** Risponde con l''errore `5028`. Usa `GET /v3/erlc/server?Vehicles=true`.
+
+
+        Returns list of vehicles on ER:LC server.'
+      deprecated: true
+      security:
+      - MRPAPIKey: []
+      responses:
+        '500':
+          description: Endpoint disabled/deprecated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                code: 5018
+                message: Endpoint устарел. Используйте более новую версию API.
+  /erlc/server/staff:
+    get:
+      tags:
+      - ERLC
+      summary: Server Staff List
+      description: '**Deprecato.** Risponde con l''errore `5028`. Usa `GET /v3/erlc/server?Staff=true`.
+
+
+        Returns list of ER:LC server staff members.'
+      deprecated: true
+      security:
+      - MRPAPIKey: []
+      responses:
+        '500':
+          description: Endpoint disabled/deprecated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                code: 5018
+                message: Endpoint устарел. Используйте более новую версию API.
+  /erlc/server/command:
+    post:
+      tags:
+      - ERLC
+      summary: Send Command to ER:LC Server
+      description: '**Deprecato.** Risponde con l''errore `5028`. Usa `POST /v3/erlc/server/command`.
+
+
+        Sends a command for execution on ER:LC server.
+
+
+        Commands are added to global queue with maximum command limit.
+
+
+        **Note:** This endpoint is **not subject** to Rate Limiting (120 requests/min).'
+      deprecated: true
+      security:
+      - MRPAPIKey: []
+      requestBody:
+        required: true
+        description: Object with Command Text.
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - command
+              properties:
+                command:
+                  type: string
+                  example: :h Test API
+      responses:
+        '500':
+          description: Endpoint disabled/deprecated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                code: 5018
+                message: Endpoint устарел. Используйте более новую версию API.
+components:
+  securitySchemes:
+    MRPAPIKey:
+      type: http
+      scheme: bearer
+      bearerFormat: API Key
+      description: 'Standard API key for accessing ER:LC endpoints.
+
+
+        Passed in `Authorization: Bearer <key>` header.
+
+
+        REQUIRED FOR ALL ER:LC ENDPOINTS.
+
+        '
+  responses:
+    BadRequest:
+      description: Bad request.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    UnauthorizedMissingOrInvalidToken:
+      description: Authentication error.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/UnauthorizedError'
+          examples:
+            missing_token:
+              summary: No token.
+              value:
+                code: 5007
+                message: missing_token
+            invalid_token:
+              summary: Invalid or deactivated token.
+              value:
+                code: 5008
+                message: invalid_token
+            invalid_master_key:
+              summary: Invalid master key.
+              value:
+                code: 5006
+                message: invalid_master_key
+    Forbidden:
+      description: Access forbidden.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ForbiddenError'
+          examples:
+            forbidden:
+              summary: No access rights to endpoint.
+              value:
+                code: 5009
+                message: forbidden
+            api_version_forbidden:
+              summary: Access to this API version is forbidden.
+              value:
+                code: 5010
+                message: api_version_forbidden
+            query_param_forbidden:
+              summary: Query parameter is forbidden.
+              value:
+                code: 5011
+                message: query_param_forbidden
+    NotFound:
+      description: Not found.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          examples:
+            discord_id_not_found:
+              summary: Discord ID not found.
+              value:
+                code: 5012
+                message: discord_id_not_found
+            token_not_found:
+              summary: Token not found.
+              value:
+                code: 5013
+                message: token_not_found
+    TooManyRequests:
+      description: Request limit exceeded (120/min) or spam detected (400+ excess requests).
+      headers:
+        X-RateLimit-Limit:
+          description: Maximum requests per minute.
+          schema:
+            type: integer
+            example: 120
+        X-RateLimit-Remaining:
+          description: Remaining requests.
+          schema:
+            type: integer
+            example: 0
+        X-RateLimit-Reset:
+          description: Unix timestamp (ms) when limit resets.
+          schema:
+            type: integer
+            example: 1740339600000
+        Retry-After:
+          description: Seconds until limit resets.
+          schema:
+            type: integer
+            example: 45
+      content:
+        application/json:
+          schema:
+            oneOf:
+            - $ref: '#/components/schemas/RateLimitError'
+            - $ref: '#/components/schemas/SpamBlockedError'
+          examples:
+            rate_limit_exceeded:
+              summary: Exceeded 120 requests/min limit.
+              value:
+                code: 5016
+                message: rate_limit_exceeded
+                retry_after: 45
+                details:
+                  limit: 120
+                  count: 125
+                  excess: 5
+                  reset_at: 1740339600000
+            spam_blocked:
+              summary: Spam ban (400+ excess requests).
+              value:
+                code: 5023
+                message: spam_blocked
+                blocked_until: 1740339900000
+                remaining_seconds: 300
+    PRCAPIError:
+      description: Error from external PRC API (ER:LC).
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              code:
+                type: integer
+                example: 5019
+              message:
+                type: string
+                example: prc_api_error
+              prc_code:
+                type: integer
+                description: PRC API error code.
+              prc_message:
+                type: string
+                description: Error description.
+          examples:
+            expired_server_key:
+              summary: Server-Key invalid or expired.
+              value:
+                code: 5019
+                message: prc_api_error
+                prc_code: 2002
+                prc_message: Invalid or expired server-key
+            server_offline:
+              summary: Server offline (no players).
+              value:
+                code: 5019
+                message: prc_api_error
+                prc_code: 3002
+                prc_message: Server is offline (no players)
+            module_outdated:
+              summary: Server module is outdated.
+              value:
+                code: 5019
+                message: prc_api_error
+                prc_code: 9999
+                prc_message: In-game server module is out of date
+    InternalServerError:
+      description: Internal server error.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          examples:
+            server_error:
+              summary: External ER:LC API error.
+              value:
+                code: 5018
+                message: server_error
+    SpamDetectedLevel1:
+      description: Suspicious activity (500+ requests/sec). 5 minute ban.
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              code:
+                type: integer
+                example: 5020
+              message:
+                type: string
+                example: spam_detected_level_1
+              blocked_until:
+                type: string
+                format: date-time
+                description: Ban end time.
+              remaining_seconds:
+                type: integer
+                description: Remaining ban time in seconds.
+          examples:
+            spam_level_1:
+              value:
+                code: 5020
+                message: spam_detected_level_1
+                blocked_until: '2026-02-23T12:35:00.000Z'
+                remaining_seconds: 300
+    SpamDetectedLevel2:
+      description: Server attack (5000+ requests/sec). 15 minute ban.
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              code:
+                type: integer
+                example: 5021
+              message:
+                type: string
+                example: spam_detected_level_2
+              blocked_until:
+                type: string
+                format: date-time
+                description: Ban end time.
+              remaining_seconds:
+                type: integer
+                description: Remaining ban time in seconds.
+          examples:
+            spam_level_2:
+              value:
+                code: 5021
+                message: spam_detected_level_2
+                blocked_until: '2026-02-23T12:45:00.000Z'
+                remaining_seconds: 900
+    SpamDetectedLevel3:
+      description: Critical attack (100000+ requests/sec). 60 minute ban.
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              code:
+                type: integer
+                example: 5022
+              message:
+                type: string
+                example: spam_detected_level_3
+              blocked_until:
+                type: string
+                format: date-time
+                description: Ban end time.
+              remaining_seconds:
+                type: integer
+                description: Remaining ban time in seconds.
+          examples:
+            spam_level_3:
+              value:
+                code: 5022
+                message: spam_detected_level_3
+                blocked_until: '2026-02-23T13:30:00.000Z'
+                remaining_seconds: 3600
+    SpamBlocked:
+      description: Active spam ban. Request from blocked client.
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              code:
+                type: integer
+                example: 5023
+              message:
+                type: string
+                example: spam_blocked
+              blocked_until:
+                type: string
+                format: date-time
+                description: Ban end time.
+              remaining_seconds:
+                type: integer
+                description: Remaining ban time in seconds.
+          examples:
+            spam_blocked:
+              value:
+                code: 5023
+                message: spam_blocked
+                blocked_until: '2026-02-23T12:35:00.000Z'
+                remaining_seconds: 245
+  schemas:
+    ErrorResponse:
+      type: object
+      description: Standard error format.
+      required:
+      - code
+      - message
+      properties:
+        code:
+          type: integer
+          description: API error code.
+          example: 5007
+        message:
+          type: string
+          description: Error message/identifier.
+          example: missing_token
+    UnauthorizedError:
+      type: object
+      description: Authentication error (missing or invalid token).
+      required:
+      - code
+      - message
+      properties:
+        code:
+          type: integer
+          example: 5007
+        message:
+          type: string
+          example: missing_token
+    ForbiddenError:
+      type: object
+      description: Access error (forbidden).
+      required:
+      - code
+      - message
+      properties:
+        code:
+          type: integer
+          example: 5009
+        message:
+          type: string
+          example: forbidden
+    RateLimitError:
+      type: object
+      description: Request limit exceeded error (120/min). Returns details with counter info.
+      required:
+      - code
+      - message
+      - retry_after
+      - details
+      properties:
+        code:
+          type: integer
+          example: 5016
+        message:
+          type: string
+          example: rate_limit_exceeded
+        retry_after:
+          type: integer
+          description: Time until limit resets in seconds.
+          example: 45
+        details:
+          type: object
+          properties:
+            limit:
+              type: integer
+              description: Request limit per minute.
+              example: 120
+            count:
+              type: integer
+              description: Current request count.
+              example: 125
+            excess:
+              type: integer
+              description: Excess requests (over limit).
+              example: 5
+            reset_at:
+              type: integer
+              description: Unix timestamp (ms) of limit reset.
+              example: 1740339600000
+    SpamBlockedError:
+      type: object
+      description: Spam ban. Issued at 400+ excess requests. 5 minute ban + additional minutes for continued spam.
+      required:
+      - code
+      - message
+      - blocked_until
+      - remaining_seconds
+      properties:
+        code:
+          type: integer
+          example: 5023
+        message:
+          type: string
+          example: spam_blocked
+        blocked_until:
+          type: integer
+          description: Unix timestamp (ms) of ban end.
+          example: 1740339900000
+        remaining_seconds:
+          type: integer
+          description: Seconds until unban.
+          example: 300

@@ -1,0 +1,262 @@
+openapi: 3.1.0
+info:
+  title: ER:LC Russia API V2 - Moscow RolePlay Stats API V2
+  version: 2.0.0
+servers:
+- url: https://api.erlcrussia.com/v2
+  description: Production API V2 (com)
+- url: https://api.erlcrussia.xyz/v2
+  description: Production API V2 (xyz)
+tags:
+- name: Moscow RolePlay Stats API V2
+  description: Unified statistics for Moscow RolePlay.
+paths:
+  /moscowroleplay/stats:
+    get:
+      tags:
+      - Moscow RolePlay Stats API V2
+      summary: Unified Statistics
+      description: '**Restrictions:**
+
+        - DOT: only `membercount`
+
+        - MRP: `playercount` is only available for MRP
+
+        '
+      parameters:
+      - name: servers
+        in: query
+        required: true
+        description: 'Server names. Can specify multiple via repeating parameter.
+
+          '
+        schema:
+          type: array
+          items:
+            type: string
+            enum:
+            - MVD
+            - FSB
+            - MCHS
+            - MZ
+            - '112'
+            - DOT
+            - MRP
+        example: MVD
+      - name: metrics
+        in: query
+        required: true
+        description: 'Metric types. Must match the number of `servers`.
+
+          '
+        schema:
+          type: array
+          items:
+            type: string
+            enum:
+            - membercount
+            - allmembercount
+            - botcount
+            - playercount
+        example: membercount
+      - name: Authorization
+        in: header
+        required: false
+        description: 'Optional API key to increase the limit from 40 to 120 requests/min.
+
+
+          Passed in the `Authorization: Bearer <key>` header.
+
+          '
+        schema:
+          type: string
+        example: Bearer your-api-key-here
+      responses:
+        '200':
+          description: 'Successful response. Format depends on the number of requests:
+
+            - 1 request → text/plain
+
+            - Multiple → application/json
+
+            '
+          content:
+            text/plain:
+              schema:
+                type: string
+                description: Metric value (only for 1 request)
+                example: '67'
+            application/json:
+              schema:
+                type: object
+                description: Object with results (only for multiple requests)
+                additionalProperties:
+                  type: object
+                  additionalProperties:
+                    type: string
+              example:
+                MVD:
+                  membercount: '67'
+                FSB:
+                  botcount: '5'
+        '400':
+          description: 'Invalid request. Possible reasons:
+
+            - Missing required parameters
+
+            - Unsupported server or metric
+
+            - Mismatch between servers and metrics count
+
+            - Playercount for a server other than MRP
+
+            '
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                Missing Parameters:
+                  summary: Missing required parameters
+                  value:
+                    code: 5001
+                    message: 'Missing required query parameters: servers and metrics'
+                Mismatch:
+                  summary: Array mismatch
+                  value:
+                    code: 5002
+                    message: Servers and metrics arrays must have same length
+                Unsupported Server:
+                  summary: Unsupported server
+                  value:
+                    code: 5003
+                    message: Unsupported Server
+                Unsupported Metric:
+                  summary: Unsupported metric
+                  value:
+                    code: 5004
+                    message: Unsupported Metric
+                Playercount Not MRP:
+                  summary: Playercount only for MRP
+                  value:
+                    code: 5005
+                    message: Playercount is only available for MRP server
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+components:
+  securitySchemes:
+    MRPAPIKey:
+      type: http
+      scheme: bearer
+      bearerFormat: API Key
+      description: 'Optional API key to increase the limit from 40 to 120 requests/min.
+
+
+        Passed in the `Authorization: Bearer <key>` header.
+
+        '
+  responses:
+    Unauthorized:
+      description: Authentication error (invalid token).
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          examples:
+            Invalid Token:
+              summary: Invalid or deactivated token.
+              value:
+                code: 5008
+                message: Invalid Token
+    TooManyRequests:
+      description: 'Request limit exceeded:
+
+        - Without token: 40 requests/min
+
+        - With token: 120 requests/min
+
+        '
+      headers:
+        X-RateLimit-Limit:
+          description: Maximum requests per minute.
+          schema:
+            type: integer
+            example: 40
+        X-RateLimit-Remaining:
+          description: Remaining number of requests.
+          schema:
+            type: integer
+            example: 0
+        X-RateLimit-Reset:
+          description: Unix timestamp (ms) when the limit will be reset.
+          schema:
+            type: integer
+            example: 1740339600000
+        Retry-After:
+          description: Seconds until limit reset.
+          schema:
+            type: integer
+            example: 45
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          examples:
+            Rate Limit Exceeded:
+              summary: Rate limit exceeded
+              value:
+                code: 5016
+                message: Rate Limit Exceeded
+                retry_after: 45
+                details:
+                  limit: 40
+                  count: 45
+                  excess: 5
+                  reset_at: 1740339600000
+    InternalServerError:
+      description: Internal server error.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          examples:
+            Server Error:
+              summary: External API error
+              value:
+                code: 5018
+                message: Server Error
+  schemas:
+    ErrorResponse:
+      type: object
+      description: Standard error format.
+      required:
+      - code
+      - message
+      properties:
+        code:
+          type: integer
+          description: API error code.
+          example: 5001
+        message:
+          type: string
+          description: Error message/identifier.
+          example: Missing Discord Id
+        retry_after:
+          type: integer
+          description: Seconds until limit reset (only for 429).
+          example: 45
+        details:
+          type: object
+          description: Additional error details.
+        blocked_until:
+          type: integer
+          description: Unix timestamp (ms) when the ban ends.
+          example: 1740339900000
+        remaining_seconds:
+          type: integer
+          description: Remaining seconds of block.
+          example: 300

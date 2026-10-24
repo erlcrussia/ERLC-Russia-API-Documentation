@@ -1,10 +1,10 @@
 ---
-title: "Codici di Errore"
-description: "Se l'API di ER:LC Russia rifiuta una richiesta, restituisce una risposta JSON con un codice di errore. Usa questa pagina per capire cosa è andato storto e come risolverlo."
+title: "Codici di errore"
+description: "Codici di errore dell'API e cosa fare per ciascuno."
 icon: "triangle-exclamation"
 ---
 
-### Formato di Risposta dell'Errore
+### Formato di risposta dell'errore
 
 Tutti gli errori vengono restituiti in formato JSON con i campi `code` e `message`.
 
@@ -16,21 +16,23 @@ Tutti gli errori vengono restituiti in formato JSON con i campi `code` e `messag
 }
 ```
 
-## Tabella degli Errori API ER:LC Russia
+## Tabella degli errori API ER:LC Russia
 
 <AccordionGroup>
-  <Accordion title="Errori di Autenticazione e Token">
+  <Accordion title="Errori di autenticazione e token">
     | Codice | Descrizione | Significato |
     | :---: | :--- | :--- |
+    | `5006` | Invalid Master Key | Chiave master non valida. Controlla l'intestazione `erlcrussia-api-master-key` |
     | `5007` | Missing Token | Token di autorizzazione mancante. Aggiungi l'intestazione `Authorization: Bearer <token>` o `erlcrussia-api-key: <token>` |
-    | `5008` | Invalid Token | Il token non è valido, è disattivato o mancante nel database |
+    | `5008` | Invalid Token | Il token non è valido, è disattivato o è stato eliminato |
+    | `5033` | Unauthorized | Nessuna sessione o chiave valida per questo percorso |
     | `5009` | Forbidden | Accesso negato a questo endpoint o azione per il tuo token |
-    | `5010` | Api Version Forbidden | Accesso alla versione API richiesta (V3/V2) non consentito |
+    | `5010` | Api Version Forbidden | La chiave non può usare questa versione dell'API |
     | `5011` | Query Param Forbidden | Accesso ai parametri di query specificati vietato |
     | `5037` | Invalid Signature | Firma digitale ED25519 della richiesta non valida |
   </Accordion>
 
-  <Accordion title="Errori di Richieste e Risorse">
+  <Accordion title="Errori di richieste e risorse">
     | Codice | Descrizione | Significato |
     | :---: | :--- | :--- |
     | `5001` | Missing Discord Id | Manca `discord_id`. Aggiungi il campo `discord_id` nel corpo della richiesta |
@@ -38,8 +40,8 @@ Tutti gli errori vengono restituiti in formato JSON con i campi `code` e `messag
     | `5003` | Invalid Version | Versione API non valida nel percorso. Usa la versione attuale `v3` |
     | `5004` | Invalid Param Name | Nome del parametro di query non valido |
     | `5005` | Missing Command | Comando non inviato. Aggiungi il campo `command` nel corpo |
-    | `5012` | Discord Id Not Found | Utente con questo ID Discord non trovato nel database |
-    | `5013` | Token Not Found | Token non trovato nel database |
+    | `5012` | Discord Id Not Found | Nessun utente con questo ID Discord |
+    | `5013` | Token Not Found | Token non trovato |
     | `5014` | Token Not Found Or Deleted | Token non trovato o eliminato |
     | `5020` | Not Found | Risorsa o endpoint richiesto non trovato |
     | `5021` | Webhook Url Already Exists | L'URL del webhook è già registrato nel sistema |
@@ -61,14 +63,15 @@ Tutti gli errori vengono restituiti in formato JSON con i campi `code` e `messag
     | `5047` | Points Limit Exceeded | Limite giornaliero di punti superato |
     | `5048` | Insufficient Points | Punti insufficienti per eseguire l'azione |
     | `5050` | Roblox Account Not Linked | Account Roblox non collegato a Discord |
+    | `5051` | Webhook Verification Failed | L'URL del webhook non ha superato il controllo della firma. Il motivo è in `reason`: `private_host`, `unreachable`, `signed_rejected`, `forged_accepted`, `signing_unavailable` |
   </Accordion>
 
-  <Accordion title="Errori del Server, Coda e Limiti">
+  <Accordion title="Errori del Server, coda e limiti">
     | Codice | Descrizione | Significato |
     | :---: | :--- | :--- |
     | `5015` | Command Queue Full | Coda dei comandi piena. Riprova più tardi |
-    | `5016` | Rate Limit Exceeded | Limite di richieste superato. Attendi il reset (`retry_after`) |
-    | `5017` | Internal Error | Errore interno del server. L'errore è registrato |
+    | `5016` | Rate Limit Exceeded | Limite di richieste superato. Attendi il reset (`Retry-After`) |
+    | `5017` | Internal Error | Errore interno del server. Riprova più tardi |
     | `5018` | Server Error | Errore durante la comunicazione con l'API esterna |
     | `5019` | Prc Api Error | Errore dall'API ufficiale di PRC. Consulta il campo `prc_code` |
     | `5024` | Cache Expired | Cache scaduta e temporaneamente non disponibile |
@@ -102,12 +105,13 @@ Tutti gli errori vengono restituiti in formato JSON con i campi `code` e `messag
     | `5135` | CDN Path Already Exists | Il percorso del file CDN esiste già. Sovrascrittura disabilitata |
     | `5136` | CDN Folder Slug Already Exists | Lo slug della cartella è già in uso. Scegliere un altro slug |
     | `5137` | CDN Folder Not Found | Cartella CDN con l'ID specificato non trovata |
-    | `5138` | CDN Storage Unavailable | Storage MinIO / S3 temporaneamente non disponibile |
+    | `5138` | CDN Storage Unavailable | L'archiviazione della CDN è temporaneamente non disponibile |
     | `5139` | CDN Source Unavailable | La sorgente esterna non ha restituito il file durante l'importazione |
     | `5140` | AI Response Unavailable | Il modello IA non ha generato una risposta utilizzabile |
+    | `5141` | AI Model Unavailable | Il modello IA non è temporaneamente disponibile |
   </Accordion>
 
-  <Accordion title="Errori dell'API Economia">
+  <Accordion title="Errori dell'API economia">
     | Codice | Descrizione | Significato |
     | :---: | :--- | :--- |
     | `6000` | Unknown Error Occurred | Controlla i log, contatta l'amministratore |
@@ -135,12 +139,12 @@ Tutti gli errori vengono restituiti in formato JSON con i campi `code` e `messag
   </Accordion>
 </AccordionGroup>
 
-## Tabella degli Errori ER:LC API
+## Tabella degli errori ER:LC API
 
 Questi codici di errore vengono restituiti dall'API esterna dei server privati di PRC in `*/erlc/*`.
 
 <AccordionGroup>
-  <Accordion title="Errori di Sistema">
+  <Accordion title="Errori di sistema">
     | Codice | Significato |
     | :---: | :--- |
     | `0` | Si è verificato un errore sconosciuto. Se persiste, contatta il supporto via ticket. |
@@ -148,7 +152,7 @@ Questi codici di errore vengono restituiti dall'API esterna dei server privati d
     | `1002` | Si è verificato un errore interno del sistema PRC. |
   </Accordion>
 
-  <Accordion title="Errori di Autenticazione">
+  <Accordion title="Errori di autenticazione">
     | Codice | Significato |
     | :---: | :--- |
     | `2000` | Non hai fornito una server-key. |
@@ -159,14 +163,14 @@ Questi codici di errore vengono restituiti dall'API esterna dei server privati d
     | `2005` | Stai effettuando richieste non autenticate per conto di più server. Crea un'applicazione pubblica e invia la sua chiave API nell'intestazione Authorization. |
   </Accordion>
 
-  <Accordion title="Errori di Richiesta">
+  <Accordion title="Errori di richiesta">
     | Codice | Significato |
     | :---: | :--- |
     | `3001` | Non hai fornito un comando valido nel corpo della richiesta. |
     | `3002` | Il server che stai tentando di raggiungere è attualmente offline (senza giocatori). |
   </Accordion>
 
-  <Accordion title="Errori di Limiti e Accesso">
+  <Accordion title="Errori di limiti e accesso">
     | Codice | Significato |
     | :---: | :--- |
     | `4000` | Non sei autorizzato a eseguire questa azione su questo server. |
@@ -175,7 +179,7 @@ Questi codici di errore vengono restituiti dall'API esterna dei server privati d
     | `4003` | Il messaggio che stai tentando di inviare è vietato. |
   </Accordion>
 
-  <Accordion title="Codici Speciali">
+  <Accordion title="Codici speciali">
     | Codice | Significato |
     | :---: | :--- |
     | `9998` | La risorsa a cui stai accedendo è limitata. |

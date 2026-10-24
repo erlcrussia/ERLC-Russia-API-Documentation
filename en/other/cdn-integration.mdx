@@ -1,39 +1,75 @@
 ---
-title: CDN V3 Integrations
-description: Direct URLs, Next.js and CI/CD with a verified organization domain.
-icon: cloud
+title: "CDN integration"
+description: "How to use team files on a website, in Next.js or in CI/CD."
+icon: "cloud"
 ---
 
-## Select integration method
+The CDN stores team files and serves them at public addresses. You manage files through API V3 with a key; serving files needs no key.
 
-| Script | Method |
+| Task | How |
 |---|---|
-| Pictures, documents, videos | Download via `POST /v3/cdn/assets`, use public URL |
-| Next.js | `assetPrefix` and loading only `.next/static` before launch |
-| Plain HTML/CSS | Full CDN URLs in `src`, `href` and `url()` |
-| Server import | `POST /v3/cdn/assets/external`; public HTTP(S) source is verified against SSRF |
-| Your domain | `POST /v3/cdn/custom-domains`, DNS/TLS, verify and Host routing in Go Edge |
-| CI/CD | New release prefix; if necessary, purge only your own prefix |
+| Images, documents, video | Upload with `POST /v3/cdn/assets` and use the public address |
+| File from a URL | `POST /v3/cdn/assets/external` downloads it into the CDN |
+| Plain HTML/CSS | Full CDN addresses in `src`, `href` and `url()` |
+| Next.js | [Next.js guide](/en/tutorials/nextjs-cdn-integration) |
+| Custom domain | [Custom CDN domains](/en/tutorials/cdn-custom-domains) |
+| Releases from CI/CD | [CI/CD and cache purge](/en/tutorials/cdn-cache-purge-cicd) |
 
-Control API calls are made on the server with `erlcrussia-api-key`. Public delivery of key files does not require a key. The organization must have a CDN namespace, the key must be associated with it, and its owner must have CDN access.
+## Access
 
-On a common domain, the URL looks like `https://cdn.erlcrussia.com/YOUR_TEAM_SLUG/images/logo.png`; MinIO key - `YOUR_TEAM_SLUG/images/logo.png`. On your domain URL - `https://files.example.com/images/logo.png`; MinIO key - `files.example.com/images/logo.png`. Simply changing the hostname does not make a different namespace file available: upload it to the desired domain.
+First bind your key to a team:
 
-## Folders and paths
+```bash
+curl -X PUT https://api.erlcrussia.com/v3/cdn/team \
+  -H 'erlcrussia-api-key: YOUR_API_KEY' \
+  -H 'Content-Type: application/json' \
+  -d '{"teamId":"YOUR_TEAM_ID"}'
+```
 
-`folderId` groups files in the interface. `pathEnabled=true` adds slug folders only when downloading without an explicit path. `false` leaves the regular group. Renaming a folder does not change the old URLs. An explicitly busy URL returns 409.
+The key owner needs a team role with CDN access; membership is checked on every request. Send the key only in the `erlcrussia-api-key` header.
 
-## Cache and errors
+## File addresses
 
-Go Edge reads MinIO and warms up the SSD. `X-Cache` describes Go Edge; `CF-Cache-Status` - Cloudflare. A successful purge means acceptance of the operation, so please check the delivery separately. Use immutable release names, do not replace the contents of the old hashed chunk.
+Each file is identified by a namespace and a path. The namespace is the team slug or a verified [custom domain](/en/tutorials/cdn-custom-domains).
 
-The custom-domains list returns an array without a success wrapper. GET assets with path returns asset, and a regular list returns assets, pagination and stats. Missing key: 401/5007, no access: 403/5009, busy path: 409/5135, limit: 429/5016.
+* Shared domain: `https://cdn.erlcrussia.com/YOUR_TEAM_SLUG/images/logo.png`
+* Custom domain: `https://files.example.com/images/logo.png`
 
-All custom domains use a common ingress cname.erlcrussia.com. Go Edge checks the Host in the CDN registry: the registered CDN domain is served there; HTTP 421 for others Host sends the request to Redirect. A separate config for each domain is not needed. If the registry is unavailable, the request ends with 502 rather than being sent to another service.
+On the shared domain a team can only use `/{slug}/...`. If `path` is omitted on upload, it is generated from the file type.
 
-See [Next.js](/en/tutorials/nextjs-cdn-integration), [custom domains](/en/tutorials/cdn-custom-domains), [CI/CD and purge](/en/tutorials/cdn-cache-purge-cicd).
+If a file with the same `path` already exists, the response is 409 and the file is not overwritten. Use a new path for new versions.
 
+## Folders
 
-Unregistered and unverified custom Hosts return 421 and pass through the shared Nginx ingress to the Redirect unbound-domain page. Registry failures return 502; a missing file on a verified CDN domain remains a CDN error.
+| Action | What happens to files |
+|---|---|
+| Create, rename or delete a folder | Nothing: file addresses stay the same |
+| `PATCH /cdn/assets` with `folderId` | The file moves to another folder in the UI |
+| `PATCH /cdn/assets` with `path` | The file gets a new address |
+| Folder with `pathEnabled: true` | New uploads without `path` get the folder prefix |
 
-[Private files and library](/en/other/user-assets).
+## Common parameters
+
+| Parameter | Meaning |
+|---|---|
+| `domain` | Namespace. Defaults to the key team namespace |
+| `ids` | Comma-separated file IDs |
+| `path` | Exact file path |
+| `prefix` | Path prefix for a group of files |
+| `folderId` | Folder: `root` for no folder, `all` for all |
+| `page, limit` | List pages, `limit` up to 100 |
+
+## Cache
+
+CDN responses include `X-Cache` (CDN cache) and `CF-Cache-Status` (Cloudflare). A purge (`POST /cdn/assets/purge`) is accepted at once and runs in the background. Publishing new versions at new addresses is more reliable than replacing old files. See [CI/CD and cache purge](/en/tutorials/cdn-cache-purge-cicd).
+
+## Common responses
+
+| Response | Meaning |
+|---|---|
+| 401, code 5007 | No key |
+| 403, code 5009 | No access to the team CDN |
+| 409, code 5135 | The path is taken |
+| 429, code 5016 | Rate limit exceeded |
+
+Personal files of website users are covered in [Personal files](/en/other/user-assets).

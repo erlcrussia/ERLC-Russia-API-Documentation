@@ -1,18 +1,33 @@
 ---
-title: "Descripción General y Acceso"
-description: "Aprende qué es la API de ER:LC Rusia, qué capacidades ofrece y cómo obtener una clave de autenticación para tus solicitudes."
+title: "Resumen y acceso"
+description: "Cómo empezar a trabajar con la API de ER:LC Rusia."
 icon: "book-open"
 ---
-**La API de ER:LC Rusia** es una potente interfaz para desarrolladores que proporciona acceso a las funciones de nuestra comunidad y permite la interacción en tiempo real con el sistema técnico del proyecto, incluida la gestión de servidores de juego, la economía y otras capacidades.
 
+La API de ER:LC Rusia da acceso a los datos y funciones del proyecto: servidores de ER:LC, puntos de infracción, economía, webhooks, CDN, enlaces cortos y modelos de IA.
 
-## ¿Quién puede usarla?
+<Steps>
+  <Step title="Obtén una clave">
+    Inicia sesión con Discord en la [página de claves](https://erlcrussia.com/my/tokens). Muestra los permisos y claves de tu cuenta. Si falta acceso, contacta con la administración del proyecto en Discord; los comandos de consulta no conceden permisos nuevos.
+  </Step>
+  <Step title="Elige una API">
+    La principal es la **API V3**, en la pestaña «Documentación de la API». Para modelos de IA, la **AI API**, compatible con el SDK de OpenAI. Para eventos en tiempo real, el [WebSocket](/es/other/websocket-gateway) y el [webhook de eventos](/es/other/event-webhook).
+  </Step>
+  <Step title="Haz tu primera solicitud">
+    Envía la clave en la cabecera `erlcrussia-api-key`:
 
-Cualquier desarrollador que trabaje con la API de ER:LC Rusia puede obtener acceso después de que se revise su ticket. Se emite una clave de autenticación tras la aprobación de la solicitud.
+    ```bash
+    curl https://api.erlcrussia.com/v3/erlc/server \
+      -H "erlcrussia-api-key: YOUR_API_KEY"
+    ```
+  </Step>
+  <Step title="Gestiona errores y límites">
+    Un error tiene `code` y `message`; todos los códigos están en [Códigos de error](/es/documentation/error-codes). Vigila las cabeceras de límites; consulta [Límites de solicitudes](/es/documentation/rate-limits).
+  </Step>
+</Steps>
+
 <Note>
-  **Si no eres desarrollador y no trabajas con APIs, esta documentación no es para ti. En su lugar, utiliza una de las aplicaciones asociadas ya preparadas que se indican a continuación.**
+  Versiones anteriores. La API V2 sigue funcionando. La API V1 está obsoleta: todas sus rutas salvo `GET /v1/erlc/server/bans` responden con el error `5028`. Crea las nuevas integraciones con V3.
 </Note>
 
-## ¿No eres desarrollador? ¡Usa una aplicación asociada!
-
-Consulta nuestra documentación pública para los miembros de la comunidad [aquí](/es/api-clients).
+¿No programas? Mira los [servicios de socios](/es/api-clients): ya funcionan con la API.

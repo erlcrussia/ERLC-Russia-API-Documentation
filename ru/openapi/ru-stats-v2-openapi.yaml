@@ -3,73 +3,83 @@ info:
   title: ER:LC Россия API V2 - Moscow RolePlay API Статистики V2
   version: 2.0.0
 servers:
-  - url: https://api.erlcrussia.xyz/v2
-    description: Production API V2 (xyz)
-  - url: https://api.erlcrussia.com/v2
-    description: Production API V2 (com)
+- url: https://api.erlcrussia.com/v2
+  description: Production API V2 (com)
+- url: https://api.erlcrussia.xyz/v2
+  description: Production API V2 (xyz)
 tags:
-  - name: Moscow RolePlay API Статистики V2
-    description: Унифицированная статистика Moscow RolePlay.
+- name: Moscow RolePlay API Статистики V2
+  description: Унифицированная статистика Moscow RolePlay.
 paths:
   /moscowroleplay/stats:
     get:
       tags:
-        - Moscow RolePlay API Статистики V2
+      - Moscow RolePlay API Статистики V2
       summary: Унифицированная Статистика
-      description: |
-        **Ограничения:**
-        - DOT: только `membercount`
-        - MRP: `playercount` доступен только для MRP
-      parameters:
-        - name: servers
-          in: query
-          required: true
-          description: |
-            Имена серверов. Можно указать несколько через повторяющийся параметр.
-          schema:
-            type: array
-            items:
-              type: string
-              enum:
-                - MVD
-                - FSB
-                - MCHS
-                - MZ
-                - '112'
-                - DOT
-                - MRP
-          example: MVD
-        - name: metrics
-          in: query
-          required: true
-          description: |
-            Типы метрик. Должно соответствовать количеству `servers`.
-          schema:
-            type: array
-            items:
-              type: string
-              enum:
-                - membercount
-                - allmembercount
-                - botcount
-                - playercount
-          example: membercount
-        - name: Authorization
-          in: header
-          required: false
-          description: |
-            Опциональный API ключ для увеличения лимита с 40 до 120 запросов/мин.
+      description: '**Ограничения:**
 
-            Передается в заголовке `Authorization: Bearer <ключ>`.
-          schema:
+        - DOT: только `membercount`
+
+        - MRP: `playercount` доступен только для MRP
+
+        '
+      parameters:
+      - name: servers
+        in: query
+        required: true
+        description: 'Имена серверов. Можно указать несколько через повторяющийся параметр.
+
+          '
+        schema:
+          type: array
+          items:
             type: string
-          example: Bearer your-api-key-here
+            enum:
+            - MVD
+            - FSB
+            - MCHS
+            - MZ
+            - '112'
+            - DOT
+            - MRP
+        example: MVD
+      - name: metrics
+        in: query
+        required: true
+        description: 'Типы метрик. Должно соответствовать количеству `servers`.
+
+          '
+        schema:
+          type: array
+          items:
+            type: string
+            enum:
+            - membercount
+            - allmembercount
+            - botcount
+            - playercount
+        example: membercount
+      - name: Authorization
+        in: header
+        required: false
+        description: 'Опциональный API ключ для увеличения лимита с 40 до 120 запросов/мин.
+
+
+          Передается в заголовке `Authorization: Bearer <ключ>`.
+
+          '
+        schema:
+          type: string
+        example: Bearer your-api-key-here
       responses:
         '200':
-          description: |
-            Успешный ответ. Формат зависит от количества запросов:
+          description: 'Успешный ответ. Формат зависит от количества запросов:
+
             - 1 запрос → text/plain
+
             - Несколько → application/json
+
+            '
           content:
             text/plain:
               schema:
@@ -90,12 +100,17 @@ paths:
                 FSB:
                   botcount: '5'
         '400':
-          description: |
-            Неверный запрос. Возможные причины:
+          description: 'Неверный запрос. Возможные причины:
+
             - Отсутствуют обязательные параметры
+
             - Неподдерживаемый сервер или метрика
+
             - Несовпадение количества servers и metrics
+
             - Playercount для сервера отличного от MRP
+
+            '
           content:
             application/json:
               schema:
@@ -110,22 +125,22 @@ paths:
                   summary: Несовпадение массивов
                   value:
                     code: 5002
-                    message: 'Servers and metrics arrays must have same length'
+                    message: Servers and metrics arrays must have same length
                 Unsupported Server:
                   summary: Неподдерживаемый сервер
                   value:
                     code: 5003
-                    message: 'Unsupported Server'
+                    message: Unsupported Server
                 Unsupported Metric:
                   summary: Неподдерживаемая метрика
                   value:
                     code: 5004
-                    message: 'Unsupported Metric'
+                    message: Unsupported Metric
                 Playercount Not MRP:
                   summary: Playercount только для MRP
                   value:
                     code: 5005
-                    message: 'Playercount is only available for MRP server'
+                    message: Playercount is only available for MRP server
         '401':
           $ref: '#/components/responses/Unauthorized'
         '429':
@@ -138,10 +153,12 @@ components:
       type: http
       scheme: bearer
       bearerFormat: API Key
-      description: |
-        Опциональный API ключ для увеличения лимита с 40 до 120 запросов/мин.
+      description: 'Опциональный API ключ для увеличения лимита с 40 до 120 запросов/мин.
+
 
         Передается в заголовке `Authorization: Bearer <ключ>`.
+
+        '
   responses:
     Unauthorized:
       description: Ошибка аутентификации (неверный токен).
@@ -156,10 +173,13 @@ components:
                 code: 5008
                 message: Invalid Token
     TooManyRequests:
-      description: |
-        Превышен лимит запросов:
+      description: 'Превышен лимит запросов:
+
         - Без токена: 40 запросов/мин
+
         - С токеном: 120 запросов/мин
+
+        '
       headers:
         X-RateLimit-Limit:
           description: Максимум запросов в минуту.
@@ -214,8 +234,8 @@ components:
       type: object
       description: Стандартный формат ошибки.
       required:
-        - code
-        - message
+      - code
+      - message
       properties:
         code:
           type: integer

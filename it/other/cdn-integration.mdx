@@ -1,39 +1,75 @@
 ---
-title: Integrazioni CDN V3
-description: URL diretti, Next.js e CI/CD con un dominio di organizzazione verificato.
-icon: cloud
+title: "Integrazione con la CDN"
+description: "Come usare i file del team su un sito, in Next.js o in CI/CD."
+icon: "cloud"
 ---
 
-## Seleziona il metodo di integrazione
+La CDN conserva i file del team e li serve a indirizzi pubblici. Si gestisce con l'API V3 e una chiave; per servire i file non serve chiave.
 
-| Scrittura | Metodo |
+| Attività | Come fare |
 |---|---|
-| Immagini, documenti, video | Scarica tramite `POST /v3/cdn/assets`, utilizza l'URL pubblico |
-| Next.js | `assetPrefix` e caricamento solo di `.next/static` prima del lancio |
-| HTML/CSS semplice | URL CDN completi in `src`, `href` e `url()` |
-| Importazione server | `POST /v3/cdn/assets/external`; la fonte HTTP(S) pubblica è verificata rispetto a SSRF |
-| Il tuo dominio | `POST /v3/cdn/custom-domains`, DNS/TLS, verifica e routing dell'host in Go Edge |
-| CI/CD | Nuovo prefisso di rilascio; se necessario, elimina solo il tuo prefisso |
+| Immagini, documenti, video | Caricali con `POST /v3/cdn/assets` e usa l'indirizzo pubblico |
+| File da un URL | `POST /v3/cdn/assets/external` lo scarica nella CDN |
+| HTML/CSS semplice | Indirizzi completi della CDN in `src`, `href` e `url()` |
+| Next.js | [Guida per Next.js](/it/tutorials/nextjs-cdn-integration) |
+| Dominio personalizzato | [Domini CDN personalizzati](/it/tutorials/cdn-custom-domains) |
+| Rilasci da CI/CD | [CI/CD e svuotamento della cache](/it/tutorials/cdn-cache-purge-cicd) |
 
-Le chiamate API di controllo vengono effettuate sul server con `erlcrussia-api-key`. La consegna pubblica dei file chiave non richiede una chiave. L'organizzazione deve disporre di uno spazio dei nomi CDN, la chiave deve essere associata ad esso e il proprietario deve avere accesso alla CDN.
+## Accesso
 
-Su un dominio comune, l'URL è simile a `https://cdn.erlcrussia.com/YOUR_TEAM_SLUG/images/logo.png`; Tasto MinIO - `YOUR_TEAM_SLUG/images/logo.png`. Sull'URL del tuo dominio: `https://files.example.com/images/logo.png`; Tasto MinIO - `files.example.com/images/logo.png`. La semplice modifica del nome host non rende disponibile un file dello spazio dei nomi diverso: caricalo nel dominio desiderato.
+Per prima cosa collega la chiave a un team:
 
-## Cartelle e percorsi
+```bash
+curl -X PUT https://api.erlcrussia.com/v3/cdn/team \
+  -H 'erlcrussia-api-key: YOUR_API_KEY' \
+  -H 'Content-Type: application/json' \
+  -d '{"teamId":"YOUR_TEAM_ID"}'
+```
 
-`folderId` raggruppa i file nell'interfaccia. `pathEnabled=true` aggiunge cartelle slug solo durante il download senza un percorso esplicito. `false` lascia il gruppo regolare. La ridenominazione di una cartella non modifica i vecchi URL. Un URL esplicitamente occupato restituisce 409.
+Il titolare della chiave deve avere un ruolo nel team con accesso alla CDN; l'appartenenza è verificata a ogni richiesta. Invia la chiave solo nell'header `erlcrussia-api-key`.
 
-## Cache ed errori
+## Indirizzi dei file
 
-Go Edge legge MinIO e riscalda l'SSD. `X-Cache` descrive Go Edge; `CF-Cache-Status` - Cloudflare. Un'eliminazione riuscita implica l'accettazione dell'operazione, quindi verificare la consegna separatamente. Utilizza nomi di versione immutabili, non sostituire il contenuto del vecchio blocco con hash.
+Ogni file è identificato da uno spazio e da un percorso. Lo spazio è lo slug del team o un [dominio personalizzato](/it/tutorials/cdn-custom-domains) verificato.
 
-L'elenco dei domini personalizzati restituisce un array senza un wrapper di successo. GET risorse con percorso restituisce risorse e un elenco regolare restituisce risorse, impaginazione e statistiche. Chiave mancante: 401/5007, nessun accesso: 403/5009, percorso occupato: 409/5135, limite: 429/5016.
+* Dominio comune: `https://cdn.erlcrussia.com/YOUR_TEAM_SLUG/images/logo.png`
+* Dominio personalizzato: `https://files.example.com/images/logo.png`
 
-Tutti i domini personalizzati utilizzano un ingresso comune cname.erlcrussia.com. Go Edge controlla l'Host nel registro CDN: il dominio CDN registrato è servito lì; HTTP 421 per gli altri L'host invia la richiesta a Redirect. Non è necessaria una configurazione separata per ciascun dominio. Se il registro non è disponibile, la richiesta termina con 502 anziché essere inviata a un altro servizio.
+Sul dominio comune un team può usare solo `/{slug}/...`. Se `path` manca al caricamento, viene generato dal tipo di file.
 
-Vedi [Next.js](/it/tutorials/nextjs-cdn-integration), [domini personalizzati](/it/tutorials/cdn-custom-domains), [CI/CD ed eliminazione](/it/tutorials/cdn-cache-purge-cicd).
+Se esiste già un file con lo stesso `path`, la risposta è 409 e il file non viene sovrascritto. Usa un nuovo percorso per ogni versione.
 
+## Cartelle
 
-Gli Host non registrati o non verificati restituiscono 421 e passano dal Nginx condiviso a Redirect con la pagina del dominio non collegato. Un registro non disponibile restituisce 502; un file assente su un dominio verificato rimane un errore CDN.
+| Azione | Cosa succede ai file |
+|---|---|
+| Creare, rinominare o eliminare una cartella | Niente: gli indirizzi restano uguali |
+| `PATCH /cdn/assets` con `folderId` | Il file passa a un'altra cartella nell'interfaccia |
+| `PATCH /cdn/assets` con `path` | Il file ottiene un nuovo indirizzo |
+| Cartella con `pathEnabled: true` | I nuovi caricamenti senza `path` ricevono il prefisso della cartella |
 
-[File privati e libreria](/it/other/user-assets).
+## Parametri comuni
+
+| Parametro | Significato |
+|---|---|
+| `domain` | Spazio. Di default, quello del team della chiave |
+| `ids` | ID dei file separati da virgole |
+| `path` | Percorso esatto del file |
+| `prefix` | Prefisso del percorso per un gruppo di file |
+| `folderId` | Cartella: `root` senza cartella, `all` tutte |
+| `page, limit` | Pagine dell'elenco, `limit` fino a 100 |
+
+## Cache
+
+Le risposte della CDN includono `X-Cache` (cache della CDN) e `CF-Cache-Status` (Cloudflare). Lo svuotamento (`POST /cdn/assets/purge`) viene accettato subito ed eseguito in background. Pubblicare nuove versioni a nuovi indirizzi è più affidabile che sostituire i file. Vedi [CI/CD e svuotamento della cache](/it/tutorials/cdn-cache-purge-cicd).
+
+## Risposte frequenti
+
+| Risposta | Significato |
+|---|---|
+| 401, codice 5007 | Manca la chiave |
+| 403, codice 5009 | Nessun accesso alla CDN del team |
+| 409, codice 5135 | Il percorso è già occupato |
+| 429, codice 5016 | Limite di richieste superato |
+
+I file personali degli utenti del sito sono descritti in [File personali](/it/other/user-assets).

@@ -3,48 +3,60 @@ info:
   title: ER:LC Russia API V2 - Moscow RolePlay Economy API V2
   version: 2.0.0
 servers:
-  - url: https://api.erlcrussia.xyz/v2
-    description: ER:LC Russia API V2
+- url: https://api.erlcrussia.com/v2
+  description: Production API V2 (com)
+- url: https://api.erlcrussia.xyz/v2
+  description: Production API V2 (xyz)
 tags:
-  - name: Moscow RolePlay Economy API V2
-    description: Endpoints for managing economy and CivOps system.
+- name: Moscow RolePlay Economy API V2
+  description: Endpoints for managing economy and CivOps system.
 paths:
   /moscowroleplay/civops/economy:
     get:
       tags:
-        - Moscow RolePlay Economy API V2
+      - Moscow RolePlay Economy API V2
       summary: Get Economy Data
-      description: |
-        Retrieve information about the server economy.
+      description: 'Retrieve information about the server economy.
+
 
         Available actions:
+
         - `balance` - user balance (requires userId).
+
         - `leaderboard` - top users by balance (requires limit).
-        - `rank` - user's rank in the leaderboard (requires userId).
-        - `cooldowns` - user's command cooldowns (requires userId).
+
+        - `rank` - user''s rank in the leaderboard (requires userId).
+
+        - `cooldowns` - user''s command cooldowns (requires userId).
+
+        '
       security:
-        - MRPAPIKey: []
+      - MRPAPIKey: []
       parameters:
-        - name: action
-          in: query
-          description: Action type for retrieving data.
-          required: true
-          schema:
-            type: string
-            enum: [balance, leaderboard, rank, cooldowns]
-        - name: userId
-          in: query
-          description: User ID (required for balance, rank, cooldowns).
-          required: false
-          schema:
-            type: string
-        - name: limit
-          in: query
-          description: Record limit for leaderboard.
-          required: false
-          schema:
-            type: integer
-            default: 10
+      - name: action
+        in: query
+        description: Action type for retrieving data.
+        required: true
+        schema:
+          type: string
+          enum:
+          - balance
+          - leaderboard
+          - rank
+          - cooldowns
+      - name: userId
+        in: query
+        description: User ID (required for balance, rank, cooldowns).
+        required: false
+        schema:
+          type: string
+      - name: limit
+        in: query
+        description: Record limit for leaderboard.
+        required: false
+        schema:
+          type: integer
+          default: 10
       responses:
         '200':
           description: Successful response with economy data.
@@ -56,7 +68,7 @@ paths:
                 balance:
                   summary: User balance.
                   value:
-                    userId: "1133665013794607114"
+                    userId: '1133665013794607114'
                     cash: 500
                     bank: 100000000000
                     rank: 1
@@ -65,25 +77,25 @@ paths:
                   value:
                     count: 10
                     users:
-                      - user_id: "1133665013794607114"
-                        cash: 500
-                        bank: 100000000000
-                      - user_id: "924918625129865256"
-                        cash: 10
-                        bank: 100000000000
+                    - user_id: '1133665013794607114'
+                      cash: 500
+                      bank: 100000000000
+                    - user_id: '924918625129865256'
+                      cash: 10
+                      bank: 100000000000
                 rank:
                   summary: User's rank in the leaderboard.
                   value:
-                    userId: "1133665013794607114"
+                    userId: '1133665013794607114'
                     rank: 1
                 cooldowns:
                   summary: User cooldowns.
                   value:
-                    userId: "1133665013794607114"
+                    userId: '1133665013794607114'
                     cooldowns:
-                      - command: "работать"
-                        last_used: 1776625200
-                        expires_at: 1776627000
+                    - command: работать
+                      last_used: 1776625200
+                      expires_at: 1776627000
         '400':
           description: Request error (missing userId for required actions or unknown action).
           content:
@@ -100,31 +112,48 @@ paths:
           $ref: '#/components/responses/InternalServerError'
     post:
       tags:
-        - Moscow RolePlay Economy API V2
+      - Moscow RolePlay Economy API V2
       summary: Economy Operations
-      description: |
-        Perform operations with the economy system (transactions, transfers, etc.).
+      description: 'Perform operations with the economy system (transactions, transfers, etc.).
+
 
         Available actions:
+
         - `transfer` - transfer between users (requires fromUserId, toUserId, amount).
+
         - `deposit` - deposit money to bank (requires userId, amount).
+
         - `withdraw` - withdraw money from bank (requires userId, amount).
+
         - `add` - add money to user (requires userId, amount, type).
+
         - `remove` - remove money from user (requires userId, amount, type).
+
         - `reset` - reset user balance (requires userId).
+
         - `resetCooldown` - reset user cooldowns (requires userId, command).
 
-        The type parameter for add/remove can be 'cash' or 'bank' (default 'cash').
+
+        The type parameter for add/remove can be ''cash'' or ''bank'' (default ''cash'').
+
+        '
       security:
-        - MRPAPIKey: []
+      - MRPAPIKey: []
       parameters:
-        - name: action
-          in: query
-          description: Operation type.
-          required: true
-          schema:
-            type: string
-            enum: [transfer, deposit, withdraw, add, remove, reset, resetCooldown]
+      - name: action
+        in: query
+        description: Operation type.
+        required: true
+        schema:
+          type: string
+          enum:
+          - transfer
+          - deposit
+          - withdraw
+          - add
+          - remove
+          - reset
+          - resetCooldown
       requestBody:
         required: true
         content:
@@ -135,39 +164,39 @@ paths:
               transfer:
                 summary: Transfer between users.
                 value:
-                  fromUserId: "1027118272879009886"
-                  toUserId: "1133665013794607114"
+                  fromUserId: '1027118272879009886'
+                  toUserId: '1133665013794607114'
                   amount: 100000
               deposit:
                 summary: Deposit money to bank.
                 value:
-                  userId: "1133665013794607114"
+                  userId: '1133665013794607114'
                   amount: 50000
               withdraw:
                 summary: Withdraw money from bank.
                 value:
-                  userId: "1133665013794607114"
+                  userId: '1133665013794607114'
                   amount: 20000
               add:
                 summary: Add money.
                 value:
-                  userId: "1133665013794607114"
+                  userId: '1133665013794607114'
                   amount: 5000
                   type: cash
               remove:
                 summary: Remove money.
                 value:
-                  userId: "1133665013794607114"
+                  userId: '1133665013794607114'
                   amount: 2000
                   type: bank
               reset:
                 summary: Reset balance.
                 value:
-                  userId: "1133665013794607114"
+                  userId: '1133665013794607114'
               resetCooldown:
                 summary: Reset command cooldown.
                 value:
-                  userId: "1133665013794607114"
+                  userId: '1133665013794607114'
                   command: работать
       responses:
         '200':
@@ -181,8 +210,8 @@ paths:
                   summary: Successful transfer.
                   value:
                     success: true
-                    fromUserId: "1027118272879009886"
-                    toUserId: "1133665013794607114"
+                    fromUserId: '1027118272879009886'
+                    toUserId: '1133665013794607114'
                     amount: 100000
                     newBalance:
                       cash: 104000
@@ -191,7 +220,7 @@ paths:
                   summary: Successful deposit.
                   value:
                     success: true
-                    userId: "1133665013794607114"
+                    userId: '1133665013794607114'
                     deposited: 50000
                     newBank: 150000
                     newCash: 3000
@@ -199,7 +228,7 @@ paths:
                   summary: Successful withdrawal.
                   value:
                     success: true
-                    userId: "1133665013794607114"
+                    userId: '1133665013794607114'
                     withdrawn: 50000
                     newBank: 53000
                     newCash: 100000
@@ -207,7 +236,7 @@ paths:
                   summary: Money added.
                   value:
                     success: true
-                    userId: "1133665013794607114"
+                    userId: '1133665013794607114'
                     type: cash
                     amount: 5000
                     newBalance:
@@ -217,7 +246,7 @@ paths:
                   summary: Money removed.
                   value:
                     success: true
-                    userId: "1133665013794607114"
+                    userId: '1133665013794607114'
                     type: bank
                     amount: 2000
                     newBalance:
@@ -227,7 +256,7 @@ paths:
                   summary: Balance reset.
                   value:
                     success: true
-                    userId: "1133665013794607114"
+                    userId: '1133665013794607114'
                     newBalance:
                       cash: 0
                       bank: 0
@@ -235,7 +264,7 @@ paths:
                   summary: Cooldown reset.
                   value:
                     success: true
-                    userId: "1133665013794607114"
+                    userId: '1133665013794607114'
                     command: работать
         '400':
           description: Request error (missing required fields or unknown action).
@@ -251,49 +280,53 @@ paths:
           $ref: '#/components/responses/TooManyRequests'
         '500':
           $ref: '#/components/responses/InternalServerError'
-
   /moscowroleplay/civops/users:
     get:
       tags:
-        - Moscow RolePlay Economy API V2
+      - Moscow RolePlay Economy API V2
       summary: Get User Data
-      description: |
-        Retrieve user inventory and transaction history.
+      description: 'Retrieve user inventory and transaction history.
+
 
         Available actions:
+
         - `inventory` - user inventory (requires userId).
+
         - `transactions` - transaction history (requires userId, page, limit).
 
+        '
       security:
-        - MRPAPIKey: []
+      - MRPAPIKey: []
       parameters:
-        - name: action
-          in: query
-          description: Action type for retrieving data.
-          required: true
-          schema:
-            type: string
-            enum: [inventory, transactions]
-        - name: userId
-          in: query
-          description: User ID (required).
-          required: false
-          schema:
-            type: string
-        - name: limit
-          in: query
-          description: Record limit for transactions.
-          required: false
-          schema:
-            type: integer
-            default: 15
-        - name: page
-          in: query
-          description: Page number for transactions.
-          required: false
-          schema:
-            type: integer
-            default: 1
+      - name: action
+        in: query
+        description: Action type for retrieving data.
+        required: true
+        schema:
+          type: string
+          enum:
+          - inventory
+          - transactions
+      - name: userId
+        in: query
+        description: User ID (required).
+        required: false
+        schema:
+          type: string
+      - name: limit
+        in: query
+        description: Record limit for transactions.
+        required: false
+        schema:
+          type: integer
+          default: 15
+      - name: page
+        in: query
+        description: Page number for transactions.
+        required: false
+        schema:
+          type: integer
+          default: 1
       responses:
         '200':
           description: Successful response with user data.
@@ -305,29 +338,29 @@ paths:
                 inventory:
                   summary: User inventory.
                   value:
-                    userId: "1133665013794607114"
+                    userId: '1133665013794607114'
                     inventory:
-                      - name: "Элитный Класс"
-                        amount: 1
-                        description: "Получите роль \"Элитный Класс\", чтобы продемонстрировать свое богатство."
-                      - name: "Петух"
-                        amount: 5
-                        description: "Надежный петух, с помощью которого вы можете выиграть (или проиграть) петушиный бой."
+                    - name: Элитный Класс
+                      amount: 1
+                      description: Получите роль "Элитный Класс", чтобы продемонстрировать свое богатство.
+                    - name: Петух
+                      amount: 5
+                      description: Надежный петух, с помощью которого вы можете выиграть (или проиграть) петушиный бой.
                 transactions:
                   summary: Purchase history from businesses.
                   value:
-                    userId: "1133665013794607114"
+                    userId: '1133665013794607114'
                     page: 1
                     total: 150
                     transactions:
-                      - id: 302
-                        user_id: "1133665013794607114"
-                        business_id: "2TAH37"
-                        business_name: "Вкусно и точка"
-                        item_name: "Напиток на выбор"
-                        item_description: "Напиток на выбор из нескольких позиций: Спрайт, Добрый Кола, Фанта, Вишневая Кола, Липтон Зеленый, Липтон Чёрный"
-                        price: 55
-                        ts: 1762088809
+                    - id: 302
+                      user_id: '1133665013794607114'
+                      business_id: 2TAH37
+                      business_name: Вкусно и точка
+                      item_name: Напиток на выбор
+                      item_description: 'Напиток на выбор из нескольких позиций: Спрайт, Добрый Кола, Фанта, Вишневая Кола, Липтон Зеленый, Липтон Чёрный'
+                      price: 55
+                      ts: 1762088809
         '400':
           description: Request error (missing userId or unknown action).
           content:
@@ -338,7 +371,7 @@ paths:
                 Missing Discord Id:
                   summary: Missing userId.
                   value:
-                    error: "userId required"
+                    error: userId required
         '401':
           $ref: '#/components/responses/UnauthorizedMissingOrInvalidToken'
         '403':
@@ -349,25 +382,33 @@ paths:
           $ref: '#/components/responses/InternalServerError'
     post:
       tags:
-        - Moscow RolePlay Economy API V2
+      - Moscow RolePlay Economy API V2
       summary: User Inventory Operations
-      description: |
-        Manage user inventory.
+      description: 'Manage user inventory.
+
 
         Available actions:
+
         - `addItem` - add item to inventory (requires userId, item).
+
         - `removeItem` - remove item from inventory (requires userId, itemName, amount).
+
         - `clearInventory` - clear entire inventory (requires userId).
+
+        '
       security:
-        - MRPAPIKey: []
+      - MRPAPIKey: []
       parameters:
-        - name: action
-          in: query
-          description: Operation type.
-          required: true
-          schema:
-            type: string
-            enum: [addItem, removeItem, clearInventory]
+      - name: action
+        in: query
+        description: Operation type.
+        required: true
+        schema:
+          type: string
+          enum:
+          - addItem
+          - removeItem
+          - clearInventory
       requestBody:
         required: true
         content:
@@ -378,21 +419,21 @@ paths:
               addItem:
                 summary: Add item.
                 value:
-                  userId: "1133665013794607114"
+                  userId: '1133665013794607114'
                   item:
-                    name: "Петух"
+                    name: Петух
                     amount: 1
-                    description: "Надежный петух, с помощью которого вы можете выиграть (или проиграть) петушиный бой."
+                    description: Надежный петух, с помощью которого вы можете выиграть (или проиграть) петушиный бой.
               removeItem:
                 summary: Remove item.
                 value:
-                  userId: "1133665013794607114"
-                  itemName: "Элитный Класс"
+                  userId: '1133665013794607114'
+                  itemName: Элитный Класс
                   amount: 1
               clearInventory:
                 summary: Clear inventory
                 value:
-                  userId: "1133665013794607114"
+                  userId: '1133665013794607114'
       responses:
         '200':
           description: Operation successfully completed.
@@ -405,22 +446,22 @@ paths:
                   summary: Item added.
                   value:
                     success: true
-                    userId: "1133665013794607114"
-                    item: "Петух"
+                    userId: '1133665013794607114'
+                    item: Петух
                     amount: 1
                 removeItem:
                   summary: Item removed.
                   value:
                     success: true
-                    userId: "1133665013794607114"
-                    item: "Элитный Класс"
+                    userId: '1133665013794607114'
+                    item: Элитный Класс
                     amount: 1
                 clearInventory:
                   summary: Inventory cleared.
                   value:
                     success: true
-                    userId: "1133665013794607114"
-                    action: "inventory_cleared"
+                    userId: '1133665013794607114'
+                    action: inventory_cleared
         '400':
           description: Request error (missing required fields or unknown action).
           content:
@@ -435,61 +476,77 @@ paths:
           $ref: '#/components/responses/TooManyRequests'
         '500':
           $ref: '#/components/responses/InternalServerError'
-
   /moscowroleplay/civops/businesses:
     get:
       tags:
-        - Moscow RolePlay Economy API V2
+      - Moscow RolePlay Economy API V2
       summary: Get Business Data
-      description: |
-        Retrieve information about businesses on the server.
+      description: 'Retrieve information about businesses on the server.
+
 
         Available actions:
+
         - `list` - list of all businesses (requires page, limit).
+
         - `info` - business information (requires businessId or businessName).
+
         - `balance` - business balance (requires businessId).
+
         - `employees` - business employees (requires businessId, page, limit).
+
         - `store` - business products (requires businessName).
+
         - `transfers` - business transfers (requires businessId, page, limit).
+
         - `rating` - top businesses by balance (requires limit).
+
         - `pending` - pending business creation requests.
 
+        '
       security:
-        - MRPAPIKey: []
+      - MRPAPIKey: []
       parameters:
-        - name: action
-          in: query
-          description: Action type for retrieving data.
-          required: true
-          schema:
-            type: string
-            enum: [list, info, balance, employees, store, transfers, rating, pending]
-        - name: businessId
-          in: query
-          description: Business ID (for info, balance, employees, transfers).
-          required: false
-          schema:
-            type: string
-        - name: businessName
-          in: query
-          description: Business name.
-          required: false
-          schema:
-            type: string
-        - name: limit
-          in: query
-          description: Record limit.
-          required: false
-          schema:
-            type: integer
-            default: 10
-        - name: page
-          in: query
-          description: Page number.
-          required: false
-          schema:
-            type: integer
-            default: 1
+      - name: action
+        in: query
+        description: Action type for retrieving data.
+        required: true
+        schema:
+          type: string
+          enum:
+          - list
+          - info
+          - balance
+          - employees
+          - store
+          - transfers
+          - rating
+          - pending
+      - name: businessId
+        in: query
+        description: Business ID (for info, balance, employees, transfers).
+        required: false
+        schema:
+          type: string
+      - name: businessName
+        in: query
+        description: Business name.
+        required: false
+        schema:
+          type: string
+      - name: limit
+        in: query
+        description: Record limit.
+        required: false
+        schema:
+          type: integer
+          default: 10
+      - name: page
+        in: query
+        description: Page number.
+        required: false
+        schema:
+          type: integer
+          default: 1
       responses:
         '200':
           description: Successful response with business data.
@@ -504,109 +561,109 @@ paths:
                     page: 1
                     total: 50
                     businesses:
-                      - id: "UCEW29"
-                        user_id: "760966468715937814"
-                        username: "ttunku_pal"
-                        name: "Roma Aeterna"
-                        form: "ООО"
-                        status: "active"
-                        created_at: 1761587615
-                        approved_by: "1133665013794607114"
-                        owner_id: "760966468715937814"
-                        owner_name: "ttunku_pal"
-                        channel_id: "1432651696210841760"
-                        channel_name: "🇮🇹┃roma-aeterna"
-                        role_id: "1432651691987304522"
-                        role_name: "Roma Aeterna"
-                        employee_role_id: "1432651694289846302"
-                        employee_role_name: "Сотрудник Бизнеса Roma Aeterna"
-                        description: "В «Roma Aeterna» мы верим, что лучшие беседы рождаются за вкусной едой. Наше кафе создано для того, чтобы вы чувствовали себя как в гостях у друзей в солнечной Италии."
-                        info_msg_id: "1432651699952156712"
-                        address: "2221 Southern Avenue"
-                        bank: 350
+                    - id: UCEW29
+                      user_id: '760966468715937814'
+                      username: ttunku_pal
+                      name: Roma Aeterna
+                      form: ООО
+                      status: active
+                      created_at: 1761587615
+                      approved_by: '1133665013794607114'
+                      owner_id: '760966468715937814'
+                      owner_name: ttunku_pal
+                      channel_id: '1432651696210841760'
+                      channel_name: 🇮🇹┃roma-aeterna
+                      role_id: '1432651691987304522'
+                      role_name: Roma Aeterna
+                      employee_role_id: '1432651694289846302'
+                      employee_role_name: Сотрудник Бизнеса Roma Aeterna
+                      description: В «Roma Aeterna» мы верим, что лучшие беседы рождаются за вкусной едой. Наше кафе создано для того, чтобы вы чувствовали себя как в гостях у друзей в солнечной Италии.
+                      info_msg_id: '1432651699952156712'
+                      address: 2221 Southern Avenue
+                      bank: 350
                 info:
                   summary: Business information.
                   value:
                     business:
-                      id: "UCEW29"
-                      user_id: "760966468715937814"
-                      username: "ttunku_pal"
-                      name: "Roma Aeterna"
-                      form: "ООО"
-                      status: "active"
+                      id: UCEW29
+                      user_id: '760966468715937814'
+                      username: ttunku_pal
+                      name: Roma Aeterna
+                      form: ООО
+                      status: active
                       created_at: 1761587615
-                      approved_by: "1133665013794607114"
-                      owner_id: "760966468715937814"
-                      owner_name: "ttunku_pal"
-                      channel_id: "1432651696210841760"
-                      channel_name: "🇮🇹┃roma-aeterna"
-                      role_id: "1432651691987304522"
-                      role_name: "Roma Aeterna"
-                      employee_role_id: "1432651694289846302"
-                      employee_role_name: "Сотрудник Бизнеса Roma Aeterna"
-                      description: "В «Roma Aeterna» мы верим, что лучшие беседы рождаются за вкусной едой."
-                      info_msg_id: "1432651699952156712"
-                      address: "2221 Southern Avenue"
+                      approved_by: '1133665013794607114'
+                      owner_id: '760966468715937814'
+                      owner_name: ttunku_pal
+                      channel_id: '1432651696210841760'
+                      channel_name: 🇮🇹┃roma-aeterna
+                      role_id: '1432651691987304522'
+                      role_name: Roma Aeterna
+                      employee_role_id: '1432651694289846302'
+                      employee_role_name: Сотрудник Бизнеса Roma Aeterna
+                      description: В «Roma Aeterna» мы верим, что лучшие беседы рождаются за вкусной едой.
+                      info_msg_id: '1432651699952156712'
+                      address: 2221 Southern Avenue
                       bank: 350
                 balance:
                   summary: Business balance.
                   value:
-                    businessId: "UCEW29"
+                    businessId: UCEW29
                     balance:
                       bank: 350
                 employees:
                   summary: Business employees.
                   value:
-                    businessId: "UCEW29"
+                    businessId: UCEW29
                     employees:
-                      - id: 61
-                        business_id: "UCEW29"
-                        user_id: "1335499851273601029"
-                        username: "ytkaytkovich_16555"
-                        position: "Сотрудник"
-                        joined_at: 1761661225
-                      - id: 65
-                        business_id: "UCEW29"
-                        user_id: "813472799280726017"
-                        username: "._ethea1th"
-                        position: "Менеджер"
-                        joined_at: 1763834359
-                      - id: 66
-                        business_id: "UCEW29"
-                        user_id: "1195675629010558986"
-                        username: "m1xsimus_"
-                        position: "Менеджер"
-                        joined_at: 1763834389
+                    - id: 61
+                      business_id: UCEW29
+                      user_id: '1335499851273601029'
+                      username: ytkaytkovich_16555
+                      position: Сотрудник
+                      joined_at: 1761661225
+                    - id: 65
+                      business_id: UCEW29
+                      user_id: '813472799280726017'
+                      username: ._ethea1th
+                      position: Менеджер
+                      joined_at: 1763834359
+                    - id: 66
+                      business_id: UCEW29
+                      user_id: '1195675629010558986'
+                      username: m1xsimus_
+                      position: Менеджер
+                      joined_at: 1763834389
                     totalCount: 3
                 store:
                   summary: Business products.
                   value:
-                    businessName: "Roma Aeterna"
+                    businessName: Roma Aeterna
                     items:
-                      - business_name: "Roma Aeterna"
-                        name: "☕ 1. Noctis Amor"
-                        description: "(«Любовь ночи») Густой эспрессо с ванильной пенкой и каплей карамели."
-                        price_buy: 250
-                        quantity: 1000
-                        createdAt: 1761779241065
-                      - business_name: "Roma Aeterna"
-                        name: "🌟 Pièce de Résistance: Aurum Caeli et Roma Aeterna"
-                        description: "Филе осетра, обжаренное на сливочном масле с трюфельной ноткой..."
-                        price_buy: 5500
-                        quantity: 98
-                        createdAt: 1761783355402
+                    - business_name: Roma Aeterna
+                      name: ☕ 1. Noctis Amor
+                      description: («Любовь ночи») Густой эспрессо с ванильной пенкой и каплей карамели.
+                      price_buy: 250
+                      quantity: 1000
+                      createdAt: 1761779241065
+                    - business_name: Roma Aeterna
+                      name: '🌟 Pièce de Résistance: Aurum Caeli et Roma Aeterna'
+                      description: Филе осетра, обжаренное на сливочном масле с трюфельной ноткой...
+                      price_buy: 5500
+                      quantity: 98
+                      createdAt: 1761783355402
                 transfers:
                   summary: Business transfers.
                   value:
-                    businessId: "UCEW29"
+                    businessId: UCEW29
                     rows:
-                      - id: "V0CWNF2J"
-                        from_business_id: "UCEW29"
-                        to_business_id: "RAWDB4"
-                        amount: 10000
-                        reason: ""
-                        created_at: 1776628017744
-                        author_id: "760966468715937814"
+                    - id: V0CWNF2J
+                      from_business_id: UCEW29
+                      to_business_id: RAWDB4
+                      amount: 10000
+                      reason: ''
+                      created_at: 1776628017744
+                      author_id: '760966468715937814'
                     total: 1
                 rating:
                   summary: Top businesses by balance.
@@ -618,14 +675,14 @@ paths:
                   value:
                     total: 2
                     requests:
-                      - requestId: "req_abc123"
-                        userId: "1133665013794607114"
-                        username: "IvanPetrov"
-                        name: "Tech Solutions"
-                        form: "ООО"
-                        channelId: "1417184142227144877"
-                        status: "pending"
-                        created_at: 1776628017744
+                    - requestId: req_abc123
+                      userId: '1133665013794607114'
+                      username: IvanPetrov
+                      name: Tech Solutions
+                      form: ООО
+                      channelId: '1417184142227144877'
+                      status: pending
+                      created_at: 1776628017744
         '400':
           description: Request error (missing required parameter or unknown action).
           content:
@@ -642,37 +699,69 @@ paths:
           $ref: '#/components/responses/InternalServerError'
     post:
       tags:
-        - Moscow RolePlay Economy API V2
+      - Moscow RolePlay Economy API V2
       summary: Business Operations
-      description: |
-        Manage businesses, employees, products, and finances.
+      description: 'Manage businesses, employees, products, and finances.
+
 
         Available actions:
+
         - `request` - create business request (userId, username, name, form, channelId).
+
         - `approve` - approve request (requestId, approverId, +business fields).
+
         - `cancelRequest` - cancel/delete pending request (requestId).
+
         - `create` - direct business creation (businessData).
+
         - `delete` - delete business (businessId).
+
         - `addMoney` - add money to business (businessId, amount).
+
         - `removeMoney` - remove money from business (businessId, amount).
+
         - `withdraw` - withdraw business money to user (businessId, amount, targetUserId).
+
         - `transfer` - transfer between businesses (fromBusinessId, toBusinessId, amount, reason, authorId).
+
         - `addEmployee` - add employee (businessId, userId, username, position).
+
         - `removeEmployee` - fire employee (businessId, userId).
+
         - `addProduct` - add product (businessName, item).
+
         - `removeProduct` - remove product (businessName, itemName).
+
         - `buyProduct` - buy product from business (userId, businessName, itemName, quantity).
+
         - `returnMoney` - refund money for transaction (businessId, transactionId).
+
+        '
       security:
-        - MRPAPIKey: []
+      - MRPAPIKey: []
       parameters:
-        - name: action
-          in: query
-          description: Operation type.
-          required: true
-          schema:
-            type: string
-            enum: [request, approve, cancelRequest, create, delete, addMoney, removeMoney, withdraw, transfer, addEmployee, removeEmployee, addProduct, removeProduct, buyProduct, returnMoney]
+      - name: action
+        in: query
+        description: Operation type.
+        required: true
+        schema:
+          type: string
+          enum:
+          - request
+          - approve
+          - cancelRequest
+          - create
+          - delete
+          - addMoney
+          - removeMoney
+          - withdraw
+          - transfer
+          - addEmployee
+          - removeEmployee
+          - addProduct
+          - removeProduct
+          - buyProduct
+          - returnMoney
       requestBody:
         required: true
         content:
@@ -683,109 +772,109 @@ paths:
               request:
                 summary: Create business request (stage 1)
                 value:
-                  userId: "760966468715937814"
-                  username: "ttunku_pal"
-                  name: "Roma Aeterna"
-                  form: "ООО"
-                  channelId: "1432651696210841760"
+                  userId: '760966468715937814'
+                  username: ttunku_pal
+                  name: Roma Aeterna
+                  form: ООО
+                  channelId: '1432651696210841760'
               cancelRequest:
                 summary: Cancel pending business request (remove from waiting)
                 value:
-                  requestId: "req_abc123"
+                  requestId: req_abc123
               approve:
                 summary: Approve request and create business (stage 2)
                 value:
-                  requestId: "req_abc123"
-                  approverId: "1133665013794607114"
-                  guildId: "1133665013794607114"
-                  ownerId: "760966468715937814"
-                  ownerName: "ttunku_pal"
-                  channelId: "1432651696210841760"
-                  channelName: "roma-aeterna"
-                  roleId: "1432651691987304522"
-                  roleName: "Roma Aeterna"
-                  employeeRoleId: "1432651694289846302"
-                  employeeRoleName: "Сотрудник Бизнеса Roma Aeterna"
-                  description: "В «Roma Aeterna» мы верим, что лучшие беседы рождаются за вкусной едой."
-                  address: "2221 Southern Avenue"
+                  requestId: req_abc123
+                  approverId: '1133665013794607114'
+                  guildId: '1133665013794607114'
+                  ownerId: '760966468715937814'
+                  ownerName: ttunku_pal
+                  channelId: '1432651696210841760'
+                  channelName: roma-aeterna
+                  roleId: '1432651691987304522'
+                  roleName: Roma Aeterna
+                  employeeRoleId: '1432651694289846302'
+                  employeeRoleName: Сотрудник Бизнеса Roma Aeterna
+                  description: В «Roma Aeterna» мы верим, что лучшие беседы рождаются за вкусной едой.
+                  address: 2221 Southern Avenue
                   createChannel: true
                   createRoles: true
               delete:
                 summary: Delete business with all Discord objects
                 value:
-                  businessId: "UCEW29"
-                  guildId: "1133665013794607114"
+                  businessId: UCEW29
+                  guildId: '1133665013794607114'
               create:
                 summary: Direct business creation
                 value:
                   businessData:
-                    name: "Roma Aeterna"
-                    owner_id: "760966468715937814"
-                    form: "ООО"
+                    name: Roma Aeterna
+                    owner_id: '760966468715937814'
+                    form: ООО
               addMoney:
                 summary: Add money to business
                 value:
-                  businessId: "UCEW29"
+                  businessId: UCEW29
                   amount: 5000
               removeMoney:
                 summary: Remove money from business
                 value:
-                  businessId: "UCEW29"
+                  businessId: UCEW29
                   amount: 5000
               withdraw:
                 summary: Withdraw money from business to user account
                 value:
-                  businessId: "UCEW29"
+                  businessId: UCEW29
                   amount: 1000
-                  targetUserId: "1133665013794607114"
+                  targetUserId: '1133665013794607114'
               transfer:
                 summary: Transfer between businesses
                 value:
-                  fromBusinessId: "UCEW29"
-                  toBusinessId: "RAWDB4"
+                  fromBusinessId: UCEW29
+                  toBusinessId: RAWDB4
                   amount: 5000
-                  reason: "Оплата услуг"
-                  authorId: "1133665013794607114"
+                  reason: Оплата услуг
+                  authorId: '1133665013794607114'
               addEmployee:
                 summary: Add employee to business
                 value:
-                  businessId: "UCEW29"
-                  userId: "1335499851273601029"
-                  username: "ytkaytkovich_16555"
-                  position: "Сотрудник"
-                  guildId: "1133665013794607114"
+                  businessId: UCEW29
+                  userId: '1335499851273601029'
+                  username: ytkaytkovich_16555
+                  position: Сотрудник
+                  guildId: '1133665013794607114'
               removeEmployee:
                 summary: Remove employee from business
                 value:
-                  businessId: "UCEW29"
-                  userId: "1335499851273601029"
-                  guildId: "1133665013794607114"
+                  businessId: UCEW29
+                  userId: '1335499851273601029'
+                  guildId: '1133665013794607114'
               addProduct:
                 summary: Add product to business store
                 value:
-                  businessName: "Roma Aeterna"
+                  businessName: Roma Aeterna
                   item:
-                    name: "☕ 1. Noctis Amor"
+                    name: ☕ 1. Noctis Amor
                     price_buy: 250
-                    description: "(«Любовь ночи») Густой эспрессо с ванильной пенкой и каплей карамели."
+                    description: («Любовь ночи») Густой эспрессо с ванильной пенкой и каплей карамели.
                     quantity: 100
               removeProduct:
                 summary: Remove product from business store
                 value:
-                  businessName: "Roma Aeterna"
-                  itemName: "☕ 1. Noctis Amor"
+                  businessName: Roma Aeterna
+                  itemName: ☕ 1. Noctis Amor
               buyProduct:
                 summary: Buy product from business
                 value:
-                  userId: "1133665013794607114"
-                  businessName: "Roma Aeterna"
-                  itemName: "☕ 1. Noctis Amor"
+                  userId: '1133665013794607114'
+                  businessName: Roma Aeterna
+                  itemName: ☕ 1. Noctis Amor
                   quantity: 1
               returnMoney:
                 summary: Refund money for transaction (product return)
                 value:
-                  businessId: "UCEW29"
-                  transactionId: "txn_20241201_xyz789"
+                  businessId: UCEW29
+                  transactionId: txn_20241201_xyz789
       responses:
         '200':
           description: Operation successfully completed.
@@ -798,34 +887,34 @@ paths:
                   summary: Request created.
                   value:
                     success: true
-                    requestId: "req_123"
-                    status: "pending"
-                    message: "Request created, awaiting approval"
+                    requestId: req_123
+                    status: pending
+                    message: Request created, awaiting approval
                 approve:
                   summary: Business approved and created.
                   value:
                     success: true
-                    businessId: "UCEW29"
-                    name: "Roma Aeterna"
-                    status: "active"
-                    owner_id: "760966468715937814"
-                    owner_name: "ttunku_pal"
+                    businessId: UCEW29
+                    name: Roma Aeterna
+                    status: active
+                    owner_id: '760966468715937814'
+                    owner_name: ttunku_pal
                 cancelRequest:
                   summary: Request cancelled.
                   value:
                     success: true
-                    requestId: "req_abc123"
-                    action: "cancelled"
+                    requestId: req_abc123
+                    action: cancelled
                     removedFromMemory: true
                     removedFromDB: false
-                    message: "Pending request has been cancelled and removed"
+                    message: Pending request has been cancelled and removed
                 buyProduct:
                   summary: Product purchased.
                   value:
                     success: true
-                    userId: "1133665013794607114"
-                    businessName: "Roma Aeterna"
-                    item: "☕ 1. Noctis Amor"
+                    userId: '1133665013794607114'
+                    businessName: Roma Aeterna
+                    item: ☕ 1. Noctis Amor
                     quantity: 1
                     totalPrice: 250
         '400':
@@ -842,59 +931,71 @@ paths:
           $ref: '#/components/responses/TooManyRequests'
         '500':
           $ref: '#/components/responses/InternalServerError'
-
   /moscowroleplay/civops/mafias:
     get:
       tags:
-        - Moscow RolePlay Economy API V2
+      - Moscow RolePlay Economy API V2
       summary: Get Mafia Data
-      description: |
-        Retrieve information about mafia organizations on the server.
+      description: 'Retrieve information about mafia organizations on the server.
+
 
         Available actions:
+
         - `list` - list of all mafias (page, limit)
+
         - `info` - mafia information (mafiaId or mafiaName)
+
         - `balance` - mafia balance (mafiaId)
+
         - `members` - mafia members (mafiaId, page, limit)
+
         - `transfers` - mafia transfers (mafiaId, page, limit)
+
         - `logs` - mafia logs (mafiaId, limit)
 
+        '
       security:
-        - MRPAPIKey: []
+      - MRPAPIKey: []
       parameters:
-        - name: action
-          in: query
-          description: Action type for retrieving data.
-          required: true
-          schema:
-            type: string
-            enum: [list, info, balance, members, transfers, logs]
-        - name: mafiaId
-          in: query
-          description: Mafia ID (for info, balance, members, transfers, logs).
-          required: false
-          schema:
-            type: string
-        - name: mafiaName
-          in: query
-          description: Mafia name (for info).
-          required: false
-          schema:
-            type: string
-        - name: limit
-          in: query
-          description: Record limit (default 10).
-          required: false
-          schema:
-            type: integer
-            default: 10
-        - name: page
-          in: query
-          description: Page number (default 1).
-          required: false
-          schema:
-            type: integer
-            default: 1
+      - name: action
+        in: query
+        description: Action type for retrieving data.
+        required: true
+        schema:
+          type: string
+          enum:
+          - list
+          - info
+          - balance
+          - members
+          - transfers
+          - logs
+      - name: mafiaId
+        in: query
+        description: Mafia ID (for info, balance, members, transfers, logs).
+        required: false
+        schema:
+          type: string
+      - name: mafiaName
+        in: query
+        description: Mafia name (for info).
+        required: false
+        schema:
+          type: string
+      - name: limit
+        in: query
+        description: Record limit (default 10).
+        required: false
+        schema:
+          type: integer
+          default: 10
+      - name: page
+        in: query
+        description: Page number (default 1).
+        required: false
+        schema:
+          type: integer
+          default: 1
       responses:
         '200':
           description: Successful response with mafia data.
@@ -909,74 +1010,74 @@ paths:
                     page: 1
                     total: 1
                     mafias:
-                      - id: "2KH2WQEO"
-                        name: "UKpanik"
-                        leader_id: "1104388035199639585"
-                        leader_name: "forziknerves"
-                        role_id: "1473315569175625811"
-                        role_name: "Состоит в ОПГ \"UKpanik\""
-                        leader_role_id: "1473315758783201354"
-                        leader_role_name: "Лидер ОПГ \"UKpanik\""
-                        channel_id: "1473316097032716381"
-                        channel_name: "💬┃ukpanik"
-                        color: "#060568"
-                        created_at: 1776881763
-                        bank: 0
+                    - id: 2KH2WQEO
+                      name: UKpanik
+                      leader_id: '1104388035199639585'
+                      leader_name: forziknerves
+                      role_id: '1473315569175625811'
+                      role_name: Состоит в ОПГ "UKpanik"
+                      leader_role_id: '1473315758783201354'
+                      leader_role_name: Лидер ОПГ "UKpanik"
+                      channel_id: '1473316097032716381'
+                      channel_name: 💬┃ukpanik
+                      color: '#060568'
+                      created_at: 1776881763
+                      bank: 0
                 info:
                   summary: Mafia information.
                   value:
                     mafia:
-                      id: "2KH2WQEO"
-                      name: "UKpanik"
-                      leader_id: "1104388035199639585"
-                      leader_name: "forziknerves"
-                      role_id: "1473315569175625811"
-                      role_name: "Состоит в ОПГ \"UKpanik\""
-                      leader_role_id: "1473315758783201354"
-                      leader_role_name: "Лидер ОПГ \"UKpanik\""
-                      channel_id: "1473316097032716381"
-                      channel_name: "💬┃ukpanik"
-                      color: "#060568"
+                      id: 2KH2WQEO
+                      name: UKpanik
+                      leader_id: '1104388035199639585'
+                      leader_name: forziknerves
+                      role_id: '1473315569175625811'
+                      role_name: Состоит в ОПГ "UKpanik"
+                      leader_role_id: '1473315758783201354'
+                      leader_role_name: Лидер ОПГ "UKpanik"
+                      channel_id: '1473316097032716381'
+                      channel_name: 💬┃ukpanik
+                      color: '#060568'
                       created_at: 1776881763
                       bank: 0
                     members:
-                      - user_id: "1104388035199639585"
-                        username: "forziknerves"
-                        position: "Лидер"
-                        joined_at: 1776881763
+                    - user_id: '1104388035199639585'
+                      username: forziknerves
+                      position: Лидер
+                      joined_at: 1776881763
                     memberCount: 1
                 balance:
                   summary: Mafia balance.
                   value:
-                    mafiaId: "2KH2WQEO"
+                    mafiaId: 2KH2WQEO
                     balance:
                       bank: 0
                 members:
                   summary: Mafia members.
                   value:
-                    mafiaId: "2KH2WQEO"
+                    mafiaId: 2KH2WQEO
                     members:
-                      - user_id: "1104388035199639585"
-                        username: "forziknerves"
-                        position: "Лидер"
-                        joined_at: 1776881763
+                    - user_id: '1104388035199639585'
+                      username: forziknerves
+                      position: Лидер
+                      joined_at: 1776881763
                     totalCount: 1
                 transfers:
                   summary: Mafia transfers.
                   value:
-                    mafiaId: "2KH2WQEO"
+                    mafiaId: 2KH2WQEO
                     rows: []
                     total: 0
                 logs:
                   summary: Mafia logs.
                   value:
-                    mafiaId: "2KH2WQEO"
+                    mafiaId: 2KH2WQEO
                     logs:
-                      - id: 5
-                        mafia_id: "2KH2WQEO"
-                        action: "create"
-                        value: "Создана ОПГ UKpanik лидером 1170030084300742680"
-                        created_at: 1776881763
+                    - id: 5
+                      mafia_id: 2KH2WQEO
+                      action: create
+                      value: Создана ОПГ UKpanik лидером 1170030084300742680
+                      created_at: 1776881763
         '400':
           description: Request error (missing required parameter or unknown action).
           content:
@@ -993,30 +1094,48 @@ paths:
           $ref: '#/components/responses/InternalServerError'
     post:
       tags:
-        - Moscow RolePlay Economy API V2
+      - Moscow RolePlay Economy API V2
       summary: Mafia Operations
-      description: |
-        Manage mafias, members, and finances.
+      description: 'Manage mafias, members, and finances.
+
 
         Available actions:
+
         - `create` - create mafia (name, leaderId, leaderName, roleId, roleName, color)
+
         - `delete` - delete mafia (mafiaId)
+
         - `addMoney` - add money to mafia (mafiaId, amount)
+
         - `removeMoney` - remove money from mafia (mafiaId, amount)
+
         - `withdraw` - withdraw mafia money to user (mafiaId, amount, targetUserId)
+
         - `transfer` - transfer between mafias (fromMafiaId, toMafiaId, amount, reason, authorId)
+
         - `addMember` - add member (mafiaId, userId, username, position)
+
         - `removeMember` - remove member (mafiaId, userId)
+
+        '
       security:
-        - MRPAPIKey: []
+      - MRPAPIKey: []
       parameters:
-        - name: action
-          in: query
-          description: Operation type.
-          required: true
-          schema:
-            type: string
-            enum: [create, delete, addMoney, removeMoney, withdraw, transfer, addMember, removeMember]
+      - name: action
+        in: query
+        description: Operation type.
+        required: true
+        schema:
+          type: string
+          enum:
+          - create
+          - delete
+          - addMoney
+          - removeMoney
+          - withdraw
+          - transfer
+          - addMember
+          - removeMember
       requestBody:
         required: true
         content:
@@ -1027,52 +1146,52 @@ paths:
               create:
                 summary: Create mafia
                 value:
-                  name: "UKpanik"
-                  leaderId: "1104388035199639585"
-                  leaderName: "forziknerves"
-                  roleId: "1473315569175625811"
-                  roleName: "Состоит в ОПГ \"UKpanik\""
-                  color: "#060568"
+                  name: UKpanik
+                  leaderId: '1104388035199639585'
+                  leaderName: forziknerves
+                  roleId: '1473315569175625811'
+                  roleName: Состоит в ОПГ "UKpanik"
+                  color: '#060568'
               delete:
                 summary: Delete mafia
                 value:
-                  mafiaId: "2KH2WQEO"
+                  mafiaId: 2KH2WQEO
               addMoney:
                 summary: Add money to mafia
                 value:
-                  mafiaId: "2KH2WQEO"
+                  mafiaId: 2KH2WQEO
                   amount: 10000
               removeMoney:
                 summary: Remove money from mafia
                 value:
-                  mafiaId: "2KH2WQEO"
+                  mafiaId: 2KH2WQEO
                   amount: 5000
               withdraw:
                 summary: Withdraw money from mafia to user account
                 value:
-                  mafiaId: "2KH2WQEO"
+                  mafiaId: 2KH2WQEO
                   amount: 3000
-                  targetUserId: "1170030084300742680"
+                  targetUserId: '1170030084300742680'
               transfer:
                 summary: Transfer between mafias
                 value:
-                  fromMafiaId: "2KH2WQEO"
-                  toMafiaId: "OTHER123ID"
+                  fromMafiaId: 2KH2WQEO
+                  toMafiaId: OTHER123ID
                   amount: 5000
-                  reason: "Взятка за покровительство"
-                  authorId: "1104388035199639585"
+                  reason: Взятка за покровительство
+                  authorId: '1104388035199639585'
               addMember:
                 summary: Add member to mafia
                 value:
-                  mafiaId: "2KH2WQEO"
-                  userId: "1170030084300742680"
-                  username: "NewMember"
-                  position: "Участник"
+                  mafiaId: 2KH2WQEO
+                  userId: '1170030084300742680'
+                  username: NewMember
+                  position: Участник
               removeMember:
                 summary: Remove member from mafia
                 value:
-                  mafiaId: "2KH2WQEO"
-                  userId: "1170030084300742680"
+                  mafiaId: 2KH2WQEO
+                  userId: '1170030084300742680'
       responses:
         '200':
           description: Operation successfully completed.
@@ -1085,36 +1204,36 @@ paths:
                   summary: Mafia created.
                   value:
                     success: true
-                    mafiaId: "2KH2WQEO"
-                    name: "UKpanik"
-                    leader_id: "1104388035199639585"
-                    leader_name: "forziknerves"
-                    role_id: "1473315569175625811"
-                    role_name: "Состоит в ОПГ \"UKpanik\""
-                    leader_role_id: "1473315758783201354"
-                    leader_role_name: "Лидер ОПГ \"UKpanik\""
-                    channel_id: "1473316097032716381"
-                    channel_name: "💬┃ukpanik"
-                    color: "#060568"
+                    mafiaId: 2KH2WQEO
+                    name: UKpanik
+                    leader_id: '1104388035199639585'
+                    leader_name: forziknerves
+                    role_id: '1473315569175625811'
+                    role_name: Состоит в ОПГ "UKpanik"
+                    leader_role_id: '1473315758783201354'
+                    leader_role_name: Лидер ОПГ "UKpanik"
+                    channel_id: '1473316097032716381'
+                    channel_name: 💬┃ukpanik
+                    color: '#060568'
                     created_at: 1776881763
                     bank: 0
                 addMember:
                   summary: Member added.
                   value:
                     success: true
-                    mafiaId: "2KH2WQEO"
-                    userId: "1170030084300742680"
-                    username: "NewMember"
-                    position: "Участник"
+                    mafiaId: 2KH2WQEO
+                    userId: '1170030084300742680'
+                    username: NewMember
+                    position: Участник
                 transfer:
                   summary: Transfer completed.
                   value:
                     success: true
-                    transferId: "V0CWNF2J"
-                    fromMafiaId: "2KH2WQEO"
-                    toMafiaId: "OTHER123ID"
+                    transferId: V0CWNF2J
+                    fromMafiaId: 2KH2WQEO
+                    toMafiaId: OTHER123ID
                     amount: 5000
-                    reason: "Взятка за покровительство"
+                    reason: Взятка за покровительство
         '400':
           description: Request error (missing required fields or unknown action).
           content:
@@ -1129,43 +1248,47 @@ paths:
           $ref: '#/components/responses/TooManyRequests'
         '500':
           $ref: '#/components/responses/InternalServerError'
-
   /moscowroleplay/civops/government:
     get:
       tags:
-        - Moscow RolePlay Economy API V2
+      - Moscow RolePlay Economy API V2
       summary: Get Government Data
-      description: |
-        Retrieve information about government finances and transfers.
+      description: 'Retrieve information about government finances and transfers.
+
 
         Available actions:
+
         - `balance` - government balance
+
         - `transfers` - list of government transfers (requires page, limit).
 
+        '
       security:
-        - MRPAPIKey: []
+      - MRPAPIKey: []
       parameters:
-        - name: action
-          in: query
-          description: Action type for retrieving data.
-          required: true
-          schema:
-            type: string
-            enum: [balance, transfers]
-        - name: page
-          in: query
-          description: Page number for transfers (default 1).
-          required: false
-          schema:
-            type: integer
-            default: 1
-        - name: limit
-          in: query
-          description: Record limit for transfers (default 25).
-          required: false
-          schema:
-            type: integer
-            default: 25
+      - name: action
+        in: query
+        description: Action type for retrieving data.
+        required: true
+        schema:
+          type: string
+          enum:
+          - balance
+          - transfers
+      - name: page
+        in: query
+        description: Page number for transfers (default 1).
+        required: false
+        schema:
+          type: integer
+          default: 1
+      - name: limit
+        in: query
+        description: Record limit for transfers (default 25).
+        required: false
+        schema:
+          type: integer
+          default: 25
       responses:
         '200':
           description: Successful response with government data.
@@ -1183,48 +1306,48 @@ paths:
                   summary: Government transfers.
                   value:
                     rows:
-                      - id: "SUIGV5OF"
-                        to_type: "opg"
-                        to_id: "WKQYFHZI"
-                        amount: 10000000
-                        reason: "Перевод"
-                        created_at: 1762001561094
-                        author_id: "1133665013794607114"
-                      - id: "EGRJQIJH"
-                        to_type: "business"
-                        to_id: "QONWJE"
-                        amount: 1000000
-                        reason: "На ремонт дорог."
-                        created_at: 1761666889623
-                        author_id: "1133665013794607114"
-                      - id: "2XI4F7T5"
-                        to_type: "business"
-                        to_id: "QONWJE"
-                        amount: 1000000
-                        reason: "На ремонт дорог."
-                        created_at: 1761666445708
-                        author_id: "1133665013794607114"
-                      - id: "QEM2QFR7"
-                        to_type: "business"
-                        to_id: "VWIV4H"
-                        amount: 10000
-                        reason: "Так надо"
-                        created_at: 1760990772813
-                        author_id: "1133665013794607114"
-                      - id: "5RW0QT8T"
-                        to_type: "user"
-                        to_id: "843529697853046804"
-                        amount: 10000
-                        reason: ""
-                        created_at: 1760990605583
-                        author_id: "1133665013794607114"
-                      - id: "WUOAKURW"
-                        to_type: "user"
-                        to_id: "843529697853046804"
-                        amount: 10000
-                        reason: "Зарплата"
-                        created_at: 1760990551476
-                        author_id: "1133665013794607114"
+                    - id: SUIGV5OF
+                      to_type: opg
+                      to_id: WKQYFHZI
+                      amount: 10000000
+                      reason: Перевод
+                      created_at: 1762001561094
+                      author_id: '1133665013794607114'
+                    - id: EGRJQIJH
+                      to_type: business
+                      to_id: QONWJE
+                      amount: 1000000
+                      reason: На ремонт дорог.
+                      created_at: 1761666889623
+                      author_id: '1133665013794607114'
+                    - id: 2XI4F7T5
+                      to_type: business
+                      to_id: QONWJE
+                      amount: 1000000
+                      reason: На ремонт дорог.
+                      created_at: 1761666445708
+                      author_id: '1133665013794607114'
+                    - id: QEM2QFR7
+                      to_type: business
+                      to_id: VWIV4H
+                      amount: 10000
+                      reason: Так надо
+                      created_at: 1760990772813
+                      author_id: '1133665013794607114'
+                    - id: 5RW0QT8T
+                      to_type: user
+                      to_id: '843529697853046804'
+                      amount: 10000
+                      reason: ''
+                      created_at: 1760990605583
+                      author_id: '1133665013794607114'
+                    - id: WUOAKURW
+                      to_type: user
+                      to_id: '843529697853046804'
+                      amount: 10000
+                      reason: Зарплата
+                      created_at: 1760990551476
+                      author_id: '1133665013794607114'
                     total: 6
         '401':
           $ref: '#/components/responses/UnauthorizedMissingOrInvalidToken'
@@ -1236,27 +1359,36 @@ paths:
           $ref: '#/components/responses/InternalServerError'
     post:
       tags:
-        - Moscow RolePlay Economy API V2
+      - Moscow RolePlay Economy API V2
       summary: Government Operations
-      description: |
-        Manage government finances and transfers.
+      description: 'Manage government finances and transfers.
+
 
         Available actions:
+
         - `addMoney` - add money to budget (requires amount).
+
         - `removeMoney` - remove money from budget (requires amount).
+
         - `withdraw` - transfer money from budget to recipient (requires amount, toType, toId, reason, authorId).
 
+
         toType can be: `user`, `business`, `mafia`
+
+        '
       security:
-        - MRPAPIKey: []
+      - MRPAPIKey: []
       parameters:
-        - name: action
-          in: query
-          description: Operation type.
-          required: true
-          schema:
-            type: string
-            enum: [addMoney, removeMoney, withdraw]
+      - name: action
+        in: query
+        description: Operation type.
+        required: true
+        schema:
+          type: string
+          enum:
+          - addMoney
+          - removeMoney
+          - withdraw
       requestBody:
         required: true
         content:
@@ -1276,10 +1408,10 @@ paths:
                 summary: Allocate money from budget (transfer to user/business/mafia)
                 value:
                   amount: 25000
-                  toType: "user"
-                  toId: "1133665013794607114"
-                  reason: "Выплата компенсации"
-                  authorId: "987654321"
+                  toType: user
+                  toId: '1133665013794607114'
+                  reason: Выплата компенсации
+                  authorId: '987654321'
       responses:
         '200':
           description: Operation successfully completed.
@@ -1299,11 +1431,11 @@ paths:
                   summary: Transfer completed.
                   value:
                     success: true
-                    transferId: "5RW0QT8T"
-                    toType: "user"
-                    toId: "1133665013794607114"
+                    transferId: 5RW0QT8T
+                    toType: user
+                    toId: '1133665013794607114'
                     amount: 25000
-                    reason: "Выплата компенсации."
+                    reason: Выплата компенсации.
         '400':
           description: Request error (missing required fields or unknown action).
           content:
@@ -1318,35 +1450,39 @@ paths:
           $ref: '#/components/responses/TooManyRequests'
         '500':
           $ref: '#/components/responses/InternalServerError'
-
   /moscowroleplay/civops/store:
     get:
       tags:
-        - Moscow RolePlay Economy API V2
+      - Moscow RolePlay Economy API V2
       summary: Get Store Data
-      description: |
-        Retrieve information about store items.
+      description: 'Retrieve information about store items.
+
 
         Available actions:
+
         - `list` - list of all store items.
+
         - `info` - information about a specific item (requires itemName).
 
+        '
       security:
-        - MRPAPIKey: []
+      - MRPAPIKey: []
       parameters:
-        - name: action
-          in: query
-          description: Action type for retrieving data.
-          required: true
-          schema:
-            type: string
-            enum: [list, info]
-        - name: itemName
-          in: query
-          description: Item name (required for info).
-          required: false
-          schema:
-            type: string
+      - name: action
+        in: query
+        description: Action type for retrieving data.
+        required: true
+        schema:
+          type: string
+          enum:
+          - list
+          - info
+      - name: itemName
+        in: query
+        description: Item name (required for info).
+        required: false
+        schema:
+          type: string
       responses:
         '200':
           description: Successful response with store data.
@@ -1360,44 +1496,44 @@ paths:
                   value:
                     count: 4
                     items:
-                      - name: "Петух"
-                        description: "Надежный петух, с помощью которого вы можете выиграть (или проиграть) петушиный бой."
-                        price_buy: 2000
-                        price_sell: null
-                        quantity: null
-                        can_use: true
-                        can_sell: false
-                        createdAt: 1760174181177
-                      - name: "Элитный Класс"
-                        description: "Получите роль \"Элитный Класс\", чтобы продемонстрировать свое богатство."
-                        price_buy: 10000000
-                        price_sell: null
-                        quantity: null
-                        can_use: false
-                        can_sell: false
-                        createdAt: 1760176255275
-                      - name: "Лицензия На Ведение Бизнеса"
-                        description: "Бизнес должен быть уникальным и одобрен государственными органами и менеджментом сервера. Лицензия может быть аннулирована при отсутствии активности, неправильном использовании или при нарушении правил сервера."
-                        price_buy: 15000
-                        price_sell: 0
-                        quantity: null
-                        can_use: false
-                        can_sell: false
-                        createdAt: 1761645253540
-                      - name: "Вино \"🍷The Box\""
-                        description: "В нём живёт свет первых встреч. Тёплый, как смех, что согревал пустые комнаты. Он мягко держит в себе воспоминания о том, как мир становился легче, когда рядом была доброта, не требующая слов."
-                        price_buy: 50000
-                        price_sell: 0
-                        quantity: 993
-                        can_use: false
-                        can_sell: false
-                        createdAt: 1766424061071
+                    - name: Петух
+                      description: Надежный петух, с помощью которого вы можете выиграть (или проиграть) петушиный бой.
+                      price_buy: 2000
+                      price_sell: null
+                      quantity: null
+                      can_use: true
+                      can_sell: false
+                      createdAt: 1760174181177
+                    - name: Элитный Класс
+                      description: Получите роль "Элитный Класс", чтобы продемонстрировать свое богатство.
+                      price_buy: 10000000
+                      price_sell: null
+                      quantity: null
+                      can_use: false
+                      can_sell: false
+                      createdAt: 1760176255275
+                    - name: Лицензия На Ведение Бизнеса
+                      description: Бизнес должен быть уникальным и одобрен государственными органами и менеджментом сервера. Лицензия может быть аннулирована при отсутствии активности, неправильном использовании или при нарушении правил сервера.
+                      price_buy: 15000
+                      price_sell: 0
+                      quantity: null
+                      can_use: false
+                      can_sell: false
+                      createdAt: 1761645253540
+                    - name: Вино "🍷The Box"
+                      description: В нём живёт свет первых встреч. Тёплый, как смех, что согревал пустые комнаты. Он мягко держит в себе воспоминания о том, как мир становился легче, когда рядом была доброта, не требующая слов.
+                      price_buy: 50000
+                      price_sell: 0
+                      quantity: 993
+                      can_use: false
+                      can_sell: false
+                      createdAt: 1766424061071
                 info:
                   summary: Item information.
                   value:
                     item:
-                      name: "Петух"
-                      description: "Надежный петух, с помощью которого вы можете выиграть (или проиграть) петушиный бой."
+                      name: Петух
+                      description: Надежный петух, с помощью которого вы можете выиграть (или проиграть) петушиный бой.
                       price_buy: 2000
                       price_sell: null
                       quantity: null
@@ -1420,26 +1556,36 @@ paths:
           $ref: '#/components/responses/InternalServerError'
     post:
       tags:
-        - Moscow RolePlay Economy API V2
+      - Moscow RolePlay Economy API V2
       summary: Store Operations
-      description: |
-        Manage store items and buying/selling.
+      description: 'Manage store items and buying/selling.
+
 
         Available actions:
+
         - `addItem` - add item to store (requires item with name, price_buy, ...).
+
         - `removeItem` - remove item from store (requires itemName).
+
         - `buy` - buy item from store (requires userId, itemName, quantity).
+
         - `sellToStore` - sell item to store (requires userId, itemName, quantity).
+
+        '
       security:
-        - MRPAPIKey: []
+      - MRPAPIKey: []
       parameters:
-        - name: action
-          in: query
-          description: Operation type.
-          required: true
-          schema:
-            type: string
-            enum: [addItem, removeItem, buy, sellToStore]
+      - name: action
+        in: query
+        description: Operation type.
+        required: true
+        schema:
+          type: string
+          enum:
+          - addItem
+          - removeItem
+          - buy
+          - sellToStore
       requestBody:
         required: true
         content:
@@ -1451,28 +1597,28 @@ paths:
                 summary: Add item to general store
                 value:
                   item:
-                    name: "Вино \"🍷The Box\""
+                    name: Вино "🍷The Box"
                     price_buy: 50000
                     price_sell: 0
-                    description: "В нём живёт свет первых встреч. Тёплый, как смех, что согревал пустые комнаты."
+                    description: В нём живёт свет первых встреч. Тёплый, как смех, что согревал пустые комнаты.
                     quantity: 1000
                     can_use: false
                     can_sell: false
               removeItem:
                 summary: Remove item from general store
                 value:
-                  itemName: "Вино \"🍷The Box\""
+                  itemName: Вино "🍷The Box"
               buy:
                 summary: Buy item from general store
                 value:
-                  userId: "1133665013794607114"
-                  itemName: "Петух"
+                  userId: '1133665013794607114'
+                  itemName: Петух
                   quantity: 1
               sellToStore:
                 summary: Sell item to store
                 value:
-                  userId: "1133665013794607114"
-                  itemName: "Вино \"🍷The Box\""
+                  userId: '1133665013794607114'
+                  itemName: Вино "🍷The Box"
                   quantity: 5
       responses:
         '200':
@@ -1486,7 +1632,7 @@ paths:
                   summary: Item added.
                   value:
                     success: true
-                    item: "Вино \"🍷The Box\""
+                    item: Вино "🍷The Box"
                     price_buy: 50000
                     price_sell: 0
                     quantity: 1000
@@ -1496,16 +1642,16 @@ paths:
                   summary: Successful purchase.
                   value:
                     success: true
-                    userId: "1133665013794607114"
-                    item: "Петух"
+                    userId: '1133665013794607114'
+                    item: Петух
                     quantity: 1
                     totalPrice: 2000
                 sellToStore:
                   summary: Successful sale.
                   value:
                     success: true
-                    userId: "1133665013794607114"
-                    item: "Вино \"🍷The Box\""
+                    userId: '1133665013794607114'
+                    item: Вино "🍷The Box"
                     quantity: 5
                     totalPrice: 0
         '400':
@@ -1522,42 +1668,44 @@ paths:
           $ref: '#/components/responses/TooManyRequests'
         '500':
           $ref: '#/components/responses/InternalServerError'
-
   /moscowroleplay/civops/ads:
     get:
       tags:
-        - Moscow RolePlay Economy API V2
+      - Moscow RolePlay Economy API V2
       summary: Get Advertisements
-      description: |
-        Retrieve list of ad requests.
+      description: 'Retrieve list of ad requests.
+
 
         Available actions:
+
         - `list` - list of ad requests (requires page, limit).
 
+        '
       security:
-        - MRPAPIKey: []
+      - MRPAPIKey: []
       parameters:
-        - name: action
-          in: query
-          description: Action type for retrieving data.
-          required: true
-          schema:
-            type: string
-            enum: [list]
-        - name: limit
-          in: query
-          description: Record limit (default 10).
-          required: false
-          schema:
-            type: integer
-            default: 10
-        - name: page
-          in: query
-          description: Page number (default 1).
-          required: false
-          schema:
-            type: integer
-            default: 1
+      - name: action
+        in: query
+        description: Action type for retrieving data.
+        required: true
+        schema:
+          type: string
+          enum:
+          - list
+      - name: limit
+        in: query
+        description: Record limit (default 10).
+        required: false
+        schema:
+          type: integer
+          default: 10
+      - name: page
+        in: query
+        description: Page number (default 1).
+        required: false
+        schema:
+          type: integer
+          default: 1
       responses:
         '200':
           description: Successful response with ad request list.
@@ -1571,54 +1719,54 @@ paths:
                   value:
                     count: 8
                     ads:
-                      - id: 38
-                        user_id: "1133665013794607114"
-                        username: "IvanPetrov"
-                        business_name: "Moscow Motors"
-                        address: "ул. Ленина, 1"
-                        created_at: 1776893453
-                      - id: 37
-                        user_id: "1133665013794607114"
-                        username: "IvanPetrov"
-                        business_name: "Moscow Motors"
-                        address: "ул. Ленина, 1"
-                        created_at: 1776893361
-                      - id: 36
-                        user_id: "1133665013794607114"
-                        username: "pancakeboyman_8"
-                        business_name: "Безопасные Качественные Дороги"
-                        address: "3101 Orchard Boulevard"
-                        created_at: 1761929707
-                      - id: 35
-                        user_id: "1133665013794607114"
-                        username: "pancakeboyman_8"
-                        business_name: "Безопасные Качественные Дороги"
-                        address: "3101 Orchard Boulevard"
-                        created_at: 1761929658
-                      - id: 34
-                        user_id: "1133665013794607114"
-                        username: "pancakeboyman_8"
-                        business_name: "Безопасные Качественные Дороги"
-                        address: "3101 Orchard Boulevard"
-                        created_at: 1761929405
-                      - id: 33
-                        user_id: "1133665013794607114"
-                        username: "pancakeboyman_8"
-                        business_name: "Безопасные Качественные Дороги"
-                        address: "3101 Orchard Boulevard"
-                        created_at: 1761929284
-                      - id: 32
-                        user_id: "1133665013794607114"
-                        username: "pancakeboyman_8"
-                        business_name: "Безопасные Качественные Дороги"
-                        address: "3101 Orchard Boulevard"
-                        created_at: 1761929190
-                      - id: 31
-                        user_id: "1133665013794607114"
-                        username: "pancakeboyman_8"
-                        business_name: "Безопасные Качественные Дороги"
-                        address: "3101 Orchard Boulevard"
-                        created_at: 1761927415
+                    - id: 38
+                      user_id: '1133665013794607114'
+                      username: IvanPetrov
+                      business_name: Moscow Motors
+                      address: ул. Ленина, 1
+                      created_at: 1776893453
+                    - id: 37
+                      user_id: '1133665013794607114'
+                      username: IvanPetrov
+                      business_name: Moscow Motors
+                      address: ул. Ленина, 1
+                      created_at: 1776893361
+                    - id: 36
+                      user_id: '1133665013794607114'
+                      username: pancakeboyman_8
+                      business_name: Безопасные Качественные Дороги
+                      address: 3101 Orchard Boulevard
+                      created_at: 1761929707
+                    - id: 35
+                      user_id: '1133665013794607114'
+                      username: pancakeboyman_8
+                      business_name: Безопасные Качественные Дороги
+                      address: 3101 Orchard Boulevard
+                      created_at: 1761929658
+                    - id: 34
+                      user_id: '1133665013794607114'
+                      username: pancakeboyman_8
+                      business_name: Безопасные Качественные Дороги
+                      address: 3101 Orchard Boulevard
+                      created_at: 1761929405
+                    - id: 33
+                      user_id: '1133665013794607114'
+                      username: pancakeboyman_8
+                      business_name: Безопасные Качественные Дороги
+                      address: 3101 Orchard Boulevard
+                      created_at: 1761929284
+                    - id: 32
+                      user_id: '1133665013794607114'
+                      username: pancakeboyman_8
+                      business_name: Безопасные Качественные Дороги
+                      address: 3101 Orchard Boulevard
+                      created_at: 1761929190
+                    - id: 31
+                      user_id: '1133665013794607114'
+                      username: pancakeboyman_8
+                      business_name: Безопасные Качественные Дороги
+                      address: 3101 Orchard Boulevard
+                      created_at: 1761927415
         '401':
           $ref: '#/components/responses/UnauthorizedMissingOrInvalidToken'
         '403':
@@ -1629,23 +1777,27 @@ paths:
           $ref: '#/components/responses/InternalServerError'
     post:
       tags:
-        - Moscow RolePlay Economy API V2
+      - Moscow RolePlay Economy API V2
       summary: Create Ad Request
-      description: |
-        Create a new advertisement request.
+      description: 'Create a new advertisement request.
+
 
         Available actions:
+
         - `create` - create request (requires userId, username, businessName, address).
+
+        '
       security:
-        - MRPAPIKey: []
+      - MRPAPIKey: []
       parameters:
-        - name: action
-          in: query
-          description: Operation type.
-          required: true
-          schema:
-            type: string
-            enum: [create]
+      - name: action
+        in: query
+        description: Operation type.
+        required: true
+        schema:
+          type: string
+          enum:
+          - create
       requestBody:
         required: true
         content:
@@ -1669,10 +1821,10 @@ paths:
               create:
                 summary: Create ad request
                 value:
-                  userId: "1104388035199639585"
-                  username: "forziknerves"
-                  businessName: "UKpanik"
-                  address: "Артемовск, Площадь Ленина 5"
+                  userId: '1104388035199639585'
+                  username: forziknerves
+                  businessName: UKpanik
+                  address: Артемовск, Площадь Ленина 5
       responses:
         '200':
           description: Request successfully created.
@@ -1685,9 +1837,9 @@ paths:
                   summary: Request created.
                   value:
                     success: true
-                    userId: "1104388035199639585"
-                    businessName: "UKpanik"
-                    address: "Артемовск, Площадь Ленина 5"
+                    userId: '1104388035199639585'
+                    businessName: UKpanik
+                    address: Артемовск, Площадь Ленина 5
                     adSent: true
         '400':
           description: Request error (missing required fields).
@@ -1696,7 +1848,7 @@ paths:
               schema:
                 type: object
               example:
-                error: "userId, username, businessName, address required"
+                error: userId, username, businessName, address required
         '401':
           $ref: '#/components/responses/UnauthorizedMissingOrInvalidToken'
         '403':
@@ -1705,30 +1857,36 @@ paths:
           $ref: '#/components/responses/TooManyRequests'
         '500':
           $ref: '#/components/responses/InternalServerError'
-
   /moscowroleplay/civops/system:
     get:
       tags:
-        - Moscow RolePlay Economy API V2
+      - Moscow RolePlay Economy API V2
       summary: System Information
-      description: |
-        Retrieve system information and Economy API statistics.
+      description: 'Retrieve system information and Economy API statistics.
+
 
         Available actions:
+
         - `stats` - general statistics (users, businesses, mafias, governmentBalance).
+
         - `uptime` - server uptime.
+
         - `dbStatus` - database connection status.
 
+        '
       security:
-        - MRPAPIKey: []
+      - MRPAPIKey: []
       parameters:
-        - name: action
-          in: query
-          description: Action type for retrieving data.
-          required: true
-          schema:
-            type: string
-            enum: [stats, uptime, dbStatus]
+      - name: action
+        in: query
+        description: Action type for retrieving data.
+        required: true
+        schema:
+          type: string
+          enum:
+          - stats
+          - uptime
+          - dbStatus
       responses:
         '200':
           description: Successful response with system data.
@@ -1751,18 +1909,18 @@ paths:
                       heapUsed: 69451704
                       external: 6152340
                       arrayBuffers: 416832
-                    timestamp: "2026-04-23T16:21:16.502Z"
+                    timestamp: '2026-04-23T16:21:16.502Z'
                 uptime:
                   summary: Uptime.
                   value:
                     uptime: 1138.501762406
-                    uptimeFormatted: "0д 0ч 18м 58с"
-                    timestamp: "2026-04-23T16:21:22.078Z"
+                    uptimeFormatted: 0д 0ч 18м 58с
+                    timestamp: '2026-04-23T16:21:22.078Z'
                 dbStatus:
                   summary: DB status.
                   value:
-                    status: "connected"
-                    timestamp: "2026-04-23T16:21:29.210Z"
+                    status: connected
+                    timestamp: '2026-04-23T16:21:29.210Z'
         '400':
           description: Request error (unknown action).
           content:
@@ -1785,17 +1943,18 @@ paths:
                 db_error:
                   summary: DB connection error.
                   value:
-                    status: "disconnected"
-                    error: "Connection timeout"
-
+                    status: disconnected
+                    error: Connection timeout
   /moscowroleplay/civops/health:
     get:
       tags:
-        - Moscow RolePlay Economy API V2
+      - Moscow RolePlay Economy API V2
       summary: Economy API Health Check
-      description: |
-        Check the availability and status of the Economy API.
+      description: 'Check the availability and status of the Economy API.
+
         This endpoint does not require authentication.
+
+        '
       responses:
         '200':
           description: Economy API is available and working correctly.
@@ -1807,13 +1966,13 @@ paths:
                 healthy:
                   summary: System is running normally.
                   value:
-                    status: "ok"
+                    status: ok
                     economy_api:
-                      status: "ok"
-                      service: "Economy API"
-                      timestamp: "2026-04-23T16:25:50.237Z"
+                      status: ok
+                      service: Economy API
+                      timestamp: '2026-04-23T16:25:50.237Z'
                       uptime: 1406.661067506
-                    timestamp: "2026-04-23T16:25:50.239Z"
+                    timestamp: '2026-04-23T16:25:50.239Z'
         '503':
           description: Economy API is unavailable.
           content:
@@ -1824,22 +1983,24 @@ paths:
                 unhealthy:
                   summary: System is unavailable.
                   value:
-                    status: "error"
-                    message: "Economy API unavailable"
-                    error: "Connection timeout"
-
+                    status: error
+                    message: Economy API unavailable
+                    error: Connection timeout
 components:
   securitySchemes:
     MRPAPIKey:
       type: http
       scheme: bearer
       bearerFormat: API Key
-      description: |
-        API key for accessing CivOps endpoints.
+      description: 'API key for accessing CivOps endpoints.
+
 
         Passed in the `Authorization: Bearer <key>` header.
 
+
         REQUIRED FOR ALL CIVOPS ENDPOINTS (except /health).
+
+        '
   responses:
     UnauthorizedMissingOrInvalidToken:
       description: Authentication error.
@@ -1912,7 +2073,7 @@ components:
               summary: Request limit exceeded.
               value:
                 code: 6021
-                message: "Rate Limit Exceeded"
+                message: Rate Limit Exceeded
                 retry_after: 30
     InternalServerError:
       description: Internal server error.
@@ -1925,14 +2086,14 @@ components:
               summary: Economy API error.
               value:
                 code: 6005
-                message: "Internal Server Error Occurred."
+                message: Internal Server Error Occurred.
   schemas:
     ErrorResponse:
       type: object
       description: Standard error format.
       required:
-        - code
-        - message
+      - code
+      - message
       properties:
         code:
           type: integer
@@ -1946,8 +2107,8 @@ components:
       type: object
       description: Authentication error (missing or invalid token).
       required:
-        - code
-        - message
+      - code
+      - message
       properties:
         code:
           type: integer
@@ -1959,8 +2120,8 @@ components:
       type: object
       description: Access error (forbidden).
       required:
-        - code
-        - message
+      - code
+      - message
       properties:
         code:
           type: integer
@@ -1972,8 +2133,8 @@ components:
       type: object
       description: Request limit exceeded error.
       required:
-        - code
-        - message
+      - code
+      - message
       properties:
         code:
           type: integer
@@ -1989,31 +2150,31 @@ components:
       type: object
       description: Economy API error.
       required:
-        - code
-        - message
+      - code
+      - message
       properties:
         code:
           type: integer
           example: 6010
         message:
           type: string
-          example: "Business not found"
+          example: Business not found
     EconomyTransferRequest:
       type: object
       description: Transfer request between users (action=transfer).
       required:
-        - fromUserId
-        - toUserId
-        - amount
+      - fromUserId
+      - toUserId
+      - amount
       properties:
         fromUserId:
           type: string
           description: Sender ID.
-          example: "123456789"
+          example: '123456789'
         toUserId:
           type: string
           description: Recipient ID.
-          example: "987654321"
+          example: '987654321'
         amount:
           type: integer
           description: Transfer amount.
@@ -2022,13 +2183,13 @@ components:
       type: object
       description: Request with userId and amount (action=deposit, withdraw).
       required:
-        - userId
-        - amount
+      - userId
+      - amount
       properties:
         userId:
           type: string
           description: User ID.
-          example: "123456789"
+          example: '123456789'
         amount:
           type: integer
           description: Operation amount.
@@ -2037,13 +2198,13 @@ components:
       type: object
       description: Request with userId, amount and type (action=add, remove).
       required:
-        - userId
-        - amount
+      - userId
+      - amount
       properties:
         userId:
           type: string
           description: User ID.
-          example: "123456789"
+          example: '123456789'
         amount:
           type: integer
           description: Operation amount.
@@ -2051,54 +2212,56 @@ components:
         type:
           type: string
           description: Balance type ('cash' or 'bank').
-          enum: [cash, bank]
+          enum:
+          - cash
+          - bank
           default: cash
           example: cash
     EconomyUserOnlyRequest:
       type: object
       description: Request with only userId (action=reset).
       required:
-        - userId
+      - userId
       properties:
         userId:
           type: string
           description: User ID.
-          example: "123456789"
+          example: '123456789'
     EconomyResetCooldownRequest:
       type: object
       description: Cooldown reset request (action=resetCooldown).
       required:
-        - userId
+      - userId
       properties:
         userId:
           type: string
           description: User ID.
-          example: "123456789"
+          example: '123456789'
         command:
           type: string
           description: Command name to reset (if not specified - resets all).
-          example: "work"
+          example: work
     UsersAddItemRequest:
       type: object
       description: Request to add item to inventory (action=addItem).
       required:
-        - userId
-        - item
+      - userId
+      - item
       properties:
         userId:
           type: string
           description: User ID.
-          example: "123456789"
+          example: '123456789'
         item:
           type: object
           description: Item to add.
           required:
-            - name
+          - name
           properties:
             name:
               type: string
               description: Item name.
-              example: "Police Badge"
+              example: Police Badge
             amount:
               type: integer
               description: Quantity.
@@ -2107,22 +2270,22 @@ components:
             description:
               type: string
               description: Item description.
-              example: "Official police badge"
+              example: Official police badge
     UsersRemoveItemRequest:
       type: object
       description: Request to remove item from inventory (action=removeItem).
       required:
-        - userId
-        - itemName
+      - userId
+      - itemName
       properties:
         userId:
           type: string
           description: User ID.
-          example: "123456789"
+          example: '123456789'
         itemName:
           type: string
           description: Item name.
-          example: "Coffee"
+          example: Coffee
         amount:
           type: integer
           description: Quantity.
@@ -2132,64 +2295,64 @@ components:
       type: object
       description: Request to clear inventory (action=clearInventory).
       required:
-        - userId
+      - userId
       properties:
         userId:
           type: string
           description: User ID.
-          example: "123456789"
+          example: '123456789'
     BusinessRequestRequest:
       type: object
       description: Request to create business application (action=request).
       required:
-        - userId
-        - username
-        - name
-        - form
+      - userId
+      - username
+      - name
+      - form
       properties:
         userId:
           type: string
           description: User ID.
-          example: "123456789"
+          example: '123456789'
         username:
           type: string
           description: Username.
-          example: "Player1"
+          example: Player1
         name:
           type: string
           description: Business name.
-          example: "Moscow Motors"
+          example: Moscow Motors
         form:
           type: string
           description: Business form.
-          example: "ООО"
+          example: ООО
         channelId:
           type: string
           description: Discord channel ID for notifications.
-          example: "1417184142227144877"
+          example: '1417184142227144877'
     BusinessApproveRequest:
       type: object
       description: Request to approve business application (action=approve).
       required:
-        - requestId
-        - approverId
+      - requestId
+      - approverId
       properties:
         requestId:
           type: string
           description: Request ID.
-          example: "req_123"
+          example: req_123
         approverId:
           type: string
           description: Approver ID.
-          example: "987654321"
+          example: '987654321'
         ownerId:
           type: string
           description: Business owner ID.
-          example: "123456789"
+          example: '123456789'
         ownerName:
           type: string
           description: Owner name.
-          example: "Player1"
+          example: Player1
         channelId:
           type: string
           description: Discord channel ID.
@@ -2218,7 +2381,7 @@ components:
       type: object
       description: Request for direct business creation (action=create).
       required:
-        - businessData
+      - businessData
       properties:
         businessData:
           type: object
@@ -2227,23 +2390,23 @@ components:
       type: object
       description: Request with only business ID (action=delete).
       required:
-        - businessId
+      - businessId
       properties:
         businessId:
           type: string
           description: Business ID.
-          example: "biz_123"
+          example: biz_123
     BusinessMoneyRequest:
       type: object
       description: Request to change business balance (action=addMoney, removeMoney).
       required:
-        - businessId
-        - amount
+      - businessId
+      - amount
       properties:
         businessId:
           type: string
           description: Business ID.
-          example: "biz_123"
+          example: biz_123
         amount:
           type: integer
           description: Amount.
@@ -2252,14 +2415,14 @@ components:
       type: object
       description: Request to withdraw money from business (action=withdraw).
       required:
-        - businessId
-        - amount
-        - targetUserId
+      - businessId
+      - amount
+      - targetUserId
       properties:
         businessId:
           type: string
           description: Business ID.
-          example: "biz_123"
+          example: biz_123
         amount:
           type: integer
           description: Amount.
@@ -2267,24 +2430,24 @@ components:
         targetUserId:
           type: string
           description: Target user ID.
-          example: "123456789"
+          example: '123456789'
     BusinessTransferRequest:
       type: object
       description: Request for transfer between businesses (action=transfer).
       required:
-        - fromBusinessId
-        - toBusinessId
-        - amount
-        - authorId
+      - fromBusinessId
+      - toBusinessId
+      - amount
+      - authorId
       properties:
         fromBusinessId:
           type: string
           description: Sender business ID.
-          example: "biz_123"
+          example: biz_123
         toBusinessId:
           type: string
           description: Recipient business ID.
-          example: "biz_456"
+          example: biz_456
         amount:
           type: integer
           description: Amount.
@@ -2292,73 +2455,73 @@ components:
         reason:
           type: string
           description: Transfer reason.
-          example: "Оплата услуг"
+          example: Оплата услуг
         authorId:
           type: string
           description: Operation author ID.
-          example: "123456789"
+          example: '123456789'
     BusinessEmployeeRequest:
       type: object
       description: Request to add employee (action=addEmployee).
       required:
-        - businessId
-        - userId
-        - username
-        - position
+      - businessId
+      - userId
+      - username
+      - position
       properties:
         businessId:
           type: string
           description: Business ID.
-          example: "biz_123"
+          example: biz_123
         userId:
           type: string
           description: User ID.
-          example: "123456789"
+          example: '123456789'
         username:
           type: string
           description: Username.
-          example: "Employee1"
+          example: Employee1
         position:
           type: string
           description: Position.
-          example: "Manager"
+          example: Manager
     BusinessRemoveEmployeeRequest:
       type: object
       description: Request to remove employee (action=removeEmployee).
       required:
-        - businessId
-        - userId
+      - businessId
+      - userId
       properties:
         businessId:
           type: string
           description: Business ID.
-          example: "biz_123"
+          example: biz_123
         userId:
           type: string
           description: User ID.
-          example: "123456789"
+          example: '123456789'
     BusinessProductRequest:
       type: object
       description: Request to add product (action=addProduct).
       required:
-        - businessName
-        - item
+      - businessName
+      - item
       properties:
         businessName:
           type: string
           description: Business name.
-          example: "Moscow Motors"
+          example: Moscow Motors
         item:
           type: object
           description: Product.
           required:
-            - name
-            - price_buy
+          - name
+          - price_buy
           properties:
             name:
               type: string
               description: Product name.
-              example: "Car"
+              example: Car
             price_buy:
               type: integer
               description: Purchase price.
@@ -2379,37 +2542,37 @@ components:
       type: object
       description: Request to remove product (action=removeProduct).
       required:
-        - businessName
-        - itemName
+      - businessName
+      - itemName
       properties:
         businessName:
           type: string
           description: Business name.
-          example: "Moscow Motors"
+          example: Moscow Motors
         itemName:
           type: string
           description: Product name.
-          example: "Car"
+          example: Car
     BusinessBuyProductRequest:
       type: object
       description: Request to buy product (action=buyProduct).
       required:
-        - userId
-        - businessName
-        - itemName
+      - userId
+      - businessName
+      - itemName
       properties:
         userId:
           type: string
           description: User ID.
-          example: "123456789"
+          example: '123456789'
         businessName:
           type: string
           description: Business name.
-          example: "Moscow Motors"
+          example: Moscow Motors
         itemName:
           type: string
           description: Product name.
-          example: "Car"
+          example: Car
         quantity:
           type: integer
           description: Quantity.
@@ -2419,35 +2582,35 @@ components:
       type: object
       description: Request for money refund (action=returnMoney).
       required:
-        - businessId
-        - transactionId
+      - businessId
+      - transactionId
       properties:
         businessId:
           type: string
           description: Business ID.
-          example: "biz_123"
+          example: biz_123
         transactionId:
           type: string
           description: Transaction ID.
-          example: "txn_001"
+          example: txn_001
     MafiaCreateRequest:
       type: object
       description: Request to create mafia (action=create).
       required:
-        - name
+      - name
       properties:
         name:
           type: string
           description: Mafia name.
-          example: "Red Mafia"
+          example: Red Mafia
         leaderId:
           type: string
           description: Leader ID.
-          example: "123456789"
+          example: '123456789'
         leaderName:
           type: string
           description: Leader name.
-          example: "Boss"
+          example: Boss
         roleId:
           type: string
           description: Discord role ID.
@@ -2457,28 +2620,28 @@ components:
         color:
           type: string
           description: Color in HEX.
-          example: "#FF0000"
+          example: '#FF0000'
     MafiaIdOnlyRequest:
       type: object
       description: Request with only mafia ID (action=delete).
       required:
-        - mafiaId
+      - mafiaId
       properties:
         mafiaId:
           type: string
           description: Mafia ID.
-          example: "maf_456"
+          example: maf_456
     MafiaMoneyRequest:
       type: object
       description: Request to change mafia balance (action=addMoney, removeMoney).
       required:
-        - mafiaId
-        - amount
+      - mafiaId
+      - amount
       properties:
         mafiaId:
           type: string
           description: Mafia ID.
-          example: "maf_456"
+          example: maf_456
         amount:
           type: integer
           description: Amount.
@@ -2487,14 +2650,14 @@ components:
       type: object
       description: Request to withdraw money from mafia (action=withdraw).
       required:
-        - mafiaId
-        - amount
-        - targetUserId
+      - mafiaId
+      - amount
+      - targetUserId
       properties:
         mafiaId:
           type: string
           description: Mafia ID.
-          example: "maf_456"
+          example: maf_456
         amount:
           type: integer
           description: Amount.
@@ -2502,24 +2665,24 @@ components:
         targetUserId:
           type: string
           description: Target user ID.
-          example: "123456789"
+          example: '123456789'
     MafiaTransferRequest:
       type: object
       description: Request for transfer between mafias (action=transfer).
       required:
-        - fromMafiaId
-        - toMafiaId
-        - amount
-        - authorId
+      - fromMafiaId
+      - toMafiaId
+      - amount
+      - authorId
       properties:
         fromMafiaId:
           type: string
           description: Sender mafia ID.
-          example: "maf_456"
+          example: maf_456
         toMafiaId:
           type: string
           description: Recipient mafia ID.
-          example: "maf_789"
+          example: maf_789
         amount:
           type: integer
           description: Amount.
@@ -2530,52 +2693,52 @@ components:
         authorId:
           type: string
           description: Operation author ID.
-          example: "123456789"
+          example: '123456789'
     MafiaAddMemberRequest:
       type: object
       description: Request to add mafia member (action=addMember).
       required:
-        - mafiaId
-        - userId
-        - username
+      - mafiaId
+      - userId
+      - username
       properties:
         mafiaId:
           type: string
           description: Mafia ID.
-          example: "maf_456"
+          example: maf_456
         userId:
           type: string
           description: User ID.
-          example: "123456789"
+          example: '123456789'
         username:
           type: string
           description: Username.
-          example: "Member1"
+          example: Member1
         position:
           type: string
           description: Position/role.
-          default: "Участник"
-          example: "Участник"
+          default: Участник
+          example: Участник
     MafiaRemoveMemberRequest:
       type: object
       description: Request to remove mafia member (action=removeMember).
       required:
-        - mafiaId
-        - userId
+      - mafiaId
+      - userId
       properties:
         mafiaId:
           type: string
           description: Mafia ID.
-          example: "maf_456"
+          example: maf_456
         userId:
           type: string
           description: User ID.
-          example: "123456789"
+          example: '123456789'
     GovernmentMoneyRequest:
       type: object
       description: Request to change government balance (action=addMoney, removeMoney).
       required:
-        - amount
+      - amount
       properties:
         amount:
           type: integer
@@ -2585,10 +2748,10 @@ components:
       type: object
       description: Request to withdraw money from budget (action=withdraw).
       required:
-        - amount
-        - toType
-        - toId
-        - authorId
+      - amount
+      - toType
+      - toId
+      - authorId
       properties:
         amount:
           type: integer
@@ -2597,37 +2760,40 @@ components:
         toType:
           type: string
           description: Recipient type.
-          enum: [user, business, mafia]
-          example: "user"
+          enum:
+          - user
+          - business
+          - mafia
+          example: user
         toId:
           type: string
           description: Recipient ID.
-          example: "123456789"
+          example: '123456789'
         reason:
           type: string
           description: Transfer reason.
-          example: "Salary"
+          example: Salary
         authorId:
           type: string
           description: Operation author ID.
-          example: "admin_001"
+          example: admin_001
     StoreAddItemRequest:
       type: object
       description: Request to add item to store (action=addItem).
       required:
-        - item
+      - item
       properties:
         item:
           type: object
           description: Product.
           required:
-            - name
-            - price_buy
+          - name
+          - price_buy
           properties:
             name:
               type: string
               description: Product name.
-              example: "Police Badge"
+              example: Police Badge
             price_buy:
               type: integer
               description: Purchase price.
@@ -2648,27 +2814,27 @@ components:
       type: object
       description: Request to remove item from store (action=removeItem).
       required:
-        - itemName
+      - itemName
       properties:
         itemName:
           type: string
           description: Item name.
-          example: "Police Badge"
+          example: Police Badge
     StoreBuyRequest:
       type: object
       description: Request to buy product (action=buy).
       required:
-        - userId
-        - itemName
+      - userId
+      - itemName
       properties:
         userId:
           type: string
           description: User ID.
-          example: "123456789"
+          example: '123456789'
         itemName:
           type: string
           description: Item name.
-          example: "Police Badge"
+          example: Police Badge
         quantity:
           type: integer
           description: Quantity.
@@ -2678,17 +2844,17 @@ components:
       type: object
       description: Request to sell product to store (action=sellToStore).
       required:
-        - userId
-        - itemName
+      - userId
+      - itemName
       properties:
         userId:
           type: string
           description: User ID.
-          example: "123456789"
+          example: '123456789'
         itemName:
           type: string
           description: Item name.
-          example: "Coffee"
+          example: Coffee
         quantity:
           type: integer
           description: Quantity.

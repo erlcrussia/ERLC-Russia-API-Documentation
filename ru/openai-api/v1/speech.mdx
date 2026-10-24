@@ -1,0 +1,9 @@
+---
+title: "Синтез речи"
+description: "Озвучивает текст и возвращает аудиофайл. Нужен AI-ключ с правом voice."
+icon: "volume-high"
+openapi: "/ru/openapi/ru-openai-api-openapi.yaml POST /v1/audio/speech"
+keywords: ["audio", "speech", "tts", "озвучивание"]
+---
+
+Преобразует текст в аудио. Используйте AI-ключ с правом `voice`. По умолчанию результат возвращается файлом MP3. Чтобы получать звук потоком в формате OpenAI, передайте `stream_format: "sse"`: придут события `speech.audio.delta` и `speech.audio.done`.

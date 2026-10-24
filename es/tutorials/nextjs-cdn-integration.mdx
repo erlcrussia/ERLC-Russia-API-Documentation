@@ -9,8 +9,8 @@ El HTML y el código del servidor permanecen en Next.js. Solo el contenido de `.
 ## 1. Seleccione la dirección de entrega
 
 CDN general: `https://cdn.erlcrussia.com/YOUR_TEAM_SLUG/releases/RELEASE_ID`.
-Dominio personalizado: `https://files.example.com/releases/RELEASE_ID` después del registro, verificación de DNS/TLS y enrutamiento del host en Go Edge.
-En la API, el campo `domain` es un slug de organización o un nombre de dominio verificado, sin esquema y sin prefijo de versión.
+Dominio personalizado: `https://files.example.com/releases/RELEASE_ID` después del registro, verificación de DNS/TLS.
+En la API, el campo `domain` es el slug del equipo o un nombre de dominio verificado, sin esquema y sin prefijo de versión.
 
 ## 2. Configurar una compilación de producción
 
@@ -52,7 +52,7 @@ curl -X POST "$API_BASE/v3/cdn/assets" \
 
 Para CSS use `text/css`, para fuentes use MIME del formato apropiado. No configure el `Content-Type: multipart/form-data` genérico manualmente: el límite lo agrega el cliente. `compress=false` guarda bytes y ensamblaje SHA-256. Para su propio dominio, reemplace `domain` con `files.example.com`.
 
-HTTP 200 devuelve `{ "success": true, "asset": { ... } }`. Una ruta explícita ocupada devuelve 409; No consideres esto como una reescritura exitosa. Compare el SHA-256 de un activo existente o utilice un nuevo RELEASE_ID. En 429, espere `Retry-After`/`retry_after` y vuelva a intentar solo la solicitud rechazada. Cargue secuencialmente, teniendo en cuenta el límite general, en lugar de cientos de solicitudes paralelas.
+HTTP 200 devuelve `{ "success": true, "asset": { ... } }`. Una ruta explícita ocupada devuelve 409; No consideres esto como una reescritura exitosa. Compare el SHA-256 de un activo existente o utilice un nuevo RELEASE_ID. En 429, espere `Retry-After`/`Retry-After` y vuelva a intentar solo la solicitud rechazada. Cargue secuencialmente, teniendo en cuenta el límite general, en lugar de cientos de solicitudes paralelas.
 
 No descargues el `.next` completo: ahí está el código del servidor y la configuración. Publicar mapas fuente `.map` solo si existe una necesidad consciente. Conserve las versiones antiguas siempre que las pestañas abiertas las utilicen.
 
@@ -71,4 +71,4 @@ En Red, verifique JS/CSS/dominio de fuente, MIME, CORS y HTTP 200. Compare los b
 
 La CDN sirve archivos cargados previamente. `originUrl` indica una redirección para la raíz del dominio o un objeto ausente, no un origen de descarga automática. Carga los archivos mediante la API antes de publicar la versión.
 
-Las rutas que comienzan con `_next/static/` se vuelven inmutables en Go Edge. Si `_next` está precedido por un prefijo de versión, la implementación actual utiliza un control de caché normal; verifique el título real. Restablecer Go Edge no borra el caché del navegador y no confirma que Cloudflare lo haya borrado.
+Las rutas que comienzan con `_next/static/` se vuelven inmutables en la CDN. Si `_next` está precedido por un prefijo de versión, la implementación actual utiliza un control de caché normal; verifique el título real. Restablecer la CDN no borra el caché del navegador y no confirma que Cloudflare lo haya borrado.

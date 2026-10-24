@@ -2,12 +2,11 @@
   "language": "es",
   "tabs": [
     {
-      "tab": "Información y Reglas",
+      "tab": "Información y reglas",
       "icon": "circle-info",
       "pages": [
-        "es/index",
         {
-          "group": "Primeros Pasos",
+          "group": "Primeros pasos",
           "icon": "rocket",
           "pages": [
             "es/introduction",
@@ -37,37 +36,305 @@
       "icon": "code",
       "versions": [
         {
-          "version": "API V1",
+          "version": "API V3",
+          "default": true,
           "pages": [
             {
-              "group": "Documentación de la API V1",
+              "group": "Documentación de la API V3",
               "icon": "file-code",
               "pages": [
                 {
-                  "group": "ER:LC API V1",
+                  "group": "ER:LC Servidor",
                   "icon": "gamepad",
                   "pages": [
-                    "es/reference/v1/erlc-api-v1/get-erlc-server-bans",
-                    "es/reference/v1/erlc-api-v1/get-erlc-server",
-                    "es/reference/v1/erlc-api-v1/get-erlc-server-players",
-                    "es/reference/v1/erlc-api-v1/get-erlc-server-joinlogs",
-                    "es/reference/v1/erlc-api-v1/get-erlc-server-queue",
-                    "es/reference/v1/erlc-api-v1/get-erlc-server-killlogs",
-                    "es/reference/v1/erlc-api-v1/get-erlc-server-commandlogs",
-                    "es/reference/v1/erlc-api-v1/get-erlc-server-modcalls",
-                    "es/reference/v1/erlc-api-v1/get-erlc-server-vehicles",
-                    "es/reference/v1/erlc-api-v1/get-erlc-server-staff",
-                    "es/reference/v1/erlc-api-v1/post-erlc-server-command"
+                    "es/reference/v3/erlc/get-erlc-server",
+                    "es/reference/v3/erlc/get-erlc-server-bans",
+                    "es/reference/v3/erlc/post-erlc-server-command"
                   ]
                 },
                 {
-                  "group": "MRP API de Estadísticas V1",
-                  "icon": "chart-bar",
+                  "group": "Estadísticas",
+                  "icon": "chart-simple",
                   "pages": [
-                    "es/reference/v1/mrp-stats-api-v1/get-moscowroleplay-stats-playercount",
-                    "es/reference/v1/mrp-stats-api-v1/get-moscowroleplay-stats-server-membercount",
-                    "es/reference/v1/mrp-stats-api-v1/get-moscowroleplay-stats-server-allmembercount",
-                    "es/reference/v1/mrp-stats-api-v1/get-moscowroleplay-stats-server-botcount"
+                    "es/reference/v3/stats/get-stats"
+                  ]
+                },
+                {
+                  "group": "Verificación",
+                  "icon": "id-badge",
+                  "pages": [
+                    "es/reference/v3/users/get-users",
+                    "es/reference/v3/users/post-users"
+                  ]
+                },
+                {
+                  "group": "Puntos de infracción",
+                  "icon": "gavel",
+                  "pages": [
+                    "es/reference/v3/points/get-user-points",
+                    "es/reference/v3/points/get-user-history",
+                    "es/reference/v3/points/add-user-points",
+                    "es/reference/v3/points/remove-user-points",
+                    "es/reference/v3/points/get-server-user-points",
+                    "es/reference/v3/points/get-server-user-history",
+                    "es/reference/v3/points/add-server-user-points",
+                    "es/reference/v3/points/remove-server-user-points"
+                  ]
+                },
+                {
+                  "group": "Economía",
+                  "icon": "coins",
+                  "pages": [
+                    {
+                      "group": "Lectura",
+                      "icon": "arrow-down",
+                      "pages": [
+                        "es/reference/v3/civops/get-civops-economy",
+                        "es/reference/v3/civops/get-civops-users",
+                        "es/reference/v3/civops/get-civops-businesses",
+                        "es/reference/v3/civops/get-civops-mafias",
+                        "es/reference/v3/civops/get-civops-government",
+                        "es/reference/v3/civops/get-civops-store",
+                        "es/reference/v3/civops/get-civops-ads",
+                        "es/reference/v3/civops/get-civops-system",
+                        "es/reference/v3/civops/get-civops-health"
+                      ]
+                    },
+                    {
+                      "group": "Acciones",
+                      "icon": "arrow-up",
+                      "pages": [
+                        "es/reference/v3/civops/post-civops-economy",
+                        "es/reference/v3/civops/post-civops-users",
+                        "es/reference/v3/civops/post-civops-businesses",
+                        "es/reference/v3/civops/post-civops-mafias",
+                        "es/reference/v3/civops/post-civops-government",
+                        "es/reference/v3/civops/post-civops-store",
+                        "es/reference/v3/civops/post-civops-ads"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "group": "Claves",
+                  "icon": "key",
+                  "pages": [
+                    "es/reference/v3/keys/get-keys",
+                    "es/reference/v3/keys/regenerate-keys"
+                  ]
+                },
+                {
+                  "group": "Webhooks",
+                  "icon": "webhook",
+                  "pages": [
+                    "es/reference/v3/webhooks/list-webhooks",
+                    "es/reference/v3/webhooks/add-webhook-url",
+                    "es/reference/v3/webhooks/update-webhook-url",
+                    "es/reference/v3/webhooks/remove-webhook-url",
+                    "es/reference/v3/webhooks/delete-all-webhooks",
+                    "es/reference/v3/webhooks/test-webhook",
+                    "es/reference/v3/webhooks/check-status",
+                    "es/reference/v3/webhooks/set-active",
+                    "es/reference/v3/webhooks/url-status",
+                    "es/reference/v3/webhooks/post-webhooks"
+                  ]
+                },
+                {
+                  "group": "Suscripciones y tienda",
+                  "icon": "crown",
+                  "pages": [
+                    "es/reference/v3/subscriptions/get-store",
+                    "es/reference/v3/subscriptions/get-user-subscriptions",
+                    "es/reference/v3/subscriptions/purchase-with-coins",
+                    "es/reference/v3/subscriptions/get-user-limits"
+                  ]
+                },
+                {
+                  "group": "CDN",
+                  "icon": "cloud",
+                  "pages": [
+                    {
+                      "group": "Archivos",
+                      "icon": "file",
+                      "pages": [
+                        "es/reference/v3/cdn/bind-team",
+                        "es/reference/v3/cdn/get-assets",
+                        "es/reference/v3/cdn/upload-asset",
+                        "es/reference/v3/cdn/external-asset",
+                        "es/reference/v3/cdn/update-assets",
+                        "es/reference/v3/cdn/delete-assets",
+                        "es/reference/v3/cdn/purge-assets",
+                        "es/reference/v3/cdn/get-manifest",
+                        "es/reference/v3/cdn/list-domains"
+                      ]
+                    },
+                    {
+                      "group": "Carpetas",
+                      "icon": "folder",
+                      "pages": [
+                        "es/reference/v3/cdn/get-folders",
+                        "es/reference/v3/cdn/create-folder",
+                        "es/reference/v3/cdn/update-folders",
+                        "es/reference/v3/cdn/delete-folders"
+                      ]
+                    },
+                    {
+                      "group": "Dominios propios",
+                      "icon": "globe",
+                      "pages": [
+                        "es/reference/v3/cdn/delete-cdn-custom-domains-id",
+                        "es/reference/v3/cdn/get-cdn-custom-domains",
+                        "es/reference/v3/cdn/get-cdn-custom-domains-id",
+                        "es/reference/v3/cdn/patch-cdn-custom-domains-id",
+                        "es/reference/v3/cdn/post-cdn-custom-domains",
+                        "es/reference/v3/cdn/post-cdn-custom-domains-id-purge",
+                        "es/reference/v3/cdn/post-cdn-custom-domains-id-regenerate-token",
+                        "es/reference/v3/cdn/post-cdn-custom-domains-id-verify",
+                        "es/reference/v3/cdn/post-cdn-webhook-purge"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "group": "Archivos personales",
+                  "icon": "file-user",
+                  "pages": [
+                    "es/reference/v3/user-assets/get-user-assets",
+                    "es/reference/v3/user-assets/post-user-assets",
+                    "es/reference/v3/user-assets/get-user-assets-id",
+                    "es/reference/v3/user-assets/delete-user-assets-id",
+                    "es/reference/v3/user-assets/get-user-assets-id-content",
+                    "es/reference/v3/user-assets/head-user-assets-id-content",
+                    "es/reference/v3/user-assets/get-user-assets-authorize"
+                  ]
+                },
+                {
+                  "group": "Enlaces cortos",
+                  "icon": "link",
+                  "pages": [
+                    "es/reference/v3/redirects/bind-key-team",
+                    "es/reference/v3/redirects/get-redirects-summary",
+                    {
+                      "group": "Enlaces",
+                      "icon": "shuffle",
+                      "pages": [
+                        "es/reference/v3/redirects/get-redirects",
+                        "es/reference/v3/redirects/post-redirects",
+                        "es/reference/v3/redirects/put-redirects",
+                        "es/reference/v3/redirects/delete-redirects",
+                        "es/reference/v3/redirects/post-redirects-batch-delete",
+                        "es/reference/v3/redirects/post-redirects-batch-group"
+                      ]
+                    },
+                    {
+                      "group": "Grupos",
+                      "icon": "folder-tree",
+                      "pages": [
+                        "es/reference/v3/redirects/get-redirects-groups",
+                        "es/reference/v3/redirects/post-redirects-groups",
+                        "es/reference/v3/redirects/put-redirects-groups-reorder",
+                        "es/reference/v3/redirects/put-redirects-groups-id",
+                        "es/reference/v3/redirects/delete-redirects-groups-id",
+                        "es/reference/v3/redirects/post-redirects-groups-batch-delete"
+                      ]
+                    },
+                    {
+                      "group": "Dominios",
+                      "icon": "globe",
+                      "pages": [
+                        "es/reference/v3/redirects/get-redirect-domains",
+                        "es/reference/v3/redirects/post-redirect-domains",
+                        "es/reference/v3/redirects/get-redirect-domains-id",
+                        "es/reference/v3/redirects/patch-redirect-domains-id",
+                        "es/reference/v3/redirects/delete-redirect-domains-id",
+                        "es/reference/v3/redirects/post-redirect-domains-id-verify"
+                      ]
+                    },
+                    {
+                      "group": "Analítica",
+                      "icon": "chart-line",
+                      "pages": [
+                        "es/reference/v3/redirects/get-redirect-analytics-overview",
+                        "es/reference/v3/redirects/get-redirect-analytics-timeseries",
+                        "es/reference/v3/redirects/get-redirect-analytics-geo",
+                        "es/reference/v3/redirects/get-redirect-analytics-sources"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "group": "AI Studio",
+                  "icon": "sparkles",
+                  "pages": [
+                    "es/reference/v3/ai/get-credits-balance",
+                    "es/reference/v3/ai/exchange-credits",
+                    "es/reference/v3/ai/list-studio-keys",
+                    "es/reference/v3/ai/create-studio-key",
+                    "es/reference/v3/ai/delete-ai-keys-id",
+                    "es/reference/v3/ai/generate-title",
+                    "es/reference/v3/ai/patch-studio-key-id",
+                    "es/reference/v3/ai/get-audio-pricing"
+                  ]
+                },
+                {
+                  "group": "Anuncios",
+                  "icon": "rectangle-ad",
+                  "pages": [
+                    "es/reference/v3/ads/post-ads-upload",
+                    "es/reference/v3/ads/post-ads-campaigns",
+                    "es/reference/v3/ads/get-ads-campaigns",
+                    "es/reference/v3/ads/get-ads-campaigns-id",
+                    "es/reference/v3/ads/post-ads-campaigns-id-buy",
+                    "es/reference/v3/ads/post-ads-campaigns-id-toggle",
+                    "es/reference/v3/ads/get-ads-packages",
+                    "es/reference/v3/ads/get-ads-serve"
+                  ]
+                },
+                {
+                  "group": "Autenticación",
+                  "icon": "shield-halved",
+                  "pages": [
+                    {
+                      "group": "Inicio de sesión",
+                      "icon": "arrow-right-to-bracket",
+                      "pages": [
+                        "es/reference/v3/auth/discord-login",
+                        "es/reference/v3/auth/discord-callback",
+                        "es/reference/v3/auth/session-init",
+                        "es/reference/v3/auth/session-init-post",
+                        "es/reference/v3/auth/session-token",
+                        "es/reference/v3/auth/get-session",
+                        "es/reference/v3/auth/logout"
+                      ]
+                    },
+                    {
+                      "group": "Sesiones",
+                      "icon": "fingerprint",
+                      "pages": [
+                        "es/reference/v3/auth/get-user-sessions",
+                        "es/reference/v3/auth/delete-user-session",
+                        "es/reference/v3/auth/delete-all-user-sessions"
+                      ]
+                    },
+                    {
+                      "group": "Roblox y perfil",
+                      "icon": "link",
+                      "pages": [
+                        "es/reference/v3/auth/roblox-login",
+                        "es/reference/v3/auth/roblox-callback",
+                        "es/reference/v3/auth/link-roblox",
+                        "es/reference/v3/auth/unlink-roblox",
+                        "es/reference/v3/auth/refresh-roblox",
+                        "es/reference/v3/auth/refresh-profile"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "group": "Estado",
+                  "icon": "heart-pulse",
+                  "pages": [
+                    "es/reference/v3/health/get-health"
                   ]
                 }
               ]
@@ -135,299 +402,37 @@
           ]
         },
         {
-          "version": "API V3",
-          "default": true,
+          "version": "API V1",
           "pages": [
-            "es/reference/v3/overview",
             {
-              "group": "Documentación API V3",
+              "group": "Documentación de la API V1",
               "icon": "file-code",
               "pages": [
                 {
-                  "group": "ER:LC API V3",
+                  "group": "ER:LC API V1",
                   "icon": "gamepad",
                   "pages": [
-                    "es/reference/v3/erlc/get-erlc-server",
-                    "es/reference/v3/erlc/get-erlc-server-bans",
-                    "es/reference/v3/erlc/post-erlc-server-command"
+                    "es/reference/v1/erlc-api-v1/get-erlc-server-bans",
+                    "es/reference/v1/erlc-api-v1/get-erlc-server",
+                    "es/reference/v1/erlc-api-v1/get-erlc-server-players",
+                    "es/reference/v1/erlc-api-v1/get-erlc-server-joinlogs",
+                    "es/reference/v1/erlc-api-v1/get-erlc-server-queue",
+                    "es/reference/v1/erlc-api-v1/get-erlc-server-killlogs",
+                    "es/reference/v1/erlc-api-v1/get-erlc-server-commandlogs",
+                    "es/reference/v1/erlc-api-v1/get-erlc-server-modcalls",
+                    "es/reference/v1/erlc-api-v1/get-erlc-server-vehicles",
+                    "es/reference/v1/erlc-api-v1/get-erlc-server-staff",
+                    "es/reference/v1/erlc-api-v1/post-erlc-server-command"
                   ]
                 },
                 {
-                  "group": "API de economía V3",
-                  "icon": "coins",
+                  "group": "MRP API de Estadísticas V1",
+                  "icon": "chart-bar",
                   "pages": [
-                    {
-                      "group": "GET-Puntos finales de la economía",
-                      "icon": "arrow-down",
-                      "pages": [
-                        "es/reference/v3/civops/get-civops-economy",
-                        "es/reference/v3/civops/get-civops-users",
-                        "es/reference/v3/civops/get-civops-businesses",
-                        "es/reference/v3/civops/get-civops-mafias",
-                        "es/reference/v3/civops/get-civops-government",
-                        "es/reference/v3/civops/get-civops-store",
-                        "es/reference/v3/civops/get-civops-ads",
-                        "es/reference/v3/civops/get-civops-system",
-                        "es/reference/v3/civops/get-civops-health"
-                      ]
-                    },
-                    {
-                      "group": "POST-Puntos finales de la economía",
-                      "icon": "arrow-up",
-                      "pages": [
-                        "es/reference/v3/civops/post-civops-economy",
-                        "es/reference/v3/civops/post-civops-users",
-                        "es/reference/v3/civops/post-civops-businesses",
-                        "es/reference/v3/civops/post-civops-mafias",
-                        "es/reference/v3/civops/post-civops-government",
-                        "es/reference/v3/civops/post-civops-store",
-                        "es/reference/v3/civops/post-civops-ads"
-                      ]
-                    }
-                  ]
-                },
-                {
-                  "group": "API de estadísticas V3",
-                  "icon": "chart-line",
-                  "pages": [
-                    "es/reference/v3/stats/get-stats"
-                  ]
-                },
-                {
-                  "group": "API de verificación V3",
-                  "icon": "id-badge",
-                  "pages": [
-                    "es/reference/v3/users/get-users",
-                    "es/reference/v3/users/post-users"
-                  ]
-                },
-                {
-                  "group": "CDN API V3",
-                  "icon": "server",
-                  "pages": [
-                    "es/reference/v3/cdn/overview",
-                    "es/reference/v3/cdn/bind-team",
-                    {
-                      "group": "Activos y espacios de nombres",
-                      "icon": "file",
-                      "pages": [
-                        "es/reference/v3/cdn/namespaces",
-                        "es/reference/v3/cdn/get-assets",
-                        "es/reference/v3/cdn/upload-asset",
-                        "es/reference/v3/cdn/external-asset",
-                        "es/reference/v3/cdn/update-assets",
-                        "es/reference/v3/cdn/delete-assets",
-                        "es/reference/v3/cdn/purge-assets",
-                        "es/reference/v3/cdn/list-domains",
-                        "es/reference/v3/cdn/get-manifest"
-                      ]
-                    },
-                    {
-                      "group": "Carpetas de interfaz",
-                      "icon": "folder",
-                      "pages": [
-                        "es/reference/v3/cdn/get-folders",
-                        "es/reference/v3/cdn/create-folder",
-                        "es/reference/v3/cdn/update-folders",
-                        "es/reference/v3/cdn/delete-folders"
-                      ]
-                    },
-                    {
-                      "group": "Dominios personalizados CDN",
-                      "pages": [
-                        "es/reference/v3/cdn/delete-cdn-custom-domains-id",
-                        "es/reference/v3/cdn/get-cdn-custom-domains",
-                        "es/reference/v3/cdn/get-cdn-custom-domains-id",
-                        "es/reference/v3/cdn/patch-cdn-custom-domains-id",
-                        "es/reference/v3/cdn/post-cdn-custom-domains",
-                        "es/reference/v3/cdn/post-cdn-custom-domains-id-purge",
-                        "es/reference/v3/cdn/post-cdn-custom-domains-id-regenerate-token",
-                        "es/reference/v3/cdn/post-cdn-custom-domains-id-verify",
-                        "es/reference/v3/cdn/post-cdn-webhook-purge"
-                      ]
-                    },
-                    {
-                      "group": "Archivos personales",
-                      "icon": "file-user",
-                      "pages": [
-                        "es/reference/v3/user-assets/get-user-assets",
-                        "es/reference/v3/user-assets/post-user-assets",
-                        "es/reference/v3/user-assets/get-user-assets-id",
-                        "es/reference/v3/user-assets/get-user-assets-authorize",
-                        "es/reference/v3/user-assets/get-user-assets-id-content",
-                        "es/reference/v3/user-assets/head-user-assets-id-content",
-                        "es/reference/v3/user-assets/delete-user-assets-id"
-                      ]
-                    }
-                  ]
-                },
-                {
-                  "group": "Redirecciones",
-                  "icon": "arrow-right-arrow-left",
-                  "pages": [
-                    {
-                      "group": "Configuración y resumen",
-                      "pages": [
-                        "es/reference/v3/redirects/bind-key-team",
-                        "es/reference/v3/redirects/get-redirects-summary"
-                      ]
-                    },
-                    {
-                      "group": "Redirecciones",
-                      "pages": [
-                        "es/reference/v3/redirects/get-redirects",
-                        "es/reference/v3/redirects/post-redirects",
-                        "es/reference/v3/redirects/put-redirects",
-                        "es/reference/v3/redirects/delete-redirects",
-                        "es/reference/v3/redirects/post-redirects-batch-delete"
-                      ]
-                    },
-                    {
-                      "group": "Grupos de redirecciones",
-                      "pages": [
-                        "es/reference/v3/redirects/get-redirects-groups",
-                        "es/reference/v3/redirects/post-redirects-groups",
-                        "es/reference/v3/redirects/put-redirects-groups-reorder",
-                        "es/reference/v3/redirects/put-redirects-groups-id",
-                        "es/reference/v3/redirects/delete-redirects-groups-id",
-                        "es/reference/v3/redirects/post-redirects-groups-batch-delete",
-                        "es/reference/v3/redirects/post-redirects-batch-group"
-                      ]
-                    },
-                    {
-                      "group": "Dominios",
-                      "pages": [
-                        "es/reference/v3/redirects/get-redirect-domains",
-                        "es/reference/v3/redirects/post-redirect-domains",
-                        "es/reference/v3/redirects/get-redirect-domains-id",
-                        "es/reference/v3/redirects/patch-redirect-domains-id",
-                        "es/reference/v3/redirects/delete-redirect-domains-id",
-                        "es/reference/v3/redirects/post-redirect-domains-id-verify"
-                      ]
-                    },
-                    {
-                      "group": "Análisis",
-                      "pages": [
-                        "es/reference/v3/redirects/get-redirect-analytics-overview",
-                        "es/reference/v3/redirects/get-redirect-analytics-timeseries",
-                        "es/reference/v3/redirects/get-redirect-analytics-geo",
-                        "es/reference/v3/redirects/get-redirect-analytics-sources"
-                      ]
-                    }
-                  ]
-                },
-                {
-                  "group": "API de castigo V3",
-                  "icon": "gavel",
-                  "pages": [
-                    "es/reference/v3/points/get-user-points",
-                    "es/reference/v3/points/get-user-history",
-                    "es/reference/v3/points/add-user-points",
-                    "es/reference/v3/points/remove-user-points",
-                    "es/reference/v3/points/get-points-serverid-robloxid",
-                    "es/reference/v3/points/get-points-serverid-robloxid-history",
-                    "es/reference/v3/points/post-points-serverid-robloxid-add",
-                    "es/reference/v3/points/post-points-serverid-robloxid-remove"
-                  ]
-                },
-                {
-                  "group": "API de claves V3",
-                  "icon": "key",
-                  "pages": [
-                    "es/reference/v3/keys/get-keys",
-                    "es/reference/v3/keys/post-keys"
-                  ]
-                },
-                {
-                  "group": "API de webhooks V3",
-                  "icon": "diagram-project",
-                  "pages": [
-                    "es/reference/v3/webhooks/get-webhooks",
-                    "es/reference/v3/webhooks/get-webhooks-status",
-                    "es/reference/v3/webhooks/post-webhooks-add-url",
-                    "es/reference/v3/webhooks/put-webhooks-url",
-                    "es/reference/v3/webhooks/patch-webhooks-url-status",
-                    "es/reference/v3/webhooks/patch-webhooks-set-active",
-                    "es/reference/v3/webhooks/post-webhooks-test",
-                    "es/reference/v3/webhooks/delete-webhooks-remove-url",
-                    "es/reference/v3/webhooks/delete-webhooks"
-                  ]
-                },
-                {
-                  "group": "API de suscripciones V3",
-                  "icon": "crown",
-                  "pages": [
-                    "es/reference/v3/subscriptions/get-funpay-config",
-                    "es/reference/v3/subscriptions/get-plans",
-                    "es/reference/v3/subscriptions/get-user-subscriptions",
-                    "es/reference/v3/subscriptions/get-user-benefits",
-                    "es/reference/v3/subscriptions/get-subscriptions-coins-balance",
-                    "es/reference/v3/subscriptions/create-funpay-order",
-                    "es/reference/v3/subscriptions/get-funpay-order-status",
-                    "es/reference/v3/subscriptions/purchase-with-coins",
-                    "es/reference/v3/subscriptions/get-subscriptions-store",
-                    "es/reference/v3/subscriptions/get-subscriptions-user-limits",
-                    "es/reference/v3/subscriptions/get-subscriptions-user-limits-discordid"
-                  ]
-                },
-                {
-                  "group": "AI API V3",
-                  "icon": "sparkles",
-                  "pages": [
-                    "es/reference/v3/ai/get-ai-credits-balance",
-                    "es/reference/v3/ai/post-ai-credits-exchange",
-                    "es/reference/v3/ai/get-ai-keys",
-                    "es/reference/v3/ai/post-ai-keys",
-                    "es/reference/v3/ai/patch-ai-keys",
-                    "es/reference/v3/ai/patch-ai-keys-id",
-                    "es/reference/v3/ai/delete-ai-keys",
-                    "es/reference/v3/ai/delete-ai-keys-id",
-                    "es/reference/v3/ai/post-ai-title",
-                    "es/reference/v3/ai/get-audio-pricing",
-                    "es/reference/v3/ai/post-audio-transcription"
-                  ]
-                },
-                {
-                  "group": "API de autorización V3",
-                  "icon": "shield-halved",
-                  "pages": [
-                    "es/reference/v3/auth/get-auth-me",
-                    "es/reference/v3/auth/get-auth-discord",
-                    "es/reference/v3/auth/get-auth-discord-callback",
-                    "es/reference/v3/auth/get-auth-roblox",
-                    "es/reference/v3/auth/get-auth-roblox-callback",
-                    "es/reference/v3/auth/get-auth-session",
-                    "es/reference/v3/auth/get-auth-user-sessions",
-                    "es/reference/v3/auth/patch-auth-user-profile",
-                    "es/reference/v3/auth/patch-auth-user-roblox-refresh",
-                    "es/reference/v3/auth/patch-auth-user-roblox-reverify",
-                    "es/reference/v3/auth/post-auth-user-roblox",
-                    "es/reference/v3/auth/delete-auth-user-roblox",
-                    "es/reference/v3/auth/delete-auth-user-sessions",
-                    "es/reference/v3/auth/delete-auth-user-sessions-id",
-                    "es/reference/v3/auth/post-auth-logout"
-                  ]
-                },
-                {
-                  "group": "API estatal V3",
-                  "icon": "heart-pulse",
-                  "pages": [
-                    "es/reference/v3/health/get-health"
-                  ]
-                },
-                {
-                  "group": "Publicidad V3",
-                  "icon": "rectangle-ad",
-                  "pages": [
-                    "es/reference/v3/ads/post-ads-upload",
-                    "es/reference/v3/ads/post-ads-campaigns",
-                    "es/reference/v3/ads/get-ads-campaigns",
-                    "es/reference/v3/ads/get-ads-campaigns-id",
-                    "es/reference/v3/ads/post-ads-campaigns-id-buy",
-                    "es/reference/v3/ads/post-ads-campaigns-id-toggle",
-                    "es/reference/v3/ads/get-ads-packages",
-                    "es/reference/v3/ads/get-ads-serve",
-                    "es/reference/v3/ads/post-ads-id-click"
+                    "es/reference/v1/mrp-stats-api-v1/get-moscowroleplay-stats-playercount",
+                    "es/reference/v1/mrp-stats-api-v1/get-moscowroleplay-stats-server-membercount",
+                    "es/reference/v1/mrp-stats-api-v1/get-moscowroleplay-stats-server-allmembercount",
+                    "es/reference/v1/mrp-stats-api-v1/get-moscowroleplay-stats-server-botcount"
                   ]
                 }
               ]
@@ -437,7 +442,44 @@
       ]
     },
     {
-      "tab": "Otras Opciones de Integración",
+      "tab": "ER:LC Rusia AI API",
+      "icon": "robot",
+      "pages": [
+        "es/openai-api/v1/overview",
+        {
+          "group": "Documentación de la AI API",
+          "icon": "file-code",
+          "pages": [
+            {
+              "group": "Modelos",
+              "icon": "microchip",
+              "pages": [
+                "es/openai-api/v1/models",
+                "es/openai-api/v1/get-model"
+              ]
+            },
+            {
+              "group": "Chat Completions",
+              "icon": "comments",
+              "pages": [
+                "es/openai-api/v1/chat-completions"
+              ]
+            },
+            {
+              "group": "Audio",
+              "icon": "waveform-lines",
+              "pages": [
+                "es/openai-api/v1/speech",
+                "es/openai-api/v1/transcriptions",
+                "es/openai-api/v1/realtime"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "tab": "Otras opciones de integración",
       "icon": "puzzle-piece",
       "pages": [
         {
@@ -451,24 +493,35 @@
       ]
     },
     {
-      "tab": "Tutoriales",
+      "tab": "Guías",
       "icon": "book-open",
       "pages": [
         {
-          "group": "Inicio Rápido",
+          "group": "Inicio rápido",
           "icon": "rocket",
           "pages": [
             "es/tutorials/how-to-get-api-key"
+          ]
+        },
+        {
+          "group": "Integración con la CDN",
+          "icon": "network-wired",
+          "pages": [
+            "es/other/cdn-integration",
+            "es/tutorials/nextjs-cdn-integration",
+            "es/tutorials/cdn-custom-domains",
+            "es/tutorials/cdn-cache-purge-cicd",
+            "es/other/user-assets"
           ]
         }
       ]
     },
     {
-      "tab": "Características de la Documentación",
+      "tab": "Funciones de la documentación",
       "icon": "clipboard-list",
       "pages": [
         {
-          "group": "Herramientas de Desarrollador",
+          "group": "Herramientas para desarrolladores",
           "icon": "terminal",
           "pages": [
             "es/docs-features/mcp-server"
@@ -508,15 +561,15 @@
             "href": "https://wiki.erlcrussia.com/es"
           },
           {
-            "label": "Historial de Cambios",
+            "label": "Historial de cambios",
             "href": "https://wiki.erlcrussia.com/es/changelogs"
           },
           {
-            "label": "Reglas del Personal",
+            "label": "Reglas del personal",
             "href": "https://wiki.erlcrussia.com/es/staff-rules"
           },
           {
-            "label": "Comenzar a Jugar",
+            "label": "Comenzar a jugar",
             "href": "https://wiki.erlcrussia.com/es/guides"
           },
           {

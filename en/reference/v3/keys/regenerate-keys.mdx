@@ -1,0 +1,34 @@
+---
+title: "Regenerate keys"
+description: "Reissues the API and/or WebSocket key. The old one stops working; permissions and subscriptions move to the new one."
+icon: "arrows-rotate"
+openapi: /en/openapi/en-api-v3-openapi.yaml POST /keys
+keywords:
+- keys
+- tokens
+- regeneration
+- regenerate
+- api
+- websocket
+---
+
+Universal endpoint for regenerating `API` and/or `WebSocket` tokens. The previous token is canceled, and all associated settings, subscriptions and rights restrictions are transferred to the newly generated token.
+
+### Authorization
+The `erlcrussia-api-key` header is **not strictly required** if you are regenerating the WebSocket key. You can pass:
+- `erlcrussia-api-key` - for regenerating the HTTP API key (`?api=true`).
+- `erlcrussia-websocket-key` - for regenerating the WebSocket key (`?websocket=true`).
+- Or both headers with simultaneous regeneration (`?api=true&websocket=true`).
+
+### Query parameters
+
+| Parameter | Type | Description |
+| :--- | :--- | :--- |
+| `api` | `boolean` | Regenerate HTTP API token (`true`). |
+| `websocket` | `boolean` | Regenerate WebSocket token (`true`). |
+
+<Note>
+At least one of the parameters (`?api=true` or `?websocket=true`) is required. When transferring `?api=true&websocket=true`, both keys will be regenerated simultaneously.
+</Note>
+
+A key may be rotated once every five minutes; respect Retry-After on 429. Successful rotation is audited with key ID and IP, without the secret.

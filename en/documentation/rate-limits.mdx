@@ -1,55 +1,40 @@
 ---
-title: Request limits
-description: Current windows, shared counters, headers, and HTTP 429 handling.
-icon: gauge-high
+title: "Rate limits"
+description: "How to find your limit and what to do on HTTP 429."
+icon: "gauge-high"
 ---
 
-Rate limits in the ER:LC Russia API are **custom and dynamic**: they are configured via the policy engine, can vary depending on IP address and API key tier, and automatically scale with active subscription benefits.
+Rate-limit headers are returned on rate-limited routes. Master keys and UNLIMITED_API_KEYS bypass this limiter and may have no X-RateLimit-* headers. HTTP header names are case-insensitive: X-Ratelimit-Limit and X-RateLimit-Limit are equivalent. A new valid key first uses the IP bucket; after credential-cache warm-up it uses its personal limit (for example, 40 → 120 for stats). Retry-After is returned when limited.
 
-The table below lists **baseline default values**. The actual limits enforced for your application are defined exclusively by server response headers. Clients and bots should avoid hardcoding static limits and should instead inspect the `X-RateLimit-*` headers dynamically.
-
-## Standard routes
-
-| Group | Baseline limit |
+| Header | Meaning |
 |---|---|
-| `/v3/cdn/*`, `/v3/user-assets/*`, `/v3/users`, `/v3/keys`, `/v3/points/*`, `/v3/health` | 20 requests per minute |
-| `/v3/erlc/*`, `/v3/civops/*`, `/v3/subscriptions/*`, `/v3/ads/*` | 120 requests per minute |
-| `/v3/stats` without an API key | 40 requests per minute |
-| `/v3/stats` with an API key | 120 requests per minute |
-| `/v3/ai/*` | 120 requests per second |
+| `X-RateLimit-Limit` | Requests allowed in the current window |
+| `X-RateLimit-Remaining` | Requests left |
+| `X-RateLimit-Reset` | When the window resets, Unix time in milliseconds |
+| `Retry-After` | Seconds to wait before retrying |
 
-Standard routes share a counter per key across methods and routes; requests without credentials use the IP address. AI has a separate one-second window. Checking a file with GET and uploading it with POST count as separate requests. When rate-limited, pause requests and retry after the period indicated in headers.
+On the OpenAI-compatible `/v1/*` methods the same values use the OpenAI names: `x-ratelimit-limit-requests`, `x-ratelimit-remaining-requests` and `x-ratelimit-reset-requests` (time until reset, for example `1s`). See the [AI API overview](/en/openai-api/v1/overview).
 
-## Authorization
+## 429 response
 
-OAuth login and callbacks: 10 requests per minute per signed session cookie. Other user auth routes allow 250 requests per session or 60 per anonymous visitor.
-
-Anonymous requests also have a shared IP limit: 120 per minute for login and 240 for other auth routes. The window resets at the start of each calendar minute.
-
-## How to navigate using response headers (HTTP Headers)
-
-Every API response includes rate-limit headers to help client applications track current quota status:
-
-| Header | Description | How client should use it |
-|---|---|---|
-| `X-RateLimit-Limit` | Request ceiling for the active window | Shows your key's personalized limit based on policies and subscription |
-| `X-RateLimit-Remaining` | Remaining requests available | When approaching `0`, the client should slow down request dispatch (client-side throttling) |
-| `X-RateLimit-Reset` | Window reset timestamp (Unix ms) | Exact point in time when the `Remaining` quota fully resets |
-| `Retry-After` | Required backoff delay in seconds (on `429`) | Mandatory delay before retrying the rejected request |
+When the limit is exceeded, the API responds with HTTP 429. The body has only the code and message; the wait time is in the headers:
 
 ```json
 {
   "code": 5016,
-  "message": "Rate Limit Exceeded",
-  "retry_after": 30,
-  "details": {"limit": 20, "count": 21, "excess": 1, "reset_at": 1792083600000}
+  "message": "Rate Limit Exceeded"
 }
 ```
 
-The auth limiter omits details. A spam ban from the standard middleware returns code=5039, message=spam_blocked, blocked_until, and remaining_seconds. Standard windows have a threshold of 400 excess requests and a base ban of five minutes; AI uses a threshold of 200 excess requests per second.
+If you keep sending requests after a 429, the key or IP is blocked for a while: you get code `5039`, and `Retry-After` shows how long to wait.
 
-Rate limiting does not make mutations idempotent. After a network interruption, inspect the resource before retrying. An explicit CDN path conflict returns 409; it is neither a 429 response nor confirmation of a successful overwrite.
+## Handling
 
-## Cloudflare protection
+* Watch `X-RateLimit-Remaining` and slow down as it approaches zero.
+* After a 429, wait `Retry-After` seconds and retry only the rejected request.
+* Do not blindly retry write requests after a network failure: first check whether the request was applied.
+* Cache responses that rarely change.
 
-Cloudflare may also reject or block requests independently of API limits, including high traffic from a single IP address. There is no universal guaranteed threshold of 10,000 requests per second: behavior depends on security rules and traffic characteristics. [Cloudflare](https://developers.cloudflare.com/waf/rate-limiting-rules/).
+<Warning>
+  Cloudflare sits in front of the API and has its own limits. If one IP sends too many requests, Cloudflare itself responds with error `1015` (HTTP 429): its own page, not API JSON, and without `X-RateLimit-*` headers. Slow down and wait a few minutes: retrying during the block extends it.
+</Warning>

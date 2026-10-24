@@ -1,6 +1,6 @@
 ---
 title: CDN в CI/CD та скидання кешу
-description: Публікація релізу та точкове очищення Cloudflare та Go Edge.
+description: Публікація релізу та точкове очищення кешу Cloudflare та CDN.
 icon: arrows-rotate
 ---
 
@@ -23,6 +23,8 @@ curl -X POST "$API_BASE/v3/cdn/webhook/purge" \
 
 ## Звичайний namespace та групи файлів
 
-`POST /v3/cdn/assets/purge?domain=YOUR_TEAM_SLUG&prefix=releases/RELEASE_ID/` приймає prefix та планує очищення Go Edge. Це інший контракт. Без ids/path/prefix вибирається весь namespace. success означає прийняття операції; перевіряйте наступну доставку.
+`POST /v3/cdn/assets/purge?domain=YOUR_TEAM_SLUG&prefix=releases/RELEASE_ID/` приймає prefix та планує очищення кешу CDN. Це інший контракт. Без ids/path/prefix вибирається весь namespace. success означає прийняття операції; перевіряйте наступну доставку.
 
-Новий URL релізу надійніше заміни старого immutable-файлу. HTTP 429 вимагає очікування Retry-After/retry_after; HTTP 409 означає існуючий об'єкт, а не успішне завантаження.
+Новий URL релізу надійніше заміни старого immutable-файлу. HTTP 429 вимагає очікування Retry-After; HTTP 409 означає існуючий об'єкт, а не успішне завантаження.
+
+Без ids/path/prefix очищення всього namespace виконується у фоні: HTTP 202, status=queued, acceptedCount — кількість вибраних об’єктів, а не завершених. Один запит на хвилину на команду та namespace; при 429 враховуйте Retry-After. Результат записується в аудит API. Точкове очищення зберігає HTTP 200 і purgedCount. Нові унікальні URL релізу зазвичай не потребують purge одразу після завантаження: це видаляє прогрітий кеш.

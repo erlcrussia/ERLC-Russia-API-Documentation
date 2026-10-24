@@ -1,0 +1,34 @@
+---
+title: "Regenerar claves"
+description: "Vuelve a emitir la clave de API y/o WebSocket. La anterior deja de funcionar; los permisos pasan a la nueva."
+icon: "arrows-rotate"
+openapi: /es/openapi/es-api-v3-openapi.yaml POST /keys
+keywords:
+- keys
+- tokens
+- regeneración
+- regenerate
+- api
+- websocket
+---
+
+Punto final universal para regenerar tokens `API` y/o `WebSocket`. El token anterior se cancela y todas las configuraciones, suscripciones y restricciones de derechos asociadas se transfieren al token recién generado.
+
+### Autorización
+El encabezado `erlcrussia-api-key` **no es estrictamente necesario** si está regenerando la clave WebSocket. Puedes pasar:
+- `erlcrussia-api-key` - para regenerar la clave API HTTP (`?api=true`).
+- `erlcrussia-websocket-key` - para regenerar la clave WebSocket (`?websocket=true`).
+- O ambos cabezales con regeneración simultánea (`?api=true&websocket=true`).
+
+### Parámetros de consulta
+
+| Parámetro | Tipo | Descripción |
+| :--- | :--- | :--- |
+| `api` | `boolean` | Regenerar el token API HTTP (`true`). |
+| `websocket` | `boolean` | Regenerar el token WebSocket (`true`). |
+
+<Note>
+Se requiere al menos uno de los parámetros (`?api=true` o `?websocket=true`). Al transferir `?api=true&websocket=true`, ambas claves se regenerarán simultáneamente.
+</Note>
+
+Una clave puede rotarse una vez cada cinco minutos; respeta Retry-After con 429. La rotación se audita con ID de clave e IP, sin el secreto.

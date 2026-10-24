@@ -1,6 +1,6 @@
 ---
 title: CDN en CI/CD y restablecimiento de caché
-description: Publicación de lanzamientos y limpieza puntual de Cloudflare y Go Edge.
+description: Publicación de lanzamientos y limpieza puntual de la caché de Cloudflare y de la CDN.
 icon: arrows-rotate
 ---
 
@@ -23,6 +23,8 @@ La respuesta contiene éxito, dominio, cloudflarePurged, edgePurged y marca de t
 
 ## Espacio de nombres normal y grupos de archivos
 
-`POST /v3/cdn/assets/purge?domain=YOUR_TEAM_SLUG&prefix=releases/RELEASE_ID/` acepta prefijos y programa la limpieza de Go Edge. Este es un contrato diferente. Sin identificadores/ruta/prefijo, se selecciona todo el espacio de nombres. éxito significa aceptación de la operación; comprobar entrega posterior.
+`POST /v3/cdn/assets/purge?domain=YOUR_TEAM_SLUG&prefix=releases/RELEASE_ID/` acepta prefijos y programa la purga de la caché de la CDN. Este es un contrato diferente. Sin identificadores/ruta/prefijo, se selecciona todo el espacio de nombres. éxito significa aceptación de la operación; comprobar entrega posterior.
 
-La nueva URL de versión es más confiable que reemplazar el antiguo archivo inmutable. HTTP 429 requiere esperar Reintentar después/retry_after; HTTP 409 significa un objeto existente, no una descarga exitosa.
+La nueva URL de versión es más confiable que reemplazar el antiguo archivo inmutable. HTTP 429 requiere esperar `Retry-After`; HTTP 409 significa un objeto existente, no una descarga exitosa.
+
+Sin ids/path/prefix, la purga de todo el namespace se ejecuta en segundo plano: HTTP 202, status=queued y acceptedCount cuenta objetos seleccionados, no trabajo terminado. Una solicitud por minuto por equipo y namespace; respeta Retry-After con 429. El resultado se registra en la auditoría del API. La purga específica mantiene HTTP 200 y purgedCount. Una URL de versión nueva y única normalmente no necesita purge justo después de subir: eso elimina la caché precalentada.

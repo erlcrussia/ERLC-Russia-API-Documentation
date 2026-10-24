@@ -1,50 +1,43 @@
 ---
-title: "How to Get an API Key?"
-description: "Step-by-step guide to obtaining API keys, WebSocket access, and webhook management."
+title: "How to get a key"
+description: "Requesting access, finding your keys and sending them in requests."
 icon: "key"
 ---
 
-To integrate with our services, you will need appropriate access and authorization keys. Note that access to the HTTP API, WebSocket servers, and webhook management is separated for security reasons.
-
-## Getting Access
+## Getting access
 
 <Steps>
-  <Step title="Opening a Ticket">
-    To initially gain access to the HTTP API, WebSocket, or webhook management system, you need to **open a ticket on our Discord server**. Describe your project and specify which features and access you will need for implementation.
+  <Step title="Sign in on the website">
+    Sign in with Discord on the [keys page](https://erlcrussia.com/my/tokens). It shows the permissions and keys issued to your account. Contact project administrators in Discord if access is missing; view commands do not grant new permissions.
   </Step>
-  <Step title="Application Approval">
-    Wait for the project administration to review your request. Once your application is approved, the appropriate access rights will be linked to your Discord account.
+  <Step title="Wait for approval">
+    Once approved, the permissions are linked to your Discord account.
   </Step>
-  <Step title="Viewing and Managing Keys">
-    Once rights are granted, you can view your tokens in your personal account on the website or directly within the Discord server using slash commands.
+  <Step title="Open your keys on the website">
+    Keys and webhooks are on [erlcrussia.com/my/tokens](https://erlcrussia.com/my/tokens) after you sign in with Discord.
   </Step>
 </Steps>
 
-## Available Key Types and Commands
+## Key types
 
-### 1. HTTP API Key
-The main token used for sending standard HTTP requests to our endpoints. Passed in the `Authorization` header.
-* **View command:** `/api view`
-* **Website view:** Account -> **Tokens -> HTTP API** (`/my/tokens?tab=api`).
+| Key | Used for | Where to find it |
+|---|---|---|
+| API key | HTTP requests to API V3 | `/my/tokens/api`, the `/api view` command |
+| WebSocket key | Connecting to the [WebSocket](/en/other/websocket-gateway). The HTTP key does not work there | `/my/tokens/websocket`, the `/websocket view` command |
+| AI key (`sk-…`) | The [AI API](/en/openai-api/v1/overview) | `/my/tokens/studio` |
 
-### 2. WebSocket Key
-For working with real-time events, a **separate independent key** is used. Do not try to use the standard HTTP token to connect to sockets — the server will reject it.
-* **View command:** `/websocket view`
-* **Website view:** Account -> **Tokens -> WebSocket** (`/my/tokens?tab=websocket`).
+Event webhooks are set up on `/my/tokens/webhooks`; you can also view them with the `/webhook view` command. See [Event webhook](/en/other/event-webhook).
+
+## Sending the key
+
+Send the API key in the `erlcrussia-api-key` header:
+
+```http
+erlcrussia-api-key: YOUR_API_KEY
+```
+
+`Authorization: Bearer YOUR_API_KEY` is accepted too. Keys in query parameters are not accepted.
 
 <Danger>
-  **Always keep your keys secret. WebSocket and HTTP API keys are completely autonomous and managed independently from each other.**
+  Do not publish keys or keep them in code that runs in the browser. If a key leaks, regenerate it right away with [`POST /v3/keys`](/en/reference/v3/keys/regenerate-keys) and contact the project administrators.
 </Danger>
-
-## Webhook Management
-
-If your service needs to receive automatic notifications about server events, you can set up webhooks.
-
-Access to the webhook management panel is also granted **strictly through tickets** with project administration. Once rights are linked to your account, you can manage webhooks:
-
-* **Discord command:** `/webhook manage`
-* **Website dashboard:** Account -> **Tokens -> Webhooks** (`/my/tokens?tab=webhooks`).
-
-<Tip>
-  **You can bind, test, activate/deactivate, and select specific game servers for webhooks directly on the website or via Discord bot.**
-</Tip>

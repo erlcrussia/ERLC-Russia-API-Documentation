@@ -1,133 +1,27 @@
 openapi: 3.1.0
 info:
-  title: Moscow RolePlay API - ER:LC Endpoints  
-  description: >
-    **ATTENTION: This API v1 version is deprecated!**
-    
-    Most endpoints are disabled and return error 500.
-    It is recommended to use the newer API version.
-    
-    Only endpoint working: `/erlc/server/bans`
-
-
-    ## Rate Limits
-
-
-    | Endpoint | Limit |
-
-    |----------|-------|
-
-    | `/erlc/server/*` (except command) | 120 requests/min |
-
-    | `/erlc/server/command` | Queue: 100 commands |
-
-
-    Returns **HTTP 429** when limit is exceeded.
-
-
-    ## Error Response Format
-
-
-    All errors are returned in JSON format with `code` and `message` fields:
-
-
-    ```json
-
-    {
-
-        "code": 5007,
-
-        "message": "missing_token"
-
-    }
-
-    ```
-
-
-    ## Error Codes
-
-
-    ### Authentication and Access Errors
-
-
-    | Code | Status | Description |
-
-    |-----|--------|----------|
-
-    | 5006 | 401 | invalid_master_key |
-
-    | 5007 | 401 | missing_token |
-
-    | 5008 | 401 | invalid_token |
-
-    | 5009 | 403 | forbidden |
-
-    | 5010 | 403 | api_version_forbidden |
-
-    | 5011 | 403 | query_param_forbidden |
-
-
-    ### PRC API Errors
-
-
-    Endpoints use external PRC API and may return errors:
-
-
-    | PRC Code | Description |
-
-    |---------|----------|
-
-    | 2002 | Invalid or expired server-key |
-
-    | 3002 | Server is offline |
-
-    | 4001 | Rate limited |
-
-    | 9999 | Module out of date |
-
-
-    When PRC API error occurs, returns:
-
-
-    ```json
-
-    {
-
-        "code": 5019,
-
-        "message": "prc_api_error",
-
-        "prc_code": 2002,
-
-        "prc_message": "Invalid or expired server-key"
-
-    }
-
-    ```
-
-
-    Base URL: `https://api.erlcrussia.xyz/v1`
-
+  title: Moscow RolePlay API - ER:LC Endpoints
+  description: "**ATTENTION: This API v1 version is deprecated!**\nMost endpoints are disabled and return error 500. It is recommended to use the newer API version.\nOnly endpoint working: `/erlc/server/bans`\n\n## Rate Limits\n\n| Endpoint | Limit |\n|----------|-------|\n| `/erlc/server/*` (except command) | 120 requests/min |\n| `/erlc/server/command` | Queue: 100 commands |\n\nReturns **HTTP 429** when limit is exceeded.\n\n## Error Response Format\n\nAll errors are returned in JSON format with `code` and `message` fields:\n\n```json\n{\n\n    \"code\": 5007,\n\n    \"message\": \"missing_token\"\n\n}\n```\n\n## Error Codes\n\n### Authentication and Access Errors\n\n| Code | Status | Description |\n|-----|--------|----------|\n| 5006 | 401 | invalid_master_key |\n| 5007 | 401 | missing_token |\n| 5008 | 401 | invalid_token |\n| 5009 | 403 | forbidden |\n| 5010 | 403 | api_version_forbidden |\n| 5011 | 403 | query_param_forbidden |\n\n### PRC API Errors\n\nEndpoints use external PRC API and may return errors:\n\n| PRC Code | Description |\n|---------|----------|\n| 2002 | Invalid or expired server-key |\n| 3002 | Server is offline |\n| 4001 | Rate limited |\n| 9999 | Module out of date |\n\nWhen PRC API error occurs, returns:\n\n```json\n{\n\n    \"code\": 5019,\n\n    \"message\": \"prc_api_error\",\n\n    \"prc_code\": 2002,\n\n    \"prc_message\": \"Invalid or expired server-key\"\n\n}\n```\n\nBase URL: `https://api.erlcrussia.xyz/v1`\n"
   version: 1.0.0
 servers:
-  - url: https://api.erlcrussia.xyz/v1
-    description: Production
+- url: https://api.erlcrussia.xyz/v1
+  description: Production
 tags:
-  - name: ERLC
-    description: ER:LC game server data and management.
+- name: ERLC
+  description: ER:LC game server data and management.
 paths:
   /erlc/server:
     get:
       tags:
-        - ERLC
-      summary: ER:LC Server Information  
-      description: >
-        **ENDPOINT DISABLED** - Returns error 500.
-        
-        Get general information about ER:LC server (online, name, status, etc.).
+      - ERLC
+      summary: ER:LC Server Information
+      description: '**Deprecated.** Responds with error `5028`. Use `GET /v3/erlc/server`.
+
+
+        Get general information about ER:LC server (online, name, status, etc.).'
       deprecated: true
       security:
-        - MRPAPIKey: []
+      - MRPAPIKey: []
       responses:
         '500':
           description: Endpoint disabled/deprecated.
@@ -137,19 +31,19 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
               example:
                 code: 5018
-                message: 'Endpoint устарел. Используйте более новую версию API.'
+                message: Endpoint устарел. Используйте более новую версию API.
   /erlc/server/players:
     get:
       tags:
-        - ERLC
-      summary: List of Players on Server  
-      description: |
-        **ENDPOINT DISABLED** - Returns error 500.
-        
-        Returns current list of players on ER:LC server.
+      - ERLC
+      summary: List of Players on Server
+      description: '**Deprecated.** Responds with error `5028`. Use `GET /v3/erlc/server?Players=true`.
+
+
+        Returns current list of players on ER:LC server.'
       deprecated: true
       security:
-        - MRPAPIKey: []
+      - MRPAPIKey: []
       responses:
         '500':
           description: Endpoint disabled/deprecated.
@@ -159,19 +53,19 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
               example:
                 code: 5018
-                message: 'Endpoint устарел. Используйте более новую версию API.'
+                message: Endpoint устарел. Используйте более новую версию API.
   /erlc/server/joinlogs:
     get:
       tags:
-        - ERLC
-      summary: Player Join/Leave Logs  
-      description: |
-        **ENDPOINT DISABLED** - Returns error 500.
-        
-        Returns list of player join/leave logs on server.
+      - ERLC
+      summary: Player Join/Leave Logs
+      description: '**Deprecated.** Responds with error `5028`. Use `GET /v3/erlc/server?JoinLogs=true`.
+
+
+        Returns list of player join/leave logs on server.'
       deprecated: true
       security:
-        - MRPAPIKey: []
+      - MRPAPIKey: []
       responses:
         '500':
           description: Endpoint disabled/deprecated.
@@ -181,19 +75,19 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
               example:
                 code: 5018
-                message: 'Endpoint устарел. Используйте более новую версию API.'
+                message: Endpoint устарел. Используйте более новую версию API.
   /erlc/server/queue:
     get:
       tags:
-        - ERLC
-      summary: Server Queue  
-      description: |
-        **ENDPOINT DISABLED** - Returns error 500.
-        
-        Returns information about ER:LC server queue.
+      - ERLC
+      summary: Server Queue
+      description: '**Deprecated.** Responds with error `5028`. Use `GET /v3/erlc/server?Queue=true`.
+
+
+        Returns information about ER:LC server queue.'
       deprecated: true
       security:
-        - MRPAPIKey: []
+      - MRPAPIKey: []
       responses:
         '500':
           description: Endpoint disabled/deprecated.
@@ -203,19 +97,19 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
               example:
                 code: 5018
-                message: 'Endpoint устарел. Используйте более новую версию API.'
+                message: Endpoint устарел. Используйте более новую версию API.
   /erlc/server/killlogs:
     get:
       tags:
-        - ERLC
-      summary: Kill Logs  
-      description: |
-        **ENDPOINT DISABLED** - Returns error 500.
-        
-        Returns kill logs on ER:LC server.
+      - ERLC
+      summary: Kill Logs
+      description: '**Deprecated.** Responds with error `5028`. Use `GET /v3/erlc/server?KillLogs=true`.
+
+
+        Returns kill logs on ER:LC server.'
       deprecated: true
       security:
-        - MRPAPIKey: []
+      - MRPAPIKey: []
       responses:
         '500':
           description: Endpoint disabled/deprecated.
@@ -225,19 +119,19 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
               example:
                 code: 5018
-                message: 'Endpoint устарел. Используйте более новую версию API.'
+                message: Endpoint устарел. Используйте более новую версию API.
   /erlc/server/commandlogs:
     get:
       tags:
-        - ERLC
-      summary: Command Logs  
-      description: |
-        **ENDPOINT DISABLED** - Returns error 500.
-        
-        Returns logs of executed commands on server.
+      - ERLC
+      summary: Command Logs
+      description: '**Deprecated.** Responds with error `5028`. Use `POST /v3/erlc/server/command`.
+
+
+        Returns logs of executed commands on server.'
       deprecated: true
       security:
-        - MRPAPIKey: []
+      - MRPAPIKey: []
       responses:
         '500':
           description: Endpoint disabled/deprecated.
@@ -247,19 +141,19 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
               example:
                 code: 5018
-                message: 'Endpoint устарел. Используйте более новую версию API.'
+                message: Endpoint устарел. Используйте более новую версию API.
   /erlc/server/modcalls:
     get:
       tags:
-        - ERLC
-      summary: Moderator Call Logs  
-      description: |
-        **ENDPOINT DISABLED** - Returns error 500.
-        
-        Returns moderator call logs on ER:LC server.
+      - ERLC
+      summary: Moderator Call Logs
+      description: '**Deprecated.** Responds with error `5028`. Use `GET /v3/erlc/server?ModCalls=true`.
+
+
+        Returns moderator call logs on ER:LC server.'
       deprecated: true
       security:
-        - MRPAPIKey: []
+      - MRPAPIKey: []
       responses:
         '500':
           description: Endpoint disabled/deprecated.
@@ -269,16 +163,18 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
               example:
                 code: 5018
-                message: 'Endpoint устарел. Используйте более новую версию API.'
+                message: Endpoint устарел. Используйте более новую версию API.
   /erlc/server/bans:
     get:
       tags:
-        - ERLC
+      - ERLC
       summary: Server Ban List
-      description: |
-        Returns list of active bans on ER:LC server.
+      description: 'Returns list of active bans on ER:LC server.
+
+
+        Still works. The API V3 equivalent is `GET /v3/erlc/server/bans`.'
       security:
-        - MRPAPIKey: []
+      - MRPAPIKey: []
       responses:
         '200':
           description: Ban list.
@@ -304,15 +200,15 @@ paths:
   /erlc/server/vehicles:
     get:
       tags:
-        - ERLC
-      summary: List of Vehicles on Server  
-      description: |
-        **ENDPOINT DISABLED** - Returns error 500.
-        
-        Returns list of vehicles on ER:LC server.
+      - ERLC
+      summary: List of Vehicles on Server
+      description: '**Deprecated.** Responds with error `5028`. Use `GET /v3/erlc/server?Vehicles=true`.
+
+
+        Returns list of vehicles on ER:LC server.'
       deprecated: true
       security:
-        - MRPAPIKey: []
+      - MRPAPIKey: []
       responses:
         '500':
           description: Endpoint disabled/deprecated.
@@ -322,19 +218,19 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
               example:
                 code: 5018
-                message: 'Endpoint устарел. Используйте более новую версию API.'
+                message: Endpoint устарел. Используйте более новую версию API.
   /erlc/server/staff:
     get:
       tags:
-        - ERLC
-      summary: Server Staff List  
-      description: |
-        **ENDPOINT DISABLED** - Returns error 500.
-        
-        Returns list of ER:LC server staff members.
+      - ERLC
+      summary: Server Staff List
+      description: '**Deprecated.** Responds with error `5028`. Use `GET /v3/erlc/server?Staff=true`.
+
+
+        Returns list of ER:LC server staff members.'
       deprecated: true
       security:
-        - MRPAPIKey: []
+      - MRPAPIKey: []
       responses:
         '500':
           description: Endpoint disabled/deprecated.
@@ -344,25 +240,25 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
               example:
                 code: 5018
-                message: 'Endpoint устарел. Используйте более новую версию API.'
+                message: Endpoint устарел. Используйте более новую версию API.
   /erlc/server/command:
     post:
       tags:
-        - ERLC
-      summary: Send Command to ER:LC Server  
-      description: >
-        **ENDPOINT DISABLED** - Returns error 500.
-        
+      - ERLC
+      summary: Send Command to ER:LC Server
+      description: '**Deprecated.** Responds with error `5028`. Use `POST /v3/erlc/server/command`.
+
+
         Sends a command for execution on ER:LC server.
 
 
         Commands are added to global queue with maximum command limit.
 
 
-        **Note:** This endpoint is **not subject** to Rate Limiting (120 requests/min).
+        **Note:** This endpoint is **not subject** to Rate Limiting (120 requests/min).'
       deprecated: true
       security:
-        - MRPAPIKey: []
+      - MRPAPIKey: []
       requestBody:
         required: true
         description: Object with Command Text.
@@ -371,11 +267,11 @@ paths:
             schema:
               type: object
               required:
-                - command
+              - command
               properties:
                 command:
                   type: string
-                  example: ':h Test API'
+                  example: :h Test API
       responses:
         '500':
           description: Endpoint disabled/deprecated.
@@ -385,19 +281,22 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
               example:
                 code: 5018
-                message: 'Endpoint устарел. Используйте более новую версию API.'
+                message: Endpoint устарел. Используйте более новую версию API.
 components:
   securitySchemes:
     MRPAPIKey:
       type: http
       scheme: bearer
       bearerFormat: API Key
-      description: |
-        Standard API key for accessing ER:LC endpoints.
+      description: 'Standard API key for accessing ER:LC endpoints.
+
 
         Passed in `Authorization: Bearer <key>` header.
 
+
         REQUIRED FOR ALL ER:LC ENDPOINTS.
+
+        '
   responses:
     BadRequest:
       description: Bad request.
@@ -493,8 +392,8 @@ components:
         application/json:
           schema:
             oneOf:
-              - $ref: '#/components/schemas/RateLimitError'
-              - $ref: '#/components/schemas/SpamBlockedError'
+            - $ref: '#/components/schemas/RateLimitError'
+            - $ref: '#/components/schemas/SpamBlockedError'
           examples:
             rate_limit_exceeded:
               summary: Exceeded 120 requests/min limit.
@@ -592,7 +491,7 @@ components:
               value:
                 code: 5020
                 message: spam_detected_level_1
-                blocked_until: "2026-02-23T12:35:00.000Z"
+                blocked_until: '2026-02-23T12:35:00.000Z'
                 remaining_seconds: 300
     SpamDetectedLevel2:
       description: Server attack (5000+ requests/sec). 15 minute ban.
@@ -619,7 +518,7 @@ components:
               value:
                 code: 5021
                 message: spam_detected_level_2
-                blocked_until: "2026-02-23T12:45:00.000Z"
+                blocked_until: '2026-02-23T12:45:00.000Z'
                 remaining_seconds: 900
     SpamDetectedLevel3:
       description: Critical attack (100000+ requests/sec). 60 minute ban.
@@ -646,7 +545,7 @@ components:
               value:
                 code: 5022
                 message: spam_detected_level_3
-                blocked_until: "2026-02-23T13:30:00.000Z"
+                blocked_until: '2026-02-23T13:30:00.000Z'
                 remaining_seconds: 3600
     SpamBlocked:
       description: Active spam ban. Request from blocked client.
@@ -673,15 +572,15 @@ components:
               value:
                 code: 5023
                 message: spam_blocked
-                blocked_until: "2026-02-23T12:35:00.000Z"
+                blocked_until: '2026-02-23T12:35:00.000Z'
                 remaining_seconds: 245
   schemas:
     ErrorResponse:
       type: object
       description: Standard error format.
       required:
-        - code
-        - message
+      - code
+      - message
       properties:
         code:
           type: integer
@@ -695,8 +594,8 @@ components:
       type: object
       description: Authentication error (missing or invalid token).
       required:
-        - code
-        - message
+      - code
+      - message
       properties:
         code:
           type: integer
@@ -708,8 +607,8 @@ components:
       type: object
       description: Access error (forbidden).
       required:
-        - code
-        - message
+      - code
+      - message
       properties:
         code:
           type: integer
@@ -721,10 +620,10 @@ components:
       type: object
       description: Request limit exceeded error (120/min). Returns details with counter info.
       required:
-        - code
-        - message
-        - retry_after
-        - details
+      - code
+      - message
+      - retry_after
+      - details
       properties:
         code:
           type: integer
@@ -759,10 +658,10 @@ components:
       type: object
       description: Spam ban. Issued at 400+ excess requests. 5 minute ban + additional minutes for continued spam.
       required:
-        - code
-        - message
-        - blocked_until
-        - remaining_seconds
+      - code
+      - message
+      - blocked_until
+      - remaining_seconds
       properties:
         code:
           type: integer

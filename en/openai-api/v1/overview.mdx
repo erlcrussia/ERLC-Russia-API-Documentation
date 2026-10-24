@@ -1,0 +1,452 @@
+---
+title: AI API overview
+description: Integration of ER:LC Russia AI models into third-party applications, bots and services via the OpenAI-compatible
+  protocol
+icon: robot
+---
+
+## Introduction
+
+**ER:LC Russia AI API** supports the Chat Completions, model listing and retrieval, and speech methods documented in this section. For chat, use `chat.completions.create` in an OpenAI SDK with `base_url` / `baseURL` set to `https://api.erlcrussia.com/v1`. ER:LC Russia extensions are documented on each method page; support for other OpenAI APIs is not implied.
+
+<CardGroup cols={2}>
+<Card title="OpenAI SDK" icon="plug">
+    Chat requests use the Chat Completions format; streaming responses use `chat.completion.chunk`. See the method reference for supported fields.
+  </Card>
+<Card title="Reasoning" icon="brain">
+Support step-by-step analysis and deep reasoning for models with thought translation in `reasoning_content`.
+  </Card>
+<Card title="Conversation context" icon="comments">
+    `session_id` is an ER:LC Russia extension for continuing a conversation.
+  </Card>
+<Card title="Images and files" icon="image">
+Attaching game screenshots, logs and documents in the standard `image_url` and `file` format.
+  </Card>
+</CardGroup>
+
+---
+
+## Authentication
+
+To make requests, pass your access token in the `Authorization` header:
+
+```http
+Authorization: Bearer YOUR_API_TOKEN
+```
+
+The `erlcrussia-api-ai-key` and `erlcrussia-api-key` headers are accepted too. Send the key only in request headers.
+
+## Errors
+
+Errors use the OpenAI format, so SDKs show the real message. `code` is an OpenAI string code (`invalid_api_key`, `model_not_found`, `insufficient_quota`, `rate_limit_exceeded`) or `null`. The numeric ER:LC Russia code from the [error codes](/en/documentation/error-codes) table is in `erlc_code`.
+
+```json
+{
+  "error": {
+    "message": "You exceeded your current quota, please check your plan and billing details.",
+    "type": "insufficient_quota",
+    "param": null,
+    "code": "insufficient_quota",
+    "erlc_code": "5038"
+  }
+}
+```
+
+## OpenAI compatibility
+
+* `/v1/chat/completions`, `/v1/models`, `/v1/audio/speech` and `/v1/audio/transcriptions` work with the OpenAI SDK.
+* `/v1/realtime` follows the OpenAI Realtime protocol: text and voice in, voice out, with manual turns. See [voice mode](/en/openai-api/v1/realtime).
+* `temperature`, `top_p`, `max_tokens`, `max_completion_tokens`, `stop`, `n` and `response_format` are accepted but not applied.
+* `usage` is part of the regular response. In a stream it arrives only with `stream_options: {"include_usage": true}`, as a separate chunk with empty `choices` before `data: [DONE]`. `usage` also has `cost_credits`, the AI credits charged.
+* Errors use the OpenAI types `invalid_request_error`, `requests`, `insufficient_quota` and `server_error`. When AI credits run out you get 429 with type `insufficient_quota`, as in OpenAI.
+* Every response has its own `id` of the form `chatcmpl-…`, as in OpenAI. The conversation id travels separately in `session_id`.
+* A request without `messages` or with an empty array gets 400 with `param: "messages"` and code `missing_required_parameter` or `empty_array`.
+* Every response carries `x-request-id`, `openai-processing-ms`, `x-ratelimit-limit-requests`, `x-ratelimit-remaining-requests` and `x-ratelimit-reset-requests`.
+* If generation fails mid-stream, an OpenAI-format `{"error": {...}}` event arrives, followed by `data: [DONE]`.
+
+---
+
+## Available Models
+
+| Model | Character | Description | Reflection Mode |
+|---|---|---|---|
+| **`niya-1`** | **Niya** | Basic model for quick replies, rules consultation and moderation | Optional (disabled by default, enabled via `thinking: true`) |
+| **`emmy-1`** | **Emmy** | Advanced model for deep analysis of logs, complex conflicts and code | **Always on** (thought level can be adjusted via `effort`) |
+| **`hubert-1`** | **Hubert** | Custom community character responding in a distinctive gaming style | Disabled |
+
+For Hubert, the proprietary surzhik is turned off by default: he responds in the language of the user’s last message. Pass `"surzhyk": true` in the body of the request to `/v1/chat/completions` to enable branding.
+
+## Message Roles
+
+The `messages` array supports standard dialog roles:
+* `system` - additional instructions or context for your project (for example, the role of a Discord bot or service tasks), superimposed on top of the basic rules of the model;
+* `user` - message from the user;
+* `assistant` is the model's previous response to save the context of the conversation.
+
+---
+
+## Reflection Options
+
+Control of the chain of reasoning depends on the chosen model:
+
+* **For Emmy (`emmy-1`):** no-thinking mode **not supported** - the model always analyzes the problem before answering. The analysis depth is configured by the **`effort`** (`string`) parameter or the `X-Reasoning-Effort` header:
+* `low` - a brief check of facts and rules;
+* `medium` *(default)* - balanced detailed analysis;
+* `high` - comprehensive step-by-step analysis;
+* `extra` / `max` - the maximum level of analytics with double-checking of hypotheses.
+* **For Nya (`niya-1`):** Reflections are turned off by default for maximum speed. Enabled by the **`thinking: true`** parameter (or `variant: "on"` / `X-Reasoning: on` header).
+* **For Hubert (`hubert-1`):** chain of thought is not used.
+
+---
+
+## Integration Examples
+
+<Tabs>
+  <Tab title="Python">
+```python
+from openai import OpenAI
+
+client = OpenAI(
+    base_url="https://api.erlcrussia.com/v1",
+    api_key="YOUR_API_TOKEN",
+)
+
+response = client.chat.completions.create(
+    model="niya-1",
+    messages=[
+        {"role": "system", "content": "Ты — официальный ассистент сервера ER:LC Россия."},
+        {"role": "user", "content": "Какие команды доступны офицеру полиции?"},
+    ],
+    temperature=0.7,
+)
+
+print(response.choices[0].message.content)
+```
+  </Tab>
+
+  <Tab title="TypeScript">
+```typescript
+import OpenAI from 'openai';
+
+const openai = new OpenAI({
+  baseURL: 'https://api.erlcrussia.com/v1',
+  apiKey: 'YOUR_API_TOKEN',
+});
+
+async function main() {
+  const stream = await openai.chat.completions.create({
+    model: 'emmy-1',
+    messages: [
+      { role: 'system', content: 'Ты — Эмми, аналитик игрового процесса.' },
+      { role: 'user', content: 'Проанализируй спорную ситуацию с погоней.' },
+    ],
+    stream: true,
+  });
+
+  for await (const chunk of stream) {
+    const delta = chunk.choices[0]?.delta as any;
+    if (delta?.reasoning_content) {
+      process.stdout.write(`[Мышление]: ${delta.reasoning_content}`);
+    }
+    if (delta?.content) {
+      process.stdout.write(delta.content);
+    }
+  }
+}
+
+main();
+```
+  </Tab>
+
+  <Tab title="JavaScript">
+```javascript
+const OpenAI = require('openai');
+
+const openai = new OpenAI({
+  baseURL: 'https://api.erlcrussia.com/v1',
+  apiKey: 'YOUR_API_TOKEN',
+});
+
+async function main() {
+  const stream = await openai.chat.completions.create({
+    model: 'emmy-1',
+    messages: [
+      { role: 'system', content: 'Ты — Эмми, аналитик игрового процесса.' },
+      { role: 'user', content: 'Проанализируй спорную ситуацию с погоней.' },
+    ],
+    stream: true,
+  });
+
+  for await (const chunk of stream) {
+    const delta = chunk.choices[0]?.delta;
+    if (delta?.reasoning_content) {
+      process.stdout.write(`[Мышление]: ${delta.reasoning_content}`);
+    }
+    if (delta?.content) {
+      process.stdout.write(delta.content);
+    }
+  }
+}
+
+main();
+```
+  </Tab>
+
+  <Tab title="cURL">
+```bash
+curl https://api.erlcrussia.com/v1/chat/completions \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer YOUR_API_TOKEN" \
+  -d '{
+    "model": "niya-1",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Привет! Расскажи о проекте ER:LC Россия"
+      }
+    ],
+    "stream": false
+  }'
+```
+  </Tab>
+
+  <Tab title="OpenCode">
+```json
+{
+  "$schema": "https://opencode.ai/config.json",
+  "provider": {
+    "erlcrussia": {
+      "npm": "@ai-sdk/openai-compatible",
+      "name": "ERLC Russia AI",
+      "options": {
+        "baseURL": "https://api.erlcrussia.com/v1",
+        "apiKey": "YOUR_API_TOKEN"
+      },
+      "models": {
+        "emmy-1": {
+          "name": "Emmy 1",
+          "limit": {
+            "context": 1048576,
+            "output": 131072
+          },
+          "reasoning": true,
+          "capabilities": {
+            "reasoning": true
+          },
+          "modalities": {
+            "input": [
+              "text",
+              "image",
+              "audio",
+              "video",
+              "pdf"
+            ],
+            "output": [
+              "text"
+            ]
+          },
+          "variants": {
+            "low": {
+              "name": "Low",
+              "reasoningEffort": "low"
+            },
+            "medium": {
+              "name": "Medium",
+              "reasoningEffort": "medium"
+            },
+            "high": {
+              "name": "High",
+              "reasoningEffort": "high"
+            },
+            "extra": {
+              "name": "Extra",
+              "reasoningEffort": "extra"
+            },
+            "max": {
+              "name": "Max",
+              "reasoningEffort": "max"
+            }
+          }
+        },
+        "niya-1": {
+          "name": "Niya 1",
+          "limit": {
+            "context": 1000000,
+            "output": 32000
+          },
+          "modalities": {
+            "input": [
+              "text",
+              "image",
+              "audio",
+              "video"
+            ],
+            "output": [
+              "text"
+            ]
+          },
+          "variants": {
+            "off": {
+              "name": "Reasoning Off"
+            },
+            "on": {
+              "name": "Reasoning On"
+            }
+          }
+        },
+        "hubert-1": {
+          "name": "Hubert 1",
+          "limit": {
+            "context": 1000000,
+            "output": 32000
+          },
+          "modalities": {
+            "input": [
+              "text",
+              "image",
+              "audio",
+              "video"
+            ],
+            "output": [
+              "text"
+            ]
+          }
+        }
+      }
+    }
+  }
+}
+```
+
+Configuration documentation: [OpenCode Documentation](https://opencode.ai/docs/ru/models/)
+  </Tab>
+
+  <Tab title="Kilo Code">
+```json
+{
+  "$schema": "https://app.kilo.ai/config.json",
+  "model": "openai-compatible/emmy-1",
+  "provider": {
+    "openai-compatible": {
+      "options": {
+        "baseURL": "https://api.erlcrussia.com/v1",
+        "apiKey": "YOUR_API_TOKEN"
+      },
+      "models": {
+        "emmy-1": {
+          "name": "Emmy 1",
+          "tool_call": true,
+          "reasoning": true,
+          "limit": {
+            "context": 1048576,
+            "output": 131072
+          },
+          "modalities": {
+            "input": [
+              "text",
+              "image",
+              "audio",
+              "video",
+              "pdf"
+            ],
+            "output": [
+              "text"
+            ]
+          },
+          "variants": {
+            "low": {
+              "reasoningEffort": "low"
+            },
+            "medium": {
+              "reasoningEffort": "medium"
+            },
+            "high": {
+              "reasoningEffort": "high"
+            },
+            "extra": {
+              "reasoningEffort": "extra"
+            },
+            "max": {
+              "reasoningEffort": "max"
+            }
+          }
+        },
+        "niya-1": {
+          "name": "Niya 1",
+          "tool_call": true,
+          "limit": {
+            "context": 1000000,
+            "output": 32000
+          },
+          "modalities": {
+            "input": [
+              "text",
+              "image",
+              "audio",
+              "video"
+            ],
+            "output": [
+              "text"
+            ]
+          },
+          "variants": {
+            "off": {
+              "reasoning": false
+            },
+            "on": {
+              "reasoning": true
+            }
+          }
+        },
+        "hubert-1": {
+          "name": "Hubert 1",
+          "tool_call": true,
+          "limit": {
+            "context": 1000000,
+            "output": 32000
+          },
+          "modalities": {
+            "input": [
+              "text",
+              "image",
+              "audio",
+              "video"
+            ],
+            "output": [
+              "text"
+            ]
+          }
+        }
+      }
+    }
+  }
+}
+```
+
+Configuration documentation: [Kilo Code Documentation](https://kilo.ai/docs/code-with-ai/agents/custom-models)
+  </Tab>
+</Tabs>
+
+---
+
+## Streaming Mode
+
+When transmitting `"stream": true`, the server returns the event stream `text/event-stream`. Each event contains the standard `chat.completion.chunk` structure:
+
+```json
+data: {"id":"chatcmpl-9b2f6c1e4a7d4c0e9f1a2b3c","object":"chat.completion.chunk","created":1726838400,"model":"emmy-1","choices":[{"index":0,"delta":{"role":"assistant","reasoning":"Анализирую правила сервера...","reasoning_content":"Анализирую правила сервера..."},"finish_reason":null}]}
+
+data: {"id":"chatcmpl-9b2f6c1e4a7d4c0e9f1a2b3c","object":"chat.completion.chunk","created":1726838400,"model":"emmy-1","choices":[{"index":0,"delta":{"content":"Приветствую!"},"finish_reason":null}]}
+
+data: {"id":"chatcmpl-9b2f6c1e4a7d4c0e9f1a2b3c","object":"chat.completion.chunk","created":1726838400,"model":"emmy-1","choices":[{"index":0,"delta":{},"finish_reason":"stop"}]}
+
+data: {"id":"chatcmpl-9b2f6c1e4a7d4c0e9f1a2b3c","object":"chat.completion.chunk","created":1726838400,"model":"emmy-1","choices":[],"usage":{"prompt_tokens":812,"completion_tokens":96,"total_tokens":908}}
+
+data: [DONE]
+```
+
+prompt_tokens includes service system context and supplied conversation history, not just the user message. Even a short request may include around 7000 input tokens and cost about 1 credit; this is an observed example, not a fixed price or minimum. Actual cost depends on model, caching and output: inspect usage.cost_credits. web_search:true allows search but does not guarantee a call; each executed search is charged separately.
+
+The full secret is returned only on creation or rotation. AI key lists, renaming and deletion return a masked token. GET /keys reveals only the calling key; all sibling keys, including your own, are masked. teamId is the bound team ID or null.
+
+Creating an AI key and exchanging coins require the owner session. An ordinary HTTP key, even with full access, cannot perform these operations. Trusted services use the admin endpoints with a master key.

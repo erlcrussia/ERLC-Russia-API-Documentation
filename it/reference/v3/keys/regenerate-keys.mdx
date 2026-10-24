@@ -1,0 +1,34 @@
+---
+title: "Rigenera chiavi"
+description: "Riemette la chiave API e/o WebSocket. La precedente smette di funzionare; i permessi passano alla nuova."
+icon: "arrows-rotate"
+openapi: /it/openapi/it-api-v3-openapi.yaml POST /keys
+keywords:
+- keys
+- tokens
+- rigenerazione
+- regenerate
+- api
+- websocket
+---
+
+Endpoint universale per la rigenerazione dei token `API` e/o `WebSocket`. Il token precedente viene annullato e tutte le impostazioni, gli abbonamenti e le limitazioni dei diritti associati vengono trasferiti al token appena generato.
+
+### Autorizzazione
+L'intestazione `erlcrussia-api-key` **non è strettamente necessaria** se stai rigenerando la chiave WebSocket. Puoi passare:
+- `erlcrussia-api-key` - per rigenerare la chiave API HTTP (`?api=true`).
+- `erlcrussia-websocket-key` - per rigenerare la chiave WebSocket (`?websocket=true`).
+- Oppure entrambe le testate con rigenerazione simultanea (`?api=true&websocket=true`).
+
+### Parametri della query
+
+| Parametro | Digitare | Descrizione |
+| :--- | :--- | :--- |
+| `api` | `boolean` | Rigenera il token API HTTP (`true`). |
+| `websocket` | `boolean` | Rigenera il token WebSocket (`true`). |
+
+<Note>
+È richiesto almeno uno dei parametri (`?api=true` o `?websocket=true`). Durante il trasferimento di `?api=true&websocket=true`, entrambe le chiavi verranno rigenerate contemporaneamente.
+</Note>
+
+Una chiave può essere ruotata una volta ogni cinque minuti; rispetta Retry-After con 429. La rotazione viene registrata con ID della chiave e IP, senza il segreto.

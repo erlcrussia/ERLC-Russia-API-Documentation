@@ -1,6 +1,6 @@
 ---
 title: "Коды ошибок"
-description: "Если API ER:LC Россия отклоняет запрос, оно возвращает JSON-ответ с кодом ошибки. На этой странице можно легко понять, что именно пошло не так и как вашему сервису это исправить."
+description: "Коды ошибок API и что делать при каждой из них."
 icon: "triangle-exclamation"
 ---
 
@@ -22,10 +22,12 @@ icon: "triangle-exclamation"
   <Accordion title="Ошибки авторизации и токенов">
     | Код | Описание | Значение |
     | :---: | :--- | :--- |
+    | `5006` | Invalid Master Key | Недействительный мастер-ключ. Проверьте заголовок `erlcrussia-api-master-key` |
     | `5007` | Missing Token | Отсутствует токен авторизации. Добавьте заголовок `Authorization: Bearer <токен>` или `erlcrussia-api-key: <токен>` |
-    | `5008` | Invalid Token | Токен недействителен, деактивирован или отсутствует в базе данных |
+    | `5008` | Invalid Token | Токен недействителен, отключён или удалён |
+    | `5033` | Unauthorized | Нет действующей сессии или ключа для этого маршрута |
     | `5009` | Forbidden | Доступ к данному эндпоинту или действию запрещен для вашего токена |
-    | `5010` | Api Version Forbidden | Доступ к запрашиваемой версии API (V3/V2) запрещен для вашего ключа |
+    | `5010` | Api Version Forbidden | Ключу запрещён доступ к этой версии API |
     | `5011` | Query Param Forbidden | Доступ к указанным query-параметрам запрещен политикой прав ключа |
     | `5037` | Invalid Signature | Неверная ED25519 цифровая подпись запроса |
   </Accordion>
@@ -38,8 +40,8 @@ icon: "triangle-exclamation"
     | `5003` | Invalid Version | Неверная версия API в маршруте. Используйте актуальную версию `v3` |
     | `5004` | Invalid Param Name | Неверное имя query-параметра |
     | `5005` | Missing Command | Не передана команда. Добавьте поле `command` в тело запроса |
-    | `5012` | Discord Id Not Found | Пользователь с данным Discord ID не найден в базе данных |
-    | `5013` | Token Not Found | Токен не найден в базе данных |
+    | `5012` | Discord Id Not Found | Пользователь с этим Discord ID не найден |
+    | `5013` | Token Not Found | Токен не найден |
     | `5014` | Token Not Found Or Deleted | Токен не найден или был удалён |
     | `5020` | Not Found | Запрашиваемый ресурс или эндпоинт не найден |
     | `5021` | Webhook Url Already Exists | URL вебхука уже зарегистрирован в системе |
@@ -61,14 +63,15 @@ icon: "triangle-exclamation"
     | `5047` | Points Limit Exceeded | Превышен суточный лимит начисления очков |
     | `5048` | Insufficient Points | Недостаточно очков для выполнения действия |
     | `5050` | Roblox Account Not Linked | Аккаунт Roblox не привязан к Discord |
+    | `5051` | Webhook Verification Failed | URL вебхука не прошёл проверку подписи. Причина — в поле `reason`: `private_host`, `unreachable`, `signed_rejected`, `forged_accepted`, `signing_unavailable` |
   </Accordion>
 
   <Accordion title="Ошибки сервера, очереди и лимитов">
     | Код | Описание | Значение |
     | :---: | :--- | :--- |
     | `5015` | Command Queue Full | Очередь команд заполнена. Попробуйте позже |
-    | `5016` | Rate Limit Exceeded | Превышен лимит запросов. Дождитесь сброса (см. `retry_after`) |
-    | `5017` | Internal Error | Внутренняя ошибка сервера. Ошибка логируется |
+    | `5016` | Rate Limit Exceeded | Превышен лимит запросов. Дождитесь сброса (см. `Retry-After`) |
+    | `5017` | Internal Error | Внутренняя ошибка сервера. Повторите запрос позже |
     | `5018` | Server Error | Ошибка при обращении к внешнему API |
     | `5019` | Prc Api Error | Ошибка от официального PRC API. См. поле `prc_code` |
     | `5024` | Cache Expired | Кеш устарел и временно недоступен |
@@ -102,9 +105,10 @@ icon: "triangle-exclamation"
     | `5135` | CDN Path Already Exists | Путь к файлу уже существует. Автоматическая перезапись не выполняется |
     | `5136` | CDN Folder Slug Already Exists | Slug папки уже занят. Выберите другой идентификатор папки |
     | `5137` | CDN Folder Not Found | Папка CDN с указанным ID не найдена |
-    | `5138` | CDN Storage Unavailable | Хранилище MinIO / S3 временно недоступно |
+    | `5138` | CDN Storage Unavailable | Хранилище CDN временно недоступно |
     | `5139` | CDN Source Unavailable | Внешний источник не отдал файл при импорте |
     | `5140` | AI Response Unavailable | AI модель не сформировала корректный ответ |
+    | `5141` | AI Model Unavailable | AI модель временно недоступна |
   </Accordion>
 
   <Accordion title="Ошибки API экономики">

@@ -1,60 +1,46 @@
 ---
-title: "Private files and library"
-description: "Private chat attachments and audio on userassets.erlcrussia.com."
+title: "Personal files"
+description: "Private AI chat attachments and user audio."
 icon: "folder-closed"
 ---
 
-Only the owner with an active session can access a file. A company API key or signed URL does not replace a user session. The domain must be registered and verified for the company.
+Personal files are AI chat attachments, microphone recordings and speech output. A file is only available to its owner with an active website session; a team API key or a file link does not give access.
 
-The website uploads original bytes through Backend. Go API derives the owner from the session and stores the original in private MinIO. Messages store an attachment ID; attaching it again does not duplicate the file.
+## Limits
 
-Up to 25 MiB per file, 1 GiB and 1000 non-deleted files per user. Content determines MIME type. Archives are stored without automatic extraction. Models receive supported images, PDF and text; storing an archive does not mean the AI has read it.
+* up to 25 MB per file, up to 1 GB and 1000 files per user;
+* uploaded files are kept until deleted; microphone recordings and speech output for 24 hours;
+* AI reads images, PDF and text; archives are stored but not unpacked;
+* HTML, SVG and other active documents are always downloaded, never opened in the browser.
 
 ## Routes
 
-| Go API | Site Backend | |
+| API V3 | Website | |
 |---|---|---|
-| `GET /v3/user-assets` | `/api/v3/ai/files` | List private files |
-| `POST /v3/user-assets?name=example.png` | `/api/v3/ai/files?name=example.png` | Upload a private file |
-| `GET /v3/user-assets/{id}` | `—` | Get private file metadata |
-| `DELETE /v3/user-assets/{id}` | `/api/v3/ai/files/{id}` | Delete a private file |
-| `GET / HEAD /v3/user-assets/{id}/content` | `/api/v3/ai/files/{id}/content` | Read private file content |
+| `GET /v3/user-assets` | `GET /api/v3/ai/files` | List files |
+| `POST /v3/user-assets?name=…` | `POST /api/v3/ai/files?name=…` | Upload |
+| `GET /v3/user-assets/{id}` | — | File details |
+| `GET`/`HEAD /v3/user-assets/{id}/content` | `GET /api/v3/ai/files/{id}/content` | Content |
+| `DELETE /v3/user-assets/{id}` | `DELETE /api/v3/ai/files/{id}` | Delete |
 
 ```javascript
-const uploaded = await fetch(`${backendUrl}/api/v3/ai/files?${new URLSearchParams({ name: file.name })}`, {
-  method: "POST", credentials: "include",
-  headers: { "Content-Type": "application/octet-stream" }, body: file
+const res = await fetch(`/api/v3/ai/files?${new URLSearchParams({ name: file.name })}`, {
+  method: "POST",
+  credentials: "include",
+  headers: { "Content-Type": "application/octet-stream" },
+  body: file,
 });
-if (!uploaded.ok) throw new Error(`Upload failed: ${uploaded.status}`);
-const asset = await uploaded.json();
-// POST /api/v3/ai/chat
-const attachment = { assetId: asset.id };
+const asset = await res.json();
+// asset.id is then sent as an attachment in POST /api/v3/ai/chat
 ```
 
-```json
-{
-  "id": "0123456789abcdef0123456789abcdef",
-  "domain": "userassets.erlcrussia.com",
-  "path": "_private/users/123456789012345678/upload/0123456789abcdef0123456789abcdef/original",
-  "name": "example.png",
-  "mimeType": "image/png",
-  "size": 68,
-  "kind": "upload",
-  "status": "ready",
-  "createdAt": "2026-10-15T19:00:00Z",
-  "expiresAt": null,
-  "url": "https://userassets.erlcrussia.com/_private/users/123456789012345678/upload/0123456789abcdef0123456789abcdef/original"
-}
-```
+## Errors
 
-401: no active session; 404: another owner, deleted or expired; 413: size or quota; 415: invalid audio; 429: rate limited; 503: unverified domain or unavailable dependency.
-
-## Operations
-
-Public CDN caching and automatic SSD eviction are unchanged. Private responses use private, no-store and bypass shared Cloudflare caching. Session, ownership and expiry are checked before every read, including SSD HIT, HEAD, Range and shared CDN aliases. Cloudflare TTL is not original-file retention.
-
-Uploads remain until deleted. Microphone recordings (recording) and server-generated audio (speech) expire after 24 hours. Access stops at expiresAt; a minute-based job removes MinIO and SSD copies and retries failures. Downloaded copies cannot be revoked. Browser-only synthesis or recognition without an audio file does not create an archive.
-
-HTML, SVG and other active documents download with Content-Disposition: attachment and sandbox. Direct MinIO access is not public. The _private prefix is reserved and cannot be uploaded through ordinary CDN endpoints.
-
-Unregistered and unverified custom Hosts return 421 and pass through the shared Nginx ingress to the Redirect unbound-domain page. Registry failures return 502; a missing file on a verified CDN domain remains a CDN error.
+| Response | Meaning |
+|---|---|
+| 401 | No active session |
+| 404 | The file belongs to someone else, was deleted or expired |
+| 413 | File size or quota exceeded |
+| 415 | Unsupported audio format |
+| 429 | Rate limit exceeded |
+| 503 | Storage is temporarily unavailable |

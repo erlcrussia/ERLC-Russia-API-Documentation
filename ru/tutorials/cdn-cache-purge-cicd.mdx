@@ -1,6 +1,6 @@
 ---
 title: "CDN в CI/CD и сброс кэша"
-description: "Публикация релиза и точечная очистка Cloudflare и Go Edge."
+description: "Публикация релиза и точечная очистка кэша Cloudflare и CDN."
 icon: "arrows-rotate"
 ---
 
@@ -23,6 +23,8 @@ curl -X POST "$API_BASE/v3/cdn/webhook/purge" \
 
 ## Обычный namespace и группы файлов
 
-`POST /v3/cdn/assets/purge?domain=YOUR_TEAM_SLUG&prefix=releases/RELEASE_ID/` принимает prefix и планирует очистку Go Edge. Это другой контракт. Без ids/path/prefix выбирается весь namespace. success означает принятие операции; проверяйте последующую доставку.
+`POST /v3/cdn/assets/purge?domain=YOUR_TEAM_SLUG&prefix=releases/RELEASE_ID/` принимает prefix и планирует очистку кэша CDN. Это другой контракт. Без ids/path/prefix выбирается весь namespace. success означает принятие операции; проверяйте последующую доставку.
 
-Новый URL релиза надёжнее замены старого immutable-файла. HTTP 429 требует ожидания Retry-After/retry_after; HTTP 409 означает существующий объект, а не успешную загрузку.
+Новый URL релиза надёжнее замены старого immutable-файла. HTTP 429 требует ожидания Retry-After; HTTP 409 означает существующий объект, а не успешную загрузку.
+
+Без ids/path/prefix сброс всего namespace выполняется в фоне: HTTP 202, status=queued, acceptedCount — число выбранных объектов, а не подтверждение завершения. Не чаще одного запроса в минуту на команду и namespace; при 429 учитывайте Retry-After. Результат выполнения записывается в аудит API. Точечный сброс сохраняет HTTP 200 и purgedCount. Новый уникальный URL релиза обычно не требует purge сразу после загрузки: это удаляет прогретый кэш.

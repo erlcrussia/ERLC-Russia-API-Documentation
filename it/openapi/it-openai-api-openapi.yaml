@@ -1,0 +1,1093 @@
+openapi: 3.1.0
+info:
+  title: ER:LC Russia - API compatibile con OpenAI
+  version: 1.0.0
+  description: Metodi compatibili con OpenAI per Chat Completions, consultazione dei modelli e sintesi vocale ER:LC Russia. Consulta i parametri supportati nella pagina di ogni metodo.
+servers:
+- url: https://api.erlcrussia.com
+  description: Server principale
+- url: https://api.erlcrussia.xyz
+  description: Server di backup
+paths:
+  /v1/chat/completions:
+    post:
+      tags:
+      - Chat Completions
+      summary: Risposta del modello
+      description: Genera una risposta del modello nel formato OpenAI Chat Completions, come JSON o in streaming.
+      security:
+      - BearerAuth: []
+      - ApiKeyAuth: []
+      parameters:
+      - name: X-Session-ID
+        in: header
+        required: false
+        schema:
+          type: string
+        description: ID della sessione di conversazione (alternativa al campo session_id nel corpo).
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChatCompletionRequest'
+            example:
+              model: niya-1
+              messages:
+              - role: system
+                content: Ты — Ния, официальный ассистент сервера ER:LC Россия.
+              - role: user
+                content: Как получить лицензию на оружие в игре?
+              stream: false
+      responses:
+        '200':
+          description: Risposta del modello o flusso di blocchi (SSE) riuscita.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChatCompletionResponse'
+              example:
+                id: chatcmpl-9b2f6c1e4a7d4c0e9f1a2b3c
+                session_id: session_1726838400000_a1b2c3
+                object: chat.completion
+                created: 1726838400
+                model: niya-1
+                choices:
+                - index: 0
+                  message:
+                    role: assistant
+                    content: Для получения лицензии на оружие вам необходимо прибыть в полицейский департамент...
+                  finish_reason: stop
+                usage:
+                  prompt_tokens: 812
+                  completion_tokens: 96
+                  total_tokens: 908
+                  completion_tokens_details:
+                    reasoning_tokens: 0
+                  prompt_tokens_details:
+                    cached_tokens: 512
+                  cost_credits: 0.42
+            text/event-stream:
+              schema:
+                type: string
+                description: 'Uno stream Server-Sent Events in formato OpenAI. Ogni evento è una riga `data: {...}` con un oggetto `chat.completion.chunk`. Il primo chunk ha `delta.role` uguale ad `assistant` e ogni chunk ha `finish_reason`: `null` mentre la risposta arriva, `stop` o `tool_calls` nell’ultimo. Con `stream_options.include_usage: true` prima della fine arriva un chunk con `choices: []` e `usage`. Lo stream termina con `data: [DONE]`. Se la generazione si interrompe, arriva un evento `{"error": {...}}` seguito da `data: [DONE]`.'
+              example: 'data: {"id":"chatcmpl-9b2f6c1e4a7d4c0e9f1a2b3c","object":"chat.completion.chunk","created":1726838400,"model":"niya-1","choices":[{"index":0,"delta":{"role":"assistant","content":"Для получения "},"finish_reason":null}]}
+
+
+                data: {"id":"chatcmpl-9b2f6c1e4a7d4c0e9f1a2b3c","object":"chat.completion.chunk","created":1726838400,"model":"niya-1","choices":[{"index":0,"delta":{"content":"лицензии..."},"finish_reason":null}]}
+
+
+                data: {"id":"chatcmpl-9b2f6c1e4a7d4c0e9f1a2b3c","object":"chat.completion.chunk","created":1726838400,"model":"niya-1","choices":[{"index":0,"delta":{},"finish_reason":"stop"}]}
+
+
+                data: {"id":"chatcmpl-9b2f6c1e4a7d4c0e9f1a2b3c","object":"chat.completion.chunk","created":1726838400,"model":"niya-1","choices":[],"usage":{"prompt_tokens":812,"completion_tokens":96,"total_tokens":908}}
+
+
+                data: [DONE]
+
+
+                '
+          headers:
+            x-request-id: &id001
+              $ref: '#/components/headers/RequestId'
+            openai-processing-ms: &id002
+              $ref: '#/components/headers/ProcessingMs'
+            x-ratelimit-limit-requests: &id003
+              $ref: '#/components/headers/RateLimitRequests'
+            x-ratelimit-remaining-requests: &id004
+              $ref: '#/components/headers/RateLimitRemainingRequests'
+            x-ratelimit-reset-requests: &id005
+              $ref: '#/components/headers/RateLimitResetRequests'
+        '400':
+          description: Corpo della richiesta non valido.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error:
+                  message: We could not parse the JSON body of your request. Make sure it is valid JSON.
+                  type: invalid_request_error
+                  param: null
+                  code: null
+                  erlc_code: '5034'
+        '401':
+          description: La chiave manca o non è valida.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error:
+                  message: Incorrect API key provided. Check the key or create a new one in the dashboard.
+                  type: invalid_request_error
+                  param: null
+                  code: invalid_api_key
+                  erlc_code: '5008'
+        '429':
+          description: 'Limite di richieste superato (`type: requests`) o crediti IA esauriti (`type: insufficient_quota`).'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                rate_limit:
+                  value:
+                    error:
+                      message: Rate limit reached. Please slow down and retry later.
+                      type: requests
+                      param: null
+                      code: rate_limit_exceeded
+                      erlc_code: '5016'
+                insufficient_quota:
+                  value:
+                    error:
+                      message: You exceeded your current quota, please check your plan and billing details.
+                      type: insufficient_quota
+                      param: null
+                      code: insufficient_quota
+                      erlc_code: '5038'
+        '503':
+          description: Il modello non è temporaneamente disponibile, riprova più tardi.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error:
+                  message: AI model temporarily unavailable
+                  type: server_error
+                  param: null
+                  code: '5141'
+  /v1/models:
+    get:
+      tags:
+      - Models
+      summary: Elenco dei modelli
+      description: Restituisce i modelli disponibili per la tua chiave. Una chiave vocale vede solo `emmy-voice-1`; le chiavi chat e agente vedono i modelli di testo.
+      security:
+      - BearerAuth: []
+      - ApiKeyAuth: []
+      responses:
+        '200':
+          description: Elenco di modelli di successo in formato OpenAI.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  object:
+                    type: string
+                    example: list
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ModelObject'
+              example:
+                object: list
+                data:
+                - id: niya-1
+                  object: model
+                  created: 1710000000
+                  owned_by: erlcrussia
+                  name: Ния 1
+                  description: Быстрая модель для повседневных задач.
+                  context_length: 1000000
+                  max_context_length: 1000000
+                  modalities:
+                  - text
+                  - image
+                  - audio
+                  - video
+                  capabilities:
+                    chat: true
+                    completion: true
+                    function_calling: true
+                    reasoning: false
+                    thinking: false
+                    tool_call: true
+                    tools: true
+                    vision: true
+                - id: emmy-1
+                  object: model
+                  created: 1710000000
+                  owned_by: erlcrussia
+                  name: Эмми 1
+                  description: Более тщательный подход к ответам.
+                  context_length: 1048576
+                  max_context_length: 1048576
+                  modalities:
+                  - text
+                  - image
+                  - audio
+                  - video
+                  reasoning: true
+                  supports_thinking: true
+                  capabilities:
+                    chat: true
+                    completion: true
+                    function_calling: true
+                    reasoning: true
+                    reasoning_effort:
+                    - low
+                    - medium
+                    - high
+                    - extra
+                    - max
+                    thinking: true
+                    tool_call: true
+                    tools: true
+                    vision: true
+                - id: hubert-1
+                  object: model
+                  created: 1710000000
+                  owned_by: erlcrussia
+                  name: Хуберт 1
+                  description: Персонаж сообщества для вопросов о сервере; суржик можно включить параметром surzhyk.
+                  context_length: 1000000
+                  max_context_length: 1000000
+                  modalities:
+                  - text
+                  - image
+                  - audio
+                  - video
+                  capabilities:
+                    chat: true
+                    completion: true
+                    function_calling: true
+                    reasoning: false
+                    thinking: false
+                    tool_call: true
+                    tools: true
+                    vision: true
+          headers:
+            x-request-id: *id001
+            openai-processing-ms: *id002
+            x-ratelimit-limit-requests: *id003
+            x-ratelimit-remaining-requests: *id004
+            x-ratelimit-reset-requests: *id005
+        '401':
+          description: La chiave manca o non è valida.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error:
+                  message: Incorrect API key provided. Check the key or create a new one in the dashboard.
+                  type: invalid_request_error
+                  param: null
+                  code: invalid_api_key
+                  erlc_code: '5008'
+  /v1/models/{model}:
+    get:
+      tags:
+      - Models
+      summary: Modello
+      description: Restituisce un modello tramite il suo identificatore.
+      security:
+      - BearerAuth: []
+      - ApiKeyAuth: []
+      parameters:
+      - name: model
+        in: path
+        required: true
+        schema:
+          type: string
+        example: niya-1
+      responses:
+        '200':
+          description: Specifica dettagliata del modello.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ModelObject'
+              example:
+                id: niya-1
+                object: model
+                created: 1710000000
+                owned_by: erlcrussia
+                name: Ния 1
+                description: Быстрая модель для повседневных задач.
+                context_length: 1000000
+                max_context_length: 1000000
+                modalities:
+                - text
+                - image
+                - audio
+                - video
+                capabilities:
+                  chat: true
+                  completion: true
+                  function_calling: true
+                  reasoning: false
+                  thinking: false
+                  tool_call: true
+                  tools: true
+                  vision: true
+          headers:
+            x-request-id: *id001
+            openai-processing-ms: *id002
+            x-ratelimit-limit-requests: *id003
+            x-ratelimit-remaining-requests: *id004
+            x-ratelimit-reset-requests: *id005
+        '401':
+          description: La chiave manca o non è valida.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error:
+                  message: Incorrect API key provided. Check the key or create a new one in the dashboard.
+                  type: invalid_request_error
+                  param: null
+                  code: invalid_api_key
+                  erlc_code: '5008'
+        '404':
+          description: Modello non trovato.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error:
+                  message: The model does not exist or you do not have access to it.
+                  type: invalid_request_error
+                  param: null
+                  code: model_not_found
+                  erlc_code: '5040'
+  /v1/audio/speech:
+    post:
+      tags:
+      - Audio
+      summary: Sintesi vocale
+      description: Converte il testo in un file audio. Richiede una chiave IA con il permesso voice.
+      security:
+      - BearerAuth: []
+      - ApiKeyAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - input
+              properties:
+                model:
+                  type: string
+                  enum:
+                  - emmy-voice-1
+                  - supertonic
+                  - tts-1
+                  - tts-1-hd
+                  default: emmy-voice-1
+                input:
+                  type: string
+                  minLength: 1
+                  maxLength: 6000
+                  description: Текст для озвучивания.
+                language:
+                  type: string
+                  enum:
+                  - ru
+                  - uk
+                  - be
+                  - en
+                  - es
+                  - it
+                  - fr
+                  - zh
+                  - ja
+                  - ko
+                  default: ru
+                voice:
+                  type: string
+                  enum:
+                  - default
+                  - F1
+                  - F2
+                  - emmy
+                  - emmy-v2
+                  - alloy
+                  - nova
+                  default: default
+                response_format:
+                  type: string
+                  enum:
+                  - mp3
+                  - wav
+                  - pcm
+                  - aac
+                  - flac
+                  - opus
+                  default: mp3
+                speed:
+                  type: number
+                  minimum: 0.25
+                  maximum: 4
+                  default: 1
+                stream:
+                  type: boolean
+                  default: false
+                  description: 'Estensione di ER:LC Russia: uno stream NDJSON con una riga per frase. Per il formato OpenAI usa `stream_format: sse`.'
+                stream_format:
+                  type: string
+                  enum:
+                  - audio
+                  - sse
+                  default: audio
+                  description: '`audio` restituisce il file intero (predefinito), `sse` invia gli eventi `speech.audio.delta` e `speech.audio.done`.'
+            example:
+              model: emmy-voice-1
+              input: Привет! Чем я могу помочь?
+              language: ru
+              voice: F1
+              response_format: mp3
+              speed: 1
+      responses:
+        '200':
+          description: Risposta riuscita.
+          content:
+            audio/mpeg:
+              schema:
+                type: string
+                format: binary
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+            application/x-ndjson:
+              schema:
+                type: string
+            text/event-stream:
+              schema:
+                type: string
+                description: 'Stream di eventi con `stream_format: sse`: `speech.audio.delta` con audio in base64 e `speech.audio.done` con `usage`.'
+              example: 'data: {"type":"speech.audio.delta","audio":"SUQzBAAAAAAA..."}
+
+
+                data: {"type":"speech.audio.done","usage":{"input_tokens":7,"output_tokens":0,"total_tokens":7}}
+
+
+                '
+          headers:
+            x-request-id: *id001
+            openai-processing-ms: *id002
+            x-ratelimit-limit-requests: *id003
+            x-ratelimit-remaining-requests: *id004
+            x-ratelimit-reset-requests: *id005
+        '400':
+          description: Corpo della richiesta non valido.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error:
+                  message: We could not parse the JSON body of your request. Make sure it is valid JSON.
+                  type: invalid_request_error
+                  param: null
+                  code: null
+                  erlc_code: '5034'
+        '401':
+          description: La chiave manca o non è valida.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error:
+                  message: Incorrect API key provided. Check the key or create a new one in the dashboard.
+                  type: invalid_request_error
+                  param: null
+                  code: invalid_api_key
+                  erlc_code: '5008'
+        '429':
+          description: 'Limite di richieste superato (`type: requests`) o crediti IA esauriti (`type: insufficient_quota`).'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                rate_limit:
+                  value:
+                    error:
+                      message: Rate limit reached. Please slow down and retry later.
+                      type: requests
+                      param: null
+                      code: rate_limit_exceeded
+                      erlc_code: '5016'
+                insufficient_quota:
+                  value:
+                    error:
+                      message: You exceeded your current quota, please check your plan and billing details.
+                      type: insufficient_quota
+                      param: null
+                      code: insufficient_quota
+                      erlc_code: '5038'
+        '503':
+          description: Il servizio è temporaneamente non disponibile.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error:
+                  message: Speech synthesis unavailable
+                  type: server_error
+                  param: null
+                  code: null
+  /v1/audio/transcriptions:
+    post:
+      tags:
+      - Audio
+      summary: Da voce a testo
+      description: Trasforma la voce in testo. Compatibile con `audio.transcriptions` dell'SDK OpenAI. Serve una chiave IA vocale (`sk-voice-…`).
+      security:
+      - BearerAuth: []
+      - ApiKeyAuth: []
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+              - file
+              properties:
+                file:
+                  type: string
+                  format: binary
+                  description: Un file audio in qualsiasi formato comune (mp3, mp4, m4a, mpeg, mpga, ogg, wav, webm, flac), fino a 25 MB e 120 secondi.
+                model:
+                  type: string
+                  example: whisper-1
+                  description: Accettato per compatibilità; trascrive sempre il modello di ER:LC Russia.
+                language:
+                  type: string
+                  example: ru
+                  description: Lingua dell'audio (ISO-639-1), `ru` di default.
+                response_format:
+                  type: string
+                  enum:
+                  - json
+                  - text
+                  default: json
+                  description: '`json` restituisce un oggetto con il testo, `text` solo il testo.'
+          audio/*:
+            schema:
+              type: string
+              format: binary
+              description: L’intero file audio come corpo della richiesta, qualsiasi tipo `audio/*`.
+      responses:
+        '200':
+          description: Il testo riconosciuto. I crediti addebitati sono nell'header `X-Credits-Charged`.
+          headers:
+            X-Credits-Charged:
+              schema:
+                type: number
+              description: Crediti IA addebitati.
+            x-request-id: *id001
+            openai-processing-ms: *id002
+            x-ratelimit-limit-requests: *id003
+            x-ratelimit-remaining-requests: *id004
+            x-ratelimit-reset-requests: *id005
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  text:
+                    type: string
+                    example: Как расшифровывается РД?
+                  usage:
+                    type: object
+                    properties:
+                      type:
+                        type: string
+                        example: duration
+                      seconds:
+                        type: number
+                        example: 2.4
+              example:
+                text: Как расшифровывается РД?
+                usage:
+                  type: duration
+                  seconds: 2.4
+            text/plain:
+              schema:
+                type: string
+        '400':
+          description: Corpo della richiesta non valido.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                invalid:
+                  value:
+                    error:
+                      message: Unsupported or corrupted audio file
+                      type: invalid_request_error
+                      param: null
+                      code: null
+                format:
+                  value:
+                    error:
+                      message: 'Unsupported response_format: use json or text'
+                      type: invalid_request_error
+                      param: null
+                      code: null
+        '401':
+          description: La chiave manca o non è valida.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error:
+                  message: Incorrect API key provided. Check the key or create a new one in the dashboard.
+                  type: invalid_request_error
+                  param: null
+                  code: invalid_api_key
+                  erlc_code: '5008'
+        '413':
+          description: L'audio supera i 120 secondi.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                duration:
+                  value:
+                    error:
+                      message: Audio exceeds 120 seconds
+                      type: invalid_request_error
+                      param: null
+                      code: null
+                size:
+                  value:
+                    error:
+                      message: File exceeds 25 MB
+                      type: invalid_request_error
+                      param: null
+                      code: null
+        '415':
+          description: Formato della richiesta non supportato.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error:
+                  message: Expected multipart/form-data or an audio file
+                  type: invalid_request_error
+                  param: null
+                  code: null
+        '429':
+          description: 'Limite di richieste superato (`type: requests`) o crediti IA esauriti (`type: insufficient_quota`).'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                rate_limit:
+                  value:
+                    error:
+                      message: Rate limit reached. Please slow down and retry later.
+                      type: requests
+                      param: null
+                      code: rate_limit_exceeded
+                      erlc_code: '5016'
+                insufficient_quota:
+                  value:
+                    error:
+                      message: You exceeded your current quota, please check your plan and billing details.
+                      type: insufficient_quota
+                      param: null
+                      code: insufficient_quota
+                      erlc_code: '5038'
+        '502':
+          description: Il servizio di trascrizione non ha risposto.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error:
+                  message: Bad Gateway
+                  type: server_error
+                  param: null
+                  code: '5049'
+        '503':
+          description: Il servizio è temporaneamente non disponibile.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error:
+                  message: Audio transcription unavailable
+                  type: server_error
+                  param: null
+                  code: null
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: 'Passaggio del token di autorizzazione nell''intestazione dell''autorizzazione: Bearer <token>.'
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: erlcrussia-api-ai-key
+      description: La chiave nell'header erlcrussia-api-ai-key.
+  schemas:
+    ModelObject:
+      type: object
+      properties:
+        id:
+          type: string
+          example: niya-1
+        object:
+          type: string
+          example: model
+        created:
+          type: integer
+          example: 1710000000
+        owned_by:
+          type: string
+          example: erlcrussia
+        name:
+          type: string
+          example: Ния 1
+        description:
+          type: string
+          example: Быстрая модель для повседневных задач.
+        context_length:
+          type: integer
+          example: 1000000
+        max_context_length:
+          type: integer
+          example: 1000000
+        modalities:
+          type: array
+          items:
+            type: string
+          example:
+          - text
+          - image
+          - audio
+          - video
+        reasoning:
+          type: boolean
+          example: false
+        supports_thinking:
+          type: boolean
+          example: false
+        capabilities:
+          type: object
+          additionalProperties: true
+    ChatMessage:
+      type: object
+      required:
+      - role
+      - content
+      properties:
+        role:
+          type: string
+          enum:
+          - system
+          - user
+          - assistant
+          description: 'Ruolo dell''autore del post:
+
+            - `system` - istruzioni di sistema e regole di comportamento del modello;
+
+            - `user`: richiesta o risposta dell''utente;
+
+            - `assistant` - risposta del modello precedente per salvare il contesto.'
+          example: user
+        content:
+          oneOf:
+          - type: string
+            description: Contenuto testuale del messaggio.
+            example: Привет! Чем ты можешь помочь?
+          - type: array
+            description: Serie multimodale di blocchi (testo, immagini, file).
+            items:
+              type: object
+              properties:
+                type:
+                  type: string
+                  enum:
+                  - text
+                  - image_url
+                  - file
+                text:
+                  type: string
+                image_url:
+                  type: object
+                  properties:
+                    url:
+                      type: string
+                      example: https://cdn.erlcrussia.com/images/screenshot.png
+                file:
+                  type: object
+                  properties:
+                    url:
+                      type: string
+                    mime:
+                      type: string
+                    filename:
+                      type: string
+    FilePart:
+      type: object
+      required:
+      - type
+      properties:
+        type:
+          type: string
+          enum:
+          - file
+          example: file
+        mime:
+          type: string
+          example: image/png
+        filename:
+          type: string
+          example: screenshot.png
+        url:
+          type: string
+          example: https://cdn.erlcrussia.com/images/screenshot.png
+    ChatCompletionRequest:
+      type: object
+      required:
+      - messages
+      properties:
+        model:
+          type: string
+          enum:
+          - niya-1
+          - emmy-1
+          - hubert-1
+          - default
+          default: niya-1
+          description: 'ID modello:
+
+            - `niya-1` - Niya (modello principale per compiti generali e moderazione, contesto 1M)
+
+            - `emmy-1` - Emmy (modello intellettuale con ragionamento passo passo, contesto 1M)
+
+            - `hubert-1` - Hubert (modello personalizzato, contesto 1M)'
+          example: niya-1
+        messages:
+          type: array
+          minItems: 1
+          description: Un elenco dei messaggi precedenti nella conversazione.
+          items:
+            $ref: '#/components/schemas/ChatMessage'
+        files:
+          type: array
+          description: Elenco aggiuntivo di file o immagini allegati alla richiesta.
+          items:
+            $ref: '#/components/schemas/FilePart'
+        stream:
+          type: boolean
+          default: false
+          description: Abilita lo streaming delle risposte agli eventi inviati dal server (SSE).
+        stream_options:
+          type: object
+          properties:
+            include_usage:
+              type: boolean
+              default: false
+              description: 'Se `true`, subito prima di `data: [DONE]` arriva un chunk separato con `choices` vuoto e il campo `usage`. Senza, lo stream non contiene `usage`.'
+        thinking:
+          type: boolean
+          description: Abilitazione della modalità di pensiero passo passo (catena di ragionamento).
+          example: true
+        surzhyk:
+          type: boolean
+          default: false
+          description: Per il modello hubert-1 include un surzhik proprietario. Per impostazione predefinita, Hubert risponde nella lingua dell'ultimo messaggio dell'utente.
+        effort:
+          type: string
+          enum:
+          - low
+          - medium
+          - high
+          - extra
+          - max
+          description: 'Grado di dettaglio del ragionamento (livello di riflessione):
+
+            - `low` - verifica dei fatti di base;
+
+            - `medium` — analisi bilanciata (predefinita);
+
+            - `high`: analisi completa passo dopo passo;
+
+            - `extra` / `max`: il massimo livello di analisi.'
+          example: medium
+        session_id:
+          type: string
+          description: Identificatore della sessione di chat pubblica (UUIDv4). Consente di salvare il contesto tra le richieste.
+          example: f47ac10b-58cc-4372-a567-0e02b2c3d479
+        regenerate:
+          type: boolean
+          description: Flag per la rigenerazione forzata dell'ultima risposta.
+        tools:
+          type: array
+          items:
+            type: object
+          description: Strumenti nel formato OpenAI. Funzionano solo con una chiave agente (`sk-agent-…`); con una chiave chat vengono ignorati.
+        tool_choice:
+          description: Scelta dello strumento nel formato OpenAI.
+          oneOf:
+          - type: string
+          - type: object
+        reasoning_effort:
+          type: string
+          description: Livello di ragionamento nel formato OpenAI. Uguale a `effort`.
+        web_search:
+          type: boolean
+          description: Consente al modello di cercare sul web.
+      description: I campi standard di OpenAI `temperature`, `top_p`, `max_tokens`, `max_completion_tokens`, `stop`, `n` e `response_format` sono accettati ma non applicati.
+    ChatCompletionResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          example: chatcmpl-9b2f6c1e4a7d4c0e9f1a2b3c
+        session_id:
+          type: string
+          example: f47ac10b-58cc-4372-a567-0e02b2c3d479
+        object:
+          type: string
+          example: chat.completion
+        created:
+          type: integer
+          example: 1726838400
+        model:
+          type: string
+          example: niya-1
+        choices:
+          type: array
+          items:
+            type: object
+            properties:
+              index:
+                type: integer
+                example: 0
+              message:
+                type: object
+                properties:
+                  role:
+                    type: string
+                    example: assistant
+                  content:
+                    type: string
+                    example: Здравствуйте! Чем я могу вам помочь?
+                  reasoning:
+                    type: string
+                    description: Testo della catena di ragionamento del modello (se il pensiero è abilitato).
+                  reasoning_content:
+                    type: string
+                    description: Campo di ragionamento duplicato per compatibilità con diversi client (formato DeepSeek/vLLM).
+              finish_reason:
+                type: string
+                example: stop
+        usage:
+          type: object
+          description: Consumo di token. `prompt_tokens` include i token in cache; `total_tokens = prompt_tokens + completion_tokens`. `cost_credits` sono i crediti IA addebitati.
+          properties:
+            prompt_tokens:
+              type: integer
+              example: 812
+            completion_tokens:
+              type: integer
+              example: 96
+            total_tokens:
+              type: integer
+              example: 908
+            completion_tokens_details:
+              type: object
+              properties:
+                reasoning_tokens:
+                  type: integer
+                  example: 0
+            prompt_tokens_details:
+              type: object
+              properties:
+                cached_tokens:
+                  type: integer
+                  example: 512
+            cost_credits:
+              type: number
+              description: Crediti IA addebitati.
+              example: 0.42
+    ErrorResponse:
+      type: object
+      description: Un errore in formato OpenAI. `code` è un codice stringa OpenAI (`invalid_api_key`, `model_not_found`, `insufficient_quota`, `rate_limit_exceeded`) oppure `null`. Il codice numerico di ER:LC Russia è in `erlc_code`, vedi i [codici di errore](/it/documentation/error-codes).
+      properties:
+        error:
+          type: object
+          properties:
+            message:
+              type: string
+              example: Insufficient AI Credits
+            type:
+              type: string
+              enum:
+              - invalid_request_error
+              - insufficient_quota
+              - requests
+              - server_error
+              example: insufficient_quota
+            param:
+              type:
+              - string
+              - 'null'
+              example: null
+            code:
+              type:
+              - string
+              - 'null'
+              example: insufficient_quota
+            erlc_code:
+              type: string
+              description: ER:LC Russia numeric error code.
+              example: '5038'
+  headers:
+    RequestId:
+      description: ID della richiesta per il supporto.
+      schema:
+        type: string
+        example: req_8f2c1e9b4a7d4c0e9f1a2b3c4d5e6f70
+    ProcessingMs:
+      description: Tempo di elaborazione in millisecondi.
+      schema:
+        type: integer
+        example: 412
+    RateLimitRequests:
+      description: Limite di richieste nella finestra corrente.
+      schema:
+        type: integer
+        example: 120
+    RateLimitRemainingRequests:
+      description: Richieste rimaste nella finestra corrente.
+      schema:
+        type: integer
+        example: 119
+    RateLimitResetRequests:
+      description: Tempo prima del reset del limite, ad esempio `1s` o `6m0s`.
+      schema:
+        type: string
+        example: 1s
+tags:
+- name: Audio
+- name: Chat Completions
+- name: Models

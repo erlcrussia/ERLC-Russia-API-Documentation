@@ -1,4 +1,32 @@
 ---
-title: "Получение ключей и ограничений"
+title: "Мои ключи"
+description: "Ваши API- и WebSocket-ключи. Укажите `api=true` и/или `websocket=true`; `restrictions=true` добавляет права."
+icon: "key"
 openapi: "/ru/openapi/ru-api-v3-openapi.yaml GET /keys"
+keywords: [ "keys", "tokens", "ключи", "токены", "ограничения", "restrictions", "api", "websocket" ]
 ---
+
+Универсальный эндпоинт для получения списка токенов (`API` и `WebSocket`) и их прав/ограничений.
+
+### Авторизация
+Заголовок `erlcrussia-api-key` **не является строго обязательным**, если вы используете WebSocket-ключ. Вы можете передать:
+- `erlcrussia-api-key` — для авторизации и работы с HTTP API ключами (`?api=true`).
+- `erlcrussia-websocket-key` — для авторизации и работы с WebSocket ключами (`?websocket=true`).
+- Либо оба заголовка одновременно.
+
+### Query-параметры
+
+| Параметр | Тип | Описание |
+| :--- | :--- | :--- |
+| `api` | `boolean` | Запросить HTTP API ключи (`true`). |
+| `websocket` | `boolean` | Запросить WebSocket ключи (`true`). |
+| `restrictions` | `boolean` | Включить ограничения для предыдущего типа ключа (`true`). |
+
+<Tip>
+Параметр `restrictions=true` привязывается к предшествующему параметру типа. Например:
+- `?api=true&restrictions=true` — вернет API ключи с их ограничениями.
+- `?api=true&websocket=true&restrictions=true` — вернет API ключи без ограничений и WebSocket ключи с ограничениями.
+- `?api=true&restrictions=true&websocket=true&restrictions=true` — вернет оба типа ключей с ограничениями.
+</Tip>
+
+Полный секрет возвращается только при создании или ротации. Списки AI-ключей, переименование и удаление возвращают маску. В GET /keys полностью виден только вызывающий ключ; остальные, включая собственные соседние ключи, замаскированы. teamId — идентификатор привязанной команды или null.

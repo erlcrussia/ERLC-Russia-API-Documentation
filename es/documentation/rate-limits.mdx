@@ -1,55 +1,40 @@
 ---
-title: Límites de solicitudes
-description: Ventanas actuales, contadores compartidos, cabeceras y tratamiento de HTTP 429.
-icon: gauge-high
+title: "Límites de solicitudes"
+description: "Cómo conocer tu límite y qué hacer ante HTTP 429."
+icon: "gauge-high"
 ---
 
-Los límites de solicitudes en la API de ER:LC Rusia son **personalizados y dinámicos**: se configuran mediante el sistema de políticas, pueden variar según la dirección IP o el nivel de la clave API, y aumentan automáticamente con los beneficios de suscripciones activas.
+Las cabeceras de límite se incluyen en rutas limitadas. Las claves maestras y UNLIMITED_API_KEYS omiten este límite y pueden no recibir X-RateLimit-*. Los nombres de cabecera HTTP no distinguen mayúsculas. Una clave válida nueva usa primero el límite por IP; tras calentar la caché de credenciales usa el personal (por ejemplo, 40 → 120 en estadísticas). Retry-After se envía al limitar.
 
-La tabla a continuación muestra los **valores base predeterminados**. Los límites reales aplicados a su aplicación se definen exclusivamente a través de las cabeceras de respuesta del servidor. Se recomienda a clientes y bots no fijar números estáticos en el código, sino orientarse dinámicamente por las cabeceras `X-RateLimit-*`.
-
-## Rutas estándar
-
-| Grupo | Límite base |
+| Cabecera | Significado |
 |---|---|
-| `/v3/cdn/*`, `/v3/user-assets/*`, `/v3/users`, `/v3/keys`, `/v3/points/*`, `/v3/health` | 20 solicitudes por minuto |
-| `/v3/erlc/*`, `/v3/civops/*`, `/v3/subscriptions/*`, `/v3/ads/*` | 120 solicitudes por minuto |
-| `/v3/stats` sin clave de API | 40 solicitudes por minuto |
-| `/v3/stats` con clave de API | 120 solicitudes por minuto |
-| `/v3/ai/*` | 120 solicitudes por segundo |
+| `X-RateLimit-Limit` | Solicitudes permitidas en la ventana actual |
+| `X-RateLimit-Remaining` | Solicitudes restantes |
+| `X-RateLimit-Reset` | Cuándo se reinicia la ventana, tiempo Unix en milisegundos |
+| `Retry-After` | Segundos de espera antes de reintentar |
 
-Las rutas estándar comparten un contador por clave entre métodos y rutas; sin credenciales se usa la IP. AI tiene una ventana independiente de un segundo. Comprobar un archivo mediante GET y subirlo mediante POST cuenta como dos solicitudes. Al alcanzar el límite, detenga el envío y repita únicamente la solicitud rechazada tras la espera indicada en las cabeceras.
+En los métodos compatibles con OpenAI `/v1/*` los mismos valores usan los nombres de OpenAI: `x-ratelimit-limit-requests`, `x-ratelimit-remaining-requests` y `x-ratelimit-reset-requests` (tiempo hasta el reinicio, por ejemplo `1s`). Consulta el [resumen de la API de IA](/es/openai-api/v1/overview).
 
-## Autorización
+## Respuesta 429
 
-El inicio de sesión OAuth y sus callbacks permiten 10 solicitudes por minuto por usuario con cookie de sesión firmada. Las demás rutas de autenticación del usuario permiten 250 por sesión o 60 por visitante anónimo.
-
-Las solicitudes anónimas tienen además un límite compartido por IP: 120 por minuto para iniciar sesión y 240 para las demás rutas de autenticación. La ventana se reinicia al comenzar cada minuto.
-
-## Cómo orientarse por las cabeceras (HTTP Headers)
-
-En cada solicitud, la API devuelve un conjunto de cabeceras que describen el estado de su cuota:
-
-| Cabecera | Descripción | Cómo debe usarla el cliente |
-|---|---|---|
-| `X-RateLimit-Limit` | Límite asignado para la ventana activa | Muestra el límite personalizado de su clave según políticas y suscripciones |
-| `X-RateLimit-Remaining` | Número de solicitudes restantes | Si se acerca a `0`, el cliente debe ralentizar el envío de solicitudes (client-side throttling) |
-| `X-RateLimit-Reset` | Momento de reinicio (marca de tiempo Unix en ms) | Indica el instante exacto en que la cuota `Remaining` se restablece por completo |
-| `Retry-After` | Tiempo de espera requerido en segundos (con `429`) | Pausa obligatoria antes de reintentar la solicitud rechazada |
+Al superar el límite, la API responde con HTTP 429. El cuerpo solo trae el código y el mensaje; el tiempo de espera va en las cabeceras:
 
 ```json
 {
   "code": 5016,
-  "message": "Rate Limit Exceeded",
-  "retry_after": 30,
-  "details": {"limit": 20, "count": 21, "excess": 1, "reset_at": 1792083600000}
+  "message": "Rate Limit Exceeded"
 }
 ```
 
-El limitador de autenticación omite details. Un bloqueo por spam del middleware estándar devuelve code=5039, message=spam_blocked, blocked_until y remaining_seconds. La ventana estándar tiene un umbral de 400 solicitudes excedentes y un bloqueo base de cinco minutos; AI usa un umbral de 200 solicitudes excedentes por segundo.
+Si sigues enviando solicitudes tras un 429, la clave o la IP se bloquean un tiempo: recibes el código `5039` y `Retry-After` indica cuánto esperar.
 
-El limitador no convierte las modificaciones en operaciones idempotentes. Tras una interrupción de red, compruebe primero el estado del recurso. Un conflicto de ruta explícita en CDN devuelve 409; no es un 429 ni confirma una sobrescritura correcta.
+## Cómo tratarlo
 
-## Protección de Cloudflare
+* Vigila `X-RateLimit-Remaining` y reduce el ritmo cuando se acerque a cero.
+* Tras un 429, espera `Retry-After` segundos y reintenta solo la solicitud rechazada.
+* No repitas a ciegas solicitudes de escritura tras un fallo de red: comprueba antes si se aplicaron.
+* Guarda en caché las respuestas que cambian poco.
 
-Cloudflare también puede rechazar o bloquear solicitudes independientemente de los límites de la API, incluido un gran volumen desde una sola IP. No existe un umbral universal garantizado de 10.000 solicitudes por segundo: depende de las reglas de seguridad y las características del tráfico. [Cloudflare](https://developers.cloudflare.com/waf/rate-limiting-rules/).
+<Warning>
+  Delante de la API está Cloudflare, con sus propios límites. Si una IP envía demasiadas solicitudes, Cloudflare responde con el error `1015` (HTTP 429): es su propia página, no JSON de la API, y sin cabeceras `X-RateLimit-*`. Reduce el ritmo y espera unos minutos: reintentar durante el bloqueo lo alarga.
+</Warning>

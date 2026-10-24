@@ -1,0 +1,248 @@
+openapi: 3.1.0
+info:
+  title: Moscow RolePlay API - Stats Endpoints
+  description: "Public Discord server statistics (no authorization required).\n\n## Error Response Format\n\nAll errors are returned in JSON format with `code` and `message` fields:\n\n```json\n{\n\n    \"code\": 5001,\n\n    \"message\": \"unsupported_server\"\n\n}\n```\n\n## Error Codes\n\n| Code | Status | Description |\n|-----|--------|----------|\n| 5001 | 400 | unsupported_server |\n| 5016 | 429 | rate_limit_exceeded |\n| 5018 | 500 | server_error |\n\nBase URL: `https://api.erlcrussia.xyz/v1`\n"
+  version: 1.0.0
+servers:
+- url: https://api.erlcrussia.xyz/v1
+  description: Production
+tags:
+- name: Stats
+  description: Public statistics (no authorization required).
+paths:
+  /moscowroleplay/stats/playercount:
+    get:
+      tags:
+      - Stats
+      summary: Current ER:LC Player Count
+      description: '**Obsoleto.** Responde con el error `5028`. Usa `GET /v3/stats`.
+
+
+        Returns current player count on ER:LC server as plain text.'
+      security: []
+      responses:
+        '200':
+          description: Player count as string.
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: '25'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+      deprecated: true
+  /moscowroleplay/stats/{server}/membercount:
+    get:
+      tags:
+      - Stats
+      summary: Discord Server Member Count
+      description: '**Obsoleto.** Responde con el error `5028`. Usa `GET /v3/stats`.
+
+
+        Returns member count in Discord for specified server.'
+      security: []
+      parameters:
+      - $ref: '#/components/parameters/ServerParam'
+      responses:
+        '200':
+          description: Member count as string.
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: '350'
+        '400':
+          description: Invalid server or unsupported stat type.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                unsupported_server:
+                  summary: Unsupported server.
+                  value:
+                    code: 5001
+                    message: unsupported_server
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+      deprecated: true
+  /moscowroleplay/stats/{server}/allmembercount:
+    get:
+      tags:
+      - Stats
+      summary: Total Member Count (Including Bots)
+      description: '**Obsoleto.** Responde con el error `5028`. Usa `GET /v3/stats`.
+
+
+        Returns total member count in Discord (including bots) for specified server.'
+      security: []
+      parameters:
+      - $ref: '#/components/parameters/ServerParam'
+      responses:
+        '200':
+          description: Total member count as string.
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: '420'
+        '400':
+          description: Invalid server or unsupported stat type.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                unsupported_server:
+                  summary: Stats unavailable for this server.
+                  value:
+                    code: 5001
+                    message: stats_unavailable_for_server
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+      deprecated: true
+  /moscowroleplay/stats/{server}/botcount:
+    get:
+      tags:
+      - Stats
+      summary: Discord Server Bot Count
+      description: '**Obsoleto.** Responde con el error `5028`. Usa `GET /v3/stats`.
+
+
+        Returns bot count in Discord for specified server.'
+      security: []
+      parameters:
+      - $ref: '#/components/parameters/ServerParam'
+      responses:
+        '200':
+          description: Bot count as string.
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: '15'
+        '400':
+          description: Invalid server or unsupported stat type.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                unsupported_server:
+                  summary: Unsupported server.
+                  value:
+                    code: 5001
+                    message: unsupported_server
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+      deprecated: true
+components:
+  parameters:
+    ServerParam:
+      name: server
+      in: path
+      required: true
+      description: 'Discord server name.
+
+        '
+      schema:
+        type: string
+        enum:
+        - MVD
+        - FSB
+        - MCHS
+        - MZ
+        - '112'
+        - DOT
+        - MRP
+  responses:
+    BadRequest:
+      description: Bad request.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    TooManyRequests:
+      description: Request limit exceeded (20/min) or spam detected (400+ excess requests).
+      headers:
+        X-RateLimit-Limit:
+          description: Maximum requests per minute.
+          schema:
+            type: integer
+            example: 20
+        X-RateLimit-Remaining:
+          description: Remaining requests.
+          schema:
+            type: integer
+            example: 0
+        X-RateLimit-Reset:
+          description: Unix timestamp (ms) when limit resets.
+          schema:
+            type: integer
+            example: 1740339600000
+        Retry-After:
+          description: Seconds until limit resets.
+          schema:
+            type: integer
+            example: 45
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          examples:
+            too_many_requests:
+              summary: Exceeded 20 requests/min limit.
+              value:
+                code: 5016
+                message: rate_limit_exceeded
+                retry_after: 45
+                details:
+                  limit: 20
+                  count: 25
+                  excess: 5
+                  reset_at: 1740339600000
+            spam_blocked:
+              summary: Spam ban (400+ excess requests).
+              value:
+                code: 5023
+                message: spam_blocked
+                blocked_until: 1740339900000
+                remaining_seconds: 300
+    InternalServerError:
+      description: Internal server error.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          examples:
+            server_error:
+              summary: External ERLC API error.
+              value:
+                code: 5018
+                message: server_error
+  schemas:
+    ErrorResponse:
+      type: object
+      description: Standard error format.
+      required:
+      - code
+      - message
+      properties:
+        code:
+          type: integer
+          description: API error code.
+          example: 5001
+        message:
+          type: string
+          description: Error message/identifier.
+          example: unsupported_server

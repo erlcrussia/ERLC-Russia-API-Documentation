@@ -1,16 +1,16 @@
 ---
-title: "Directrices de Uso de la API"
+title: "Directrices de uso de la API"
 description: "Reglas y responsabilidades al acceder a la API de ER:LC Rusia, incluyendo acciones prohibidas, seguridad de tokens y normas de la comunidad."
 icon: "shield-check"
 ---
 
 El uso de la API de ER:LC Rusia conlleva una serie de obligaciones. Ya sea que estés creando un bot de Discord, un sitio web para un negocio o cualquier otra integración, debes seguir estrictamente estas reglas para mantener el acceso a la API y proteger a nuestra comunidad.
 
-## Alcance del Soporte
+## Alcance del soporte
 
 **Brindamos soporte técnico de la API exclusivamente a desarrolladores que tengan acceso directo a su código**. Si estás creando un producto para usuarios finales (por ejemplo, un bot para otros servidores o para tu negocio), tú eres responsable de brindarles soporte. El equipo de desarrollo de ER:LC Rusia no resolverá problemas para usuarios que simplemente utilizan tu servicio.
 
-## Acciones Prohibidas
+## Acciones prohibidas
 
 <Danger>
   Las siguientes acciones están **estrictamente prohibidas** y resultarán en la **revocación indefinida** del acceso a la API (bloqueo de token), así como posibles sanciones en nuestros servidores de juego y en Discord:
@@ -25,11 +25,11 @@ El uso de la API de ER:LC Rusia conlleva una serie de obligaciones. Ya sea que e
   * **Incumplimiento de las [Reglas oficiales de la API de ER:LC](https://apidocs.erlc.gg/policies/aups)** al integrar nuestra API para ER:LC.
 </Danger>
 
-### Reglas de la Comunidad de ER:LC Rusia
+### Reglas de la comunidad de ER:LC Rusia
 
 La API no debe utilizarse para acciones que violen las Reglas de la Comunidad de ER:LC. Están disponibles [**en este enlace**](https://wiki.erlcrussia.com).
 
-## Seguridad de Datos y Claves de Acceso
+## Seguridad de datos y claves de acceso
 
 Eres completamente responsable de la seguridad de tus claves de API, tokens de autorización y cualquier dato devuelto por la API.
 
@@ -37,13 +37,13 @@ Eres completamente responsable de la seguridad de tus claves de API, tokens de a
 * No las dejes en el código del lado del cliente (frontend) donde cualquier usuario pueda copiarlas.
 * Si tu clave se ha visto comprometida o filtrada, **notifícanos de inmediato mediante un ticket de Discord**. Ignorar una filtración o no notificar a la administración de manera oportuna puede resultar en el **bloqueo indefinido** de tu acceso a la API.
 
-## Optimización y Carga
+## Optimización y carga
 
 Si tu servicio maneja un gran volumen de solicitudes, estás obligado a implementar un **almacenamiento en caché adecuado**, **límites de frecuencia (rate limiting)** y un **manejo correcto de errores (p. ej., 429 Too Many Requests)**.
 
-Nos reservamos el derecho de restringir temporal o permanentemente el acceso a cualquier aplicación que sobrecargue el servidor, bloquee el Event Loop, degrade el rendimiento de la infraestructura o represente una amenaza para la estabilidad del proyecto.
+Nos reservamos el derecho de restringir temporal o permanentemente el acceso a cualquier aplicación que sobrecargue el servidor, degrade el rendimiento de la infraestructura o represente una amenaza para la estabilidad del proyecto.
 
-## Reporte de Vulnerabilidades
+## Reporte de vulnerabilidades
 
 Si descubres un error crítico, un exploit de evasión o una vulnerabilidad de seguridad que afecte a la API de ER:LC Rusia o a su backend, repórtalo de inmediato mediante un ticket de Discord o envía un correo electrónico a [**pancakeboyman_8@erlcrussia.com**](mailto:pancakeboyman_8@erlcrussia.com).
 

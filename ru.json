@@ -5,7 +5,6 @@
       "tab": "Информация и правила",
       "icon": "circle-info",
       "pages": [
-        "ru/index",
         {
           "group": "Начало",
           "icon": "rocket",
@@ -37,37 +36,305 @@
       "icon": "code",
       "versions": [
         {
-          "version": "API V1",
+          "version": "API V3",
+          "default": true,
           "pages": [
             {
-              "group": "Документация API V1",
+              "group": "Документация API V3",
               "icon": "file-code",
               "pages": [
                 {
-                  "group": "ER:LC API V1",
+                  "group": "ER:LC Сервер",
                   "icon": "gamepad",
                   "pages": [
-                    "ru/reference/v1/erlc-api-v1/get-erlc-server-bans",
-                    "ru/reference/v1/erlc-api-v1/get-erlc-server",
-                    "ru/reference/v1/erlc-api-v1/get-erlc-server-players",
-                    "ru/reference/v1/erlc-api-v1/get-erlc-server-joinlogs",
-                    "ru/reference/v1/erlc-api-v1/get-erlc-server-queue",
-                    "ru/reference/v1/erlc-api-v1/get-erlc-server-killlogs",
-                    "ru/reference/v1/erlc-api-v1/get-erlc-server-commandlogs",
-                    "ru/reference/v1/erlc-api-v1/get-erlc-server-modcalls",
-                    "ru/reference/v1/erlc-api-v1/get-erlc-server-vehicles",
-                    "ru/reference/v1/erlc-api-v1/get-erlc-server-staff",
-                    "ru/reference/v1/erlc-api-v1/post-erlc-server-command"
+                    "ru/reference/v3/erlc/get-erlc-server",
+                    "ru/reference/v3/erlc/get-erlc-server-bans",
+                    "ru/reference/v3/erlc/post-erlc-server-command"
                   ]
                 },
                 {
-                  "group": "MRP API статистики V1",
-                  "icon": "chart-bar",
+                  "group": "Статистика",
+                  "icon": "chart-simple",
                   "pages": [
-                    "ru/reference/v1/mrp-stats-api-v1/get-moscowroleplay-stats-playercount",
-                    "ru/reference/v1/mrp-stats-api-v1/get-moscowroleplay-stats-server-membercount",
-                    "ru/reference/v1/mrp-stats-api-v1/get-moscowroleplay-stats-server-allmembercount",
-                    "ru/reference/v1/mrp-stats-api-v1/get-moscowroleplay-stats-server-botcount"
+                    "ru/reference/v3/stats/get-stats"
+                  ]
+                },
+                {
+                  "group": "Верификация",
+                  "icon": "id-badge",
+                  "pages": [
+                    "ru/reference/v3/users/get-users",
+                    "ru/reference/v3/users/post-users"
+                  ]
+                },
+                {
+                  "group": "Баллы нарушений",
+                  "icon": "gavel",
+                  "pages": [
+                    "ru/reference/v3/points/get-user-points",
+                    "ru/reference/v3/points/get-user-history",
+                    "ru/reference/v3/points/add-user-points",
+                    "ru/reference/v3/points/remove-user-points",
+                    "ru/reference/v3/points/get-server-user-points",
+                    "ru/reference/v3/points/get-server-user-history",
+                    "ru/reference/v3/points/add-server-user-points",
+                    "ru/reference/v3/points/remove-server-user-points"
+                  ]
+                },
+                {
+                  "group": "Экономика",
+                  "icon": "coins",
+                  "pages": [
+                    {
+                      "group": "Чтение",
+                      "icon": "arrow-down",
+                      "pages": [
+                        "ru/reference/v3/civops/get-civops-economy",
+                        "ru/reference/v3/civops/get-civops-users",
+                        "ru/reference/v3/civops/get-civops-businesses",
+                        "ru/reference/v3/civops/get-civops-mafias",
+                        "ru/reference/v3/civops/get-civops-government",
+                        "ru/reference/v3/civops/get-civops-store",
+                        "ru/reference/v3/civops/get-civops-ads",
+                        "ru/reference/v3/civops/get-civops-system",
+                        "ru/reference/v3/civops/get-civops-health"
+                      ]
+                    },
+                    {
+                      "group": "Действия",
+                      "icon": "arrow-up",
+                      "pages": [
+                        "ru/reference/v3/civops/post-civops-economy",
+                        "ru/reference/v3/civops/post-civops-users",
+                        "ru/reference/v3/civops/post-civops-businesses",
+                        "ru/reference/v3/civops/post-civops-mafias",
+                        "ru/reference/v3/civops/post-civops-government",
+                        "ru/reference/v3/civops/post-civops-store",
+                        "ru/reference/v3/civops/post-civops-ads"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "group": "Ключи",
+                  "icon": "key",
+                  "pages": [
+                    "ru/reference/v3/keys/get-keys",
+                    "ru/reference/v3/keys/regenerate-keys"
+                  ]
+                },
+                {
+                  "group": "Вебхуки",
+                  "icon": "webhook",
+                  "pages": [
+                    "ru/reference/v3/webhooks/list-webhooks",
+                    "ru/reference/v3/webhooks/add-webhook-url",
+                    "ru/reference/v3/webhooks/update-webhook-url",
+                    "ru/reference/v3/webhooks/remove-webhook-url",
+                    "ru/reference/v3/webhooks/delete-all-webhooks",
+                    "ru/reference/v3/webhooks/test-webhook",
+                    "ru/reference/v3/webhooks/check-status",
+                    "ru/reference/v3/webhooks/set-active",
+                    "ru/reference/v3/webhooks/url-status",
+                    "ru/reference/v3/webhooks/post-webhooks"
+                  ]
+                },
+                {
+                  "group": "Подписки и магазин",
+                  "icon": "crown",
+                  "pages": [
+                    "ru/reference/v3/subscriptions/get-store",
+                    "ru/reference/v3/subscriptions/get-user-subscriptions",
+                    "ru/reference/v3/subscriptions/purchase-with-coins",
+                    "ru/reference/v3/subscriptions/get-user-limits"
+                  ]
+                },
+                {
+                  "group": "CDN",
+                  "icon": "cloud",
+                  "pages": [
+                    {
+                      "group": "Файлы",
+                      "icon": "file",
+                      "pages": [
+                        "ru/reference/v3/cdn/bind-team",
+                        "ru/reference/v3/cdn/get-assets",
+                        "ru/reference/v3/cdn/upload-asset",
+                        "ru/reference/v3/cdn/external-asset",
+                        "ru/reference/v3/cdn/update-assets",
+                        "ru/reference/v3/cdn/delete-assets",
+                        "ru/reference/v3/cdn/purge-assets",
+                        "ru/reference/v3/cdn/get-manifest",
+                        "ru/reference/v3/cdn/list-domains"
+                      ]
+                    },
+                    {
+                      "group": "Папки",
+                      "icon": "folder",
+                      "pages": [
+                        "ru/reference/v3/cdn/get-folders",
+                        "ru/reference/v3/cdn/create-folder",
+                        "ru/reference/v3/cdn/update-folders",
+                        "ru/reference/v3/cdn/delete-folders"
+                      ]
+                    },
+                    {
+                      "group": "Свои домены",
+                      "icon": "globe",
+                      "pages": [
+                        "ru/reference/v3/cdn/delete-cdn-custom-domains-id",
+                        "ru/reference/v3/cdn/get-cdn-custom-domains",
+                        "ru/reference/v3/cdn/get-cdn-custom-domains-id",
+                        "ru/reference/v3/cdn/patch-cdn-custom-domains-id",
+                        "ru/reference/v3/cdn/post-cdn-custom-domains",
+                        "ru/reference/v3/cdn/post-cdn-custom-domains-id-purge",
+                        "ru/reference/v3/cdn/post-cdn-custom-domains-id-regenerate-token",
+                        "ru/reference/v3/cdn/post-cdn-custom-domains-id-verify",
+                        "ru/reference/v3/cdn/post-cdn-webhook-purge"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "group": "Личные файлы",
+                  "icon": "file-user",
+                  "pages": [
+                    "ru/reference/v3/user-assets/get-user-assets",
+                    "ru/reference/v3/user-assets/post-user-assets",
+                    "ru/reference/v3/user-assets/get-user-assets-id",
+                    "ru/reference/v3/user-assets/delete-user-assets-id",
+                    "ru/reference/v3/user-assets/get-user-assets-id-content",
+                    "ru/reference/v3/user-assets/head-user-assets-id-content",
+                    "ru/reference/v3/user-assets/get-user-assets-authorize"
+                  ]
+                },
+                {
+                  "group": "Короткие ссылки",
+                  "icon": "link",
+                  "pages": [
+                    "ru/reference/v3/redirects/bind-key-team",
+                    "ru/reference/v3/redirects/get-redirects-summary",
+                    {
+                      "group": "Ссылки",
+                      "icon": "shuffle",
+                      "pages": [
+                        "ru/reference/v3/redirects/get-redirects",
+                        "ru/reference/v3/redirects/post-redirects",
+                        "ru/reference/v3/redirects/put-redirects",
+                        "ru/reference/v3/redirects/delete-redirects",
+                        "ru/reference/v3/redirects/post-redirects-batch-delete",
+                        "ru/reference/v3/redirects/post-redirects-batch-group"
+                      ]
+                    },
+                    {
+                      "group": "Группы",
+                      "icon": "folder-tree",
+                      "pages": [
+                        "ru/reference/v3/redirects/get-redirects-groups",
+                        "ru/reference/v3/redirects/post-redirects-groups",
+                        "ru/reference/v3/redirects/put-redirects-groups-reorder",
+                        "ru/reference/v3/redirects/put-redirects-groups-id",
+                        "ru/reference/v3/redirects/delete-redirects-groups-id",
+                        "ru/reference/v3/redirects/post-redirects-groups-batch-delete"
+                      ]
+                    },
+                    {
+                      "group": "Домены",
+                      "icon": "globe",
+                      "pages": [
+                        "ru/reference/v3/redirects/get-redirect-domains",
+                        "ru/reference/v3/redirects/post-redirect-domains",
+                        "ru/reference/v3/redirects/get-redirect-domains-id",
+                        "ru/reference/v3/redirects/patch-redirect-domains-id",
+                        "ru/reference/v3/redirects/delete-redirect-domains-id",
+                        "ru/reference/v3/redirects/post-redirect-domains-id-verify"
+                      ]
+                    },
+                    {
+                      "group": "Аналитика",
+                      "icon": "chart-line",
+                      "pages": [
+                        "ru/reference/v3/redirects/get-redirect-analytics-overview",
+                        "ru/reference/v3/redirects/get-redirect-analytics-timeseries",
+                        "ru/reference/v3/redirects/get-redirect-analytics-geo",
+                        "ru/reference/v3/redirects/get-redirect-analytics-sources"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "group": "AI Studio",
+                  "icon": "sparkles",
+                  "pages": [
+                    "ru/reference/v3/ai/get-credits-balance",
+                    "ru/reference/v3/ai/exchange-credits",
+                    "ru/reference/v3/ai/list-studio-keys",
+                    "ru/reference/v3/ai/create-studio-key",
+                    "ru/reference/v3/ai/delete-ai-keys-id",
+                    "ru/reference/v3/ai/generate-title",
+                    "ru/reference/v3/ai/patch-studio-key-id",
+                    "ru/reference/v3/ai/get-audio-pricing"
+                  ]
+                },
+                {
+                  "group": "Реклама",
+                  "icon": "rectangle-ad",
+                  "pages": [
+                    "ru/reference/v3/ads/post-ads-upload",
+                    "ru/reference/v3/ads/post-ads-campaigns",
+                    "ru/reference/v3/ads/get-ads-campaigns",
+                    "ru/reference/v3/ads/get-ads-campaigns-id",
+                    "ru/reference/v3/ads/post-ads-campaigns-id-buy",
+                    "ru/reference/v3/ads/post-ads-campaigns-id-toggle",
+                    "ru/reference/v3/ads/get-ads-packages",
+                    "ru/reference/v3/ads/get-ads-serve"
+                  ]
+                },
+                {
+                  "group": "Авторизация",
+                  "icon": "shield-halved",
+                  "pages": [
+                    {
+                      "group": "Вход",
+                      "icon": "arrow-right-to-bracket",
+                      "pages": [
+                        "ru/reference/v3/auth/discord-login",
+                        "ru/reference/v3/auth/discord-callback",
+                        "ru/reference/v3/auth/session-init",
+                        "ru/reference/v3/auth/session-init-post",
+                        "ru/reference/v3/auth/session-token",
+                        "ru/reference/v3/auth/get-session",
+                        "ru/reference/v3/auth/logout"
+                      ]
+                    },
+                    {
+                      "group": "Сессии",
+                      "icon": "fingerprint",
+                      "pages": [
+                        "ru/reference/v3/auth/get-user-sessions",
+                        "ru/reference/v3/auth/delete-user-session",
+                        "ru/reference/v3/auth/delete-all-user-sessions"
+                      ]
+                    },
+                    {
+                      "group": "Roblox и профиль",
+                      "icon": "link",
+                      "pages": [
+                        "ru/reference/v3/auth/roblox-login",
+                        "ru/reference/v3/auth/roblox-callback",
+                        "ru/reference/v3/auth/link-roblox",
+                        "ru/reference/v3/auth/unlink-roblox",
+                        "ru/reference/v3/auth/refresh-roblox",
+                        "ru/reference/v3/auth/refresh-profile"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "group": "Состояние",
+                  "icon": "heart-pulse",
+                  "pages": [
+                    "ru/reference/v3/health/get-health"
                   ]
                 }
               ]
@@ -135,301 +402,76 @@
           ]
         },
         {
-          "version": "API V3",
-          "default": true,
+          "version": "API V1",
           "pages": [
-            "ru/reference/v3/overview",
             {
-              "group": "Документация API V3",
+              "group": "Документация API V1",
               "icon": "file-code",
               "pages": [
                 {
-                  "group": "ER:LC API V3",
+                  "group": "ER:LC API V1",
                   "icon": "gamepad",
                   "pages": [
-                    "ru/reference/v3/erlc/get-erlc-server",
-                    "ru/reference/v3/erlc/get-erlc-server-bans",
-                    "ru/reference/v3/erlc/post-erlc-server-command"
+                    "ru/reference/v1/erlc-api-v1/get-erlc-server-bans",
+                    "ru/reference/v1/erlc-api-v1/get-erlc-server",
+                    "ru/reference/v1/erlc-api-v1/get-erlc-server-players",
+                    "ru/reference/v1/erlc-api-v1/get-erlc-server-joinlogs",
+                    "ru/reference/v1/erlc-api-v1/get-erlc-server-queue",
+                    "ru/reference/v1/erlc-api-v1/get-erlc-server-killlogs",
+                    "ru/reference/v1/erlc-api-v1/get-erlc-server-commandlogs",
+                    "ru/reference/v1/erlc-api-v1/get-erlc-server-modcalls",
+                    "ru/reference/v1/erlc-api-v1/get-erlc-server-vehicles",
+                    "ru/reference/v1/erlc-api-v1/get-erlc-server-staff",
+                    "ru/reference/v1/erlc-api-v1/post-erlc-server-command"
                   ]
                 },
                 {
-                  "group": "API экономики V3",
-                  "icon": "coins",
+                  "group": "MRP API статистики V1",
+                  "icon": "chart-bar",
                   "pages": [
-                    {
-                      "group": "GET-эндпоинты экономики",
-                      "icon": "arrow-down",
-                      "pages": [
-                        "ru/reference/v3/civops/get-civops-economy",
-                        "ru/reference/v3/civops/get-civops-users",
-                        "ru/reference/v3/civops/get-civops-businesses",
-                        "ru/reference/v3/civops/get-civops-mafias",
-                        "ru/reference/v3/civops/get-civops-government",
-                        "ru/reference/v3/civops/get-civops-store",
-                        "ru/reference/v3/civops/get-civops-ads",
-                        "ru/reference/v3/civops/get-civops-system",
-                        "ru/reference/v3/civops/get-civops-health"
-                      ]
-                    },
-                    {
-                      "group": "POST-эндпоинты экономики",
-                      "icon": "arrow-up",
-                      "pages": [
-                        "ru/reference/v3/civops/post-civops-economy",
-                        "ru/reference/v3/civops/post-civops-users",
-                        "ru/reference/v3/civops/post-civops-businesses",
-                        "ru/reference/v3/civops/post-civops-mafias",
-                        "ru/reference/v3/civops/post-civops-government",
-                        "ru/reference/v3/civops/post-civops-store",
-                        "ru/reference/v3/civops/post-civops-ads"
-                      ]
-                    }
-                  ]
-                },
-                {
-                  "group": "API статистики V3",
-                  "icon": "chart-line",
-                  "pages": [
-                    "ru/reference/v3/stats/get-stats"
-                  ]
-                },
-                {
-                  "group": "API верификации V3",
-                  "icon": "id-badge",
-                  "pages": [
-                    "ru/reference/v3/users/get-users",
-                    "ru/reference/v3/users/post-users"
-                  ]
-                },
-                {
-                  "group": "CDN API V3",
-                  "icon": "server",
-                  "pages": [
-                    "ru/reference/v3/cdn/overview",
-                    "ru/reference/v3/cdn/bind-team",
-                    {
-                      "group": "Ассеты и пространства имён",
-                      "icon": "file",
-                      "pages": [
-                        "ru/reference/v3/cdn/namespaces",
-                        "ru/reference/v3/cdn/get-assets",
-                        "ru/reference/v3/cdn/upload-asset",
-                        "ru/reference/v3/cdn/external-asset",
-                        "ru/reference/v3/cdn/update-assets",
-                        "ru/reference/v3/cdn/delete-assets",
-                        "ru/reference/v3/cdn/purge-assets",
-                        "ru/reference/v3/cdn/list-domains",
-                        "ru/reference/v3/cdn/get-manifest"
-                      ]
-                    },
-                    {
-                      "group": "Папки интерфейса",
-                      "icon": "folder",
-                      "pages": [
-                        "ru/reference/v3/cdn/get-folders",
-                        "ru/reference/v3/cdn/create-folder",
-                        "ru/reference/v3/cdn/update-folders",
-                        "ru/reference/v3/cdn/delete-folders"
-                      ]
-                    },
-                    {
-                      "group": "Кастомные домены CDN",
-                      "pages": [
-                        "ru/reference/v3/cdn/delete-cdn-custom-domains-id",
-                        "ru/reference/v3/cdn/get-cdn-custom-domains",
-                        "ru/reference/v3/cdn/get-cdn-custom-domains-id",
-                        "ru/reference/v3/cdn/patch-cdn-custom-domains-id",
-                        "ru/reference/v3/cdn/post-cdn-custom-domains",
-                        "ru/reference/v3/cdn/post-cdn-custom-domains-id-purge",
-                        "ru/reference/v3/cdn/post-cdn-custom-domains-id-regenerate-token",
-                        "ru/reference/v3/cdn/post-cdn-custom-domains-id-verify",
-                        "ru/reference/v3/cdn/post-cdn-webhook-purge"
-                      ]
-                    },
-                    {
-                      "group": "Личные файлы",
-                      "icon": "file-user",
-                      "pages": [
-                        "ru/reference/v3/user-assets/get-user-assets",
-                        "ru/reference/v3/user-assets/post-user-assets",
-                        "ru/reference/v3/user-assets/get-user-assets-id",
-                        "ru/reference/v3/user-assets/get-user-assets-authorize",
-                        "ru/reference/v3/user-assets/get-user-assets-id-content",
-                        "ru/reference/v3/user-assets/head-user-assets-id-content",
-                        "ru/reference/v3/user-assets/delete-user-assets-id"
-                      ]
-                    }
-                  ]
-                },
-                {
-                  "group": "Редиректы",
-                  "icon": "arrow-right-arrow-left",
-                  "pages": [
-                    {
-                      "group": "Настройки и сводка",
-                      "pages": [
-                        "ru/reference/v3/redirects/bind-key-team",
-                        "ru/reference/v3/redirects/get-redirects-summary"
-                      ]
-                    },
-                    {
-                      "group": "Редиректы",
-                      "pages": [
-                        "ru/reference/v3/redirects/get-redirects",
-                        "ru/reference/v3/redirects/post-redirects",
-                        "ru/reference/v3/redirects/put-redirects",
-                        "ru/reference/v3/redirects/delete-redirects",
-                        "ru/reference/v3/redirects/post-redirects-batch-delete"
-                      ]
-                    },
-                    {
-                      "group": "Группы редиректов",
-                      "pages": [
-                        "ru/reference/v3/redirects/get-redirects-groups",
-                        "ru/reference/v3/redirects/post-redirects-groups",
-                        "ru/reference/v3/redirects/put-redirects-groups-reorder",
-                        "ru/reference/v3/redirects/put-redirects-groups-id",
-                        "ru/reference/v3/redirects/delete-redirects-groups-id",
-                        "ru/reference/v3/redirects/post-redirects-groups-batch-delete",
-                        "ru/reference/v3/redirects/post-redirects-batch-group"
-                      ]
-                    },
-                    {
-                      "group": "Домены",
-                      "pages": [
-                        "ru/reference/v3/redirects/get-redirect-domains",
-                        "ru/reference/v3/redirects/post-redirect-domains",
-                        "ru/reference/v3/redirects/get-redirect-domains-id",
-                        "ru/reference/v3/redirects/patch-redirect-domains-id",
-                        "ru/reference/v3/redirects/delete-redirect-domains-id",
-                        "ru/reference/v3/redirects/post-redirect-domains-id-verify"
-                      ]
-                    },
-                    {
-                      "group": "Аналитика",
-                      "pages": [
-                        "ru/reference/v3/redirects/get-redirect-analytics-overview",
-                        "ru/reference/v3/redirects/get-redirect-analytics-timeseries",
-                        "ru/reference/v3/redirects/get-redirect-analytics-geo",
-                        "ru/reference/v3/redirects/get-redirect-analytics-sources"
-                      ]
-                    }
-                  ]
-                },
-                {
-                  "group": "API наказаний V3",
-                  "icon": "gavel",
-                  "pages": [
-                    "ru/reference/v3/points/get-user-points",
-                    "ru/reference/v3/points/get-user-history",
-                    "ru/reference/v3/points/add-user-points",
-                    "ru/reference/v3/points/remove-user-points",
-                    "ru/reference/v3/points/get-points-serverid-robloxid",
-                    "ru/reference/v3/points/get-points-serverid-robloxid-history",
-                    "ru/reference/v3/points/post-points-serverid-robloxid-add",
-                    "ru/reference/v3/points/post-points-serverid-robloxid-remove"
-                  ]
-                },
-                {
-                  "group": "API ключей V3",
-                  "icon": "key",
-                  "pages": [
-                    "ru/reference/v3/keys/get-keys",
-                    "ru/reference/v3/keys/post-keys"
-                  ]
-                },
-                {
-                  "group": "API вебхуков V3",
-                  "icon": "diagram-project",
-                  "pages": [
-                    "ru/reference/v3/webhooks/get-webhooks",
-                    "ru/reference/v3/webhooks/get-webhooks-status",
-                    "ru/reference/v3/webhooks/post-webhooks-add-url",
-                    "ru/reference/v3/webhooks/put-webhooks-url",
-                    "ru/reference/v3/webhooks/patch-webhooks-url-status",
-                    "ru/reference/v3/webhooks/patch-webhooks-set-active",
-                    "ru/reference/v3/webhooks/post-webhooks-test",
-                    "ru/reference/v3/webhooks/delete-webhooks-remove-url",
-                    "ru/reference/v3/webhooks/delete-webhooks"
-                  ]
-                },
-                {
-                  "group": "API подписок V3",
-                  "icon": "crown",
-                  "pages": [
-                    "ru/reference/v3/subscriptions/get-funpay-config",
-                    "ru/reference/v3/subscriptions/get-plans",
-                    "ru/reference/v3/subscriptions/get-user-subscriptions",
-                    "ru/reference/v3/subscriptions/get-user-benefits",
-                    "ru/reference/v3/subscriptions/get-subscriptions-coins-balance",
-                    "ru/reference/v3/subscriptions/create-funpay-order",
-                    "ru/reference/v3/subscriptions/get-funpay-order-status",
-                    "ru/reference/v3/subscriptions/purchase-with-coins",
-                    "ru/reference/v3/subscriptions/get-subscriptions-store",
-                    "ru/reference/v3/subscriptions/get-subscriptions-user-limits",
-                    "ru/reference/v3/subscriptions/get-subscriptions-user-limits-discordid"
-                  ]
-                },
-                {
-                  "group": "AI API V3",
-                  "icon": "sparkles",
-                  "pages": [
-                    "ru/reference/v3/ai/get-ai-credits-balance",
-                    "ru/reference/v3/ai/post-ai-credits-exchange",
-                    "ru/reference/v3/ai/get-ai-keys",
-                    "ru/reference/v3/ai/post-ai-keys",
-                    "ru/reference/v3/ai/patch-ai-keys",
-                    "ru/reference/v3/ai/patch-ai-keys-id",
-                    "ru/reference/v3/ai/delete-ai-keys",
-                    "ru/reference/v3/ai/delete-ai-keys-id",
-                    "ru/reference/v3/ai/post-ai-title",
-                    "ru/reference/v3/ai/get-audio-pricing",
-                    "ru/reference/v3/ai/post-audio-transcription"
-                  ]
-                },
-                {
-                  "group": "API авторизации V3",
-                  "icon": "shield-halved",
-                  "pages": [
-                    "ru/reference/v3/auth/get-auth-me",
-                    "ru/reference/v3/auth/get-auth-discord",
-                    "ru/reference/v3/auth/get-auth-discord-callback",
-                    "ru/reference/v3/auth/get-auth-roblox",
-                    "ru/reference/v3/auth/get-auth-roblox-callback",
-                    "ru/reference/v3/auth/get-auth-session",
-                    "ru/reference/v3/auth/get-auth-user-sessions",
-                    "ru/reference/v3/auth/patch-auth-user-profile",
-                    "ru/reference/v3/auth/patch-auth-user-roblox-refresh",
-                    "ru/reference/v3/auth/patch-auth-user-roblox-reverify",
-                    "ru/reference/v3/auth/post-auth-user-roblox",
-                    "ru/reference/v3/auth/delete-auth-user-roblox",
-                    "ru/reference/v3/auth/delete-auth-user-sessions",
-                    "ru/reference/v3/auth/delete-auth-user-sessions-id",
-                    "ru/reference/v3/auth/post-auth-logout"
-                  ]
-                },
-                {
-                  "group": "API состояния V3",
-                  "icon": "heart-pulse",
-                  "pages": [
-                    "ru/reference/v3/health/get-health"
-                  ]
-                },
-                {
-                  "group": "Реклама V3",
-                  "icon": "rectangle-ad",
-                  "pages": [
-                    "ru/reference/v3/ads/post-ads-upload",
-                    "ru/reference/v3/ads/post-ads-campaigns",
-                    "ru/reference/v3/ads/get-ads-campaigns",
-                    "ru/reference/v3/ads/get-ads-campaigns-id",
-                    "ru/reference/v3/ads/post-ads-campaigns-id-buy",
-                    "ru/reference/v3/ads/post-ads-campaigns-id-toggle",
-                    "ru/reference/v3/ads/get-ads-packages",
-                    "ru/reference/v3/ads/get-ads-serve",
-                    "ru/reference/v3/ads/post-ads-id-click"
+                    "ru/reference/v1/mrp-stats-api-v1/get-moscowroleplay-stats-playercount",
+                    "ru/reference/v1/mrp-stats-api-v1/get-moscowroleplay-stats-server-membercount",
+                    "ru/reference/v1/mrp-stats-api-v1/get-moscowroleplay-stats-server-allmembercount",
+                    "ru/reference/v1/mrp-stats-api-v1/get-moscowroleplay-stats-server-botcount"
                   ]
                 }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "tab": "ER:LC Россия AI API",
+      "icon": "robot",
+      "pages": [
+        "ru/openai-api/v1/overview",
+        {
+          "group": "Документация AI API",
+          "icon": "file-code",
+          "pages": [
+            {
+              "group": "Модели",
+              "icon": "microchip",
+              "pages": [
+                "ru/openai-api/v1/models",
+                "ru/openai-api/v1/get-model"
+              ]
+            },
+            {
+              "group": "Chat Completions",
+              "icon": "comments",
+              "pages": [
+                "ru/openai-api/v1/chat-completions"
+              ]
+            },
+            {
+              "group": "Аудио",
+              "icon": "waveform-lines",
+              "pages": [
+                "ru/openai-api/v1/speech",
+                "ru/openai-api/v1/transcriptions",
+                "ru/openai-api/v1/realtime"
               ]
             }
           ]
@@ -519,15 +561,15 @@
             "href": "https://wiki.erlcrussia.com/ru"
           },
           {
-            "label": "История Изменений",
+            "label": "История изменений",
             "href": "https://wiki.erlcrussia.com/ru/changelogs"
           },
           {
-            "label": "Правила Персонала",
+            "label": "Правила персонала",
             "href": "https://wiki.erlcrussia.com/ru/staff-rules"
           },
           {
-            "label": "Начать Играть",
+            "label": "Начать играть",
             "href": "https://wiki.erlcrussia.com/ru/guides"
           },
           {

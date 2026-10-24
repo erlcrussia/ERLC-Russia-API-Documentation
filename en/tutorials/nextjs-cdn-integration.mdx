@@ -9,8 +9,8 @@ The HTML and server code remain in Next.js. Only the content of `.next/static`, 
 ## 1. Select delivery address
 
 General CDN: `https://cdn.erlcrussia.com/YOUR_TEAM_SLUG/releases/RELEASE_ID`.
-Custom domain: `https://files.example.com/releases/RELEASE_ID` after registration, DNS/TLS check and Host routing in Go Edge.
-The API `domain` field takes the organization slug or a verified hostname, without a URL scheme or release prefix.
+Custom domain: `https://files.example.com/releases/RELEASE_ID` after registration, DNS/TLS check.
+The API `domain` field takes the team slug or a verified hostname, without a URL scheme or release prefix.
 
 ## 2. Set up a production build
 
@@ -52,7 +52,7 @@ curl -X POST "$API_BASE/v3/cdn/assets" \
 
 For CSS use `text/css`, for fonts use MIME of the appropriate format. Do not set the generic `Content-Type: multipart/form-data` manually: the boundary is added by the client. `compress=false` saves bytes and SHA-256 assembly. For your own domain, replace `domain` with `files.example.com`.
 
-HTTP 200 returns `{ "success": true, "asset": { ... } }`. A busy explicit path returns 409; don't consider this a successful rewrite. Compare the SHA-256 of an existing asset or use a new RELEASE_ID. At 429, wait for `Retry-After`/`retry_after` and retry only the rejected request. Load sequentially, taking into account the overall limit, rather than hundreds of parallel requests.
+HTTP 200 returns `{ "success": true, "asset": { ... } }`. A busy explicit path returns 409; don't consider this a successful rewrite. Compare the SHA-256 of an existing asset or use a new RELEASE_ID. At 429, wait for `Retry-After`/`Retry-After` and retry only the rejected request. Load sequentially, taking into account the overall limit, rather than hundreds of parallel requests.
 
 Don't download the entire `.next`: that's where the server code and configuration are. Publish source maps `.map` only if there is a conscious need. Keep old releases as long as open tabs use them.
 
@@ -71,4 +71,4 @@ In Network, check JS/CSS/font domain, MIME, CORS and HTTP 200. Compare bytes to 
 
 The CDN serves files uploaded in advance. `originUrl` specifies a redirect destination for the domain root or a missing object, rather than a source for automatic downloads. Upload build files through the API before publishing the release.
 
-Paths starting with `_next/static/` are made immutable in Go Edge. If `_next` is preceded by a release prefix, the current implementation uses a normal Cache-Control; check the actual title. Resetting Go Edge does not clear the browser cache and does not itself confirm that Cloudflare has cleared it.
+Paths starting with `_next/static/` are made immutable by the CDN. If `_next` is preceded by a release prefix, the current implementation uses a normal Cache-Control; check the actual title. Resetting CDN does not clear the browser cache and does not itself confirm that Cloudflare has cleared it.

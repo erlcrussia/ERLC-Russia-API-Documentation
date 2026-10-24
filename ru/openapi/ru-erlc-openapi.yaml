@@ -3,26 +3,26 @@ info:
   title: ER:LC Россия API V1 - Moscow RolePlay API ER:LC V1
   version: 1.0.0
 servers:
-  - url: https://api.erlcrussia.xyz/v1
-    description: Production API V1 (xyz)
-  - url: https://api.erlcrussia.com/v1
-    description: Production API V1 (com)
+- url: https://api.erlcrussia.com/v1
+  description: Production API V1 (com)
+- url: https://api.erlcrussia.xyz/v1
+  description: Production API V1 (xyz)
 tags:
-  - name: Moscow RolePlay API ER:LC V1
-    description: Данные игрового сервера ER:LC и управление им.
+- name: Moscow RolePlay API ER:LC V1
+  description: Данные игрового сервера ER:LC и управление им.
 paths:
   /erlc/server:
     get:
       tags:
-        - Moscow RolePlay API ER:LC V1
-      summary: Информация о Сервере ER:LC  
-      description: >
-        **ЭНДПОИНТ ОТКЛЮЧЕН** - Возвращает ошибку 500.
-        
-        Получение общей информации о сервере ER:LC (онлайн, название, статус и т.д.).
+      - Moscow RolePlay API ER:LC V1
+      summary: Информация о Сервере ER:LC
+      description: '**Устарел.** Отвечает ошибкой `5028`. Используйте `GET /v3/erlc/server`.
+
+
+        Получение общей информации о сервере ER:LC (онлайн, название, статус и т.д.).'
       deprecated: true
       security:
-        - MRPAPIKey: []
+      - MRPAPIKey: []
       responses:
         '500':
           description: Эндпоинт отключен/устарел.
@@ -32,19 +32,19 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
               example:
                 code: 5018
-                message: 'Endpoint устарел. Используйте более новую версию API.'
+                message: Endpoint устарел. Используйте более новую версию API.
   /erlc/server/players:
     get:
       tags:
-        - Moscow RolePlay API ER:LC V1
-      summary: Список Игроков На Сервере  
-      description: |
-        **ЭНДПОИНТ ОТКЛЮЧЕН** - Возвращает ошибку 500.
-        
-        Возвращает текущий список игроков на сервере ER:LC.
+      - Moscow RolePlay API ER:LC V1
+      summary: Список Игроков На Сервере
+      description: '**Устарел.** Отвечает ошибкой `5028`. Используйте `GET /v3/erlc/server?Players=true`.
+
+
+        Возвращает текущий список игроков на сервере ER:LC.'
       deprecated: true
       security:
-        - MRPAPIKey: []
+      - MRPAPIKey: []
       responses:
         '500':
           description: Эндпоинт отключен/устарел.
@@ -54,19 +54,19 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
               example:
                 code: 5018
-                message: 'Endpoint устарел. Используйте более новую версию API.'
+                message: Endpoint устарел. Используйте более новую версию API.
   /erlc/server/joinlogs:
     get:
       tags:
-        - Moscow RolePlay API ER:LC V1
-      summary: Логи Входов/Выходов Игроков  
-      description: |
-        **ЭНДПОИНТ ОТКЛЮЧЕН** - Возвращает ошибку 500.
-        
-        Возвращает список логов входов и выходов игроков на сервер.
+      - Moscow RolePlay API ER:LC V1
+      summary: Логи Входов/Выходов Игроков
+      description: '**Устарел.** Отвечает ошибкой `5028`. Используйте `GET /v3/erlc/server?JoinLogs=true`.
+
+
+        Возвращает список логов входов и выходов игроков на сервер.'
       deprecated: true
       security:
-        - MRPAPIKey: []
+      - MRPAPIKey: []
       responses:
         '500':
           description: Эндпоинт отключен/устарел.
@@ -76,19 +76,19 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
               example:
                 code: 5018
-                message: 'Endpoint устарел. Используйте более новую версию API.'
+                message: Endpoint устарел. Используйте более новую версию API.
   /erlc/server/queue:
     get:
       tags:
-        - Moscow RolePlay API ER:LC V1
-      summary: Очередь На Сервер  
-      description: |
-        **ЭНДПОИНТ ОТКЛЮЧЕН** - Возвращает ошибку 500.
-        
-        Возвращает информацию об очереди на сервер ER:LC.
+      - Moscow RolePlay API ER:LC V1
+      summary: Очередь На Сервер
+      description: '**Устарел.** Отвечает ошибкой `5028`. Используйте `GET /v3/erlc/server?Queue=true`.
+
+
+        Возвращает информацию об очереди на сервер ER:LC.'
       deprecated: true
       security:
-        - MRPAPIKey: []
+      - MRPAPIKey: []
       responses:
         '500':
           description: Эндпоинт отключен/устарел.
@@ -98,19 +98,19 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
               example:
                 code: 5018
-                message: 'Endpoint устарел. Используйте более новую версию API.'
+                message: Endpoint устарел. Используйте более новую версию API.
   /erlc/server/killlogs:
     get:
       tags:
-        - Moscow RolePlay API ER:LC V1
-      summary: Логи Убийств  
-      description: |
-        **ЭНДПОИНТ ОТКЛЮЧЕН** - Возвращает ошибку 500.
-        
-        Возвращает логи убийств на сервере ER:LC.
+      - Moscow RolePlay API ER:LC V1
+      summary: Логи Убийств
+      description: '**Устарел.** Отвечает ошибкой `5028`. Используйте `GET /v3/erlc/server?KillLogs=true`.
+
+
+        Возвращает логи убийств на сервере ER:LC.'
       deprecated: true
       security:
-        - MRPAPIKey: []
+      - MRPAPIKey: []
       responses:
         '500':
           description: Эндпоинт отключен/устарел.
@@ -120,19 +120,19 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
               example:
                 code: 5018
-                message: 'Endpoint устарел. Используйте более новую версию API.'
+                message: Endpoint устарел. Используйте более новую версию API.
   /erlc/server/commandlogs:
     get:
       tags:
-        - Moscow RolePlay API ER:LC V1
-      summary: Логи Команд  
-      description: |
-        **ЭНДПОИНТ ОТКЛЮЧЕН** - Возвращает ошибку 500.
-        
-        Возвращает логи выполненных команд на сервере.
+      - Moscow RolePlay API ER:LC V1
+      summary: Логи Команд
+      description: '**Устарел.** Отвечает ошибкой `5028`. Используйте `POST /v3/erlc/server/command`.
+
+
+        Возвращает логи выполненных команд на сервере.'
       deprecated: true
       security:
-        - MRPAPIKey: []
+      - MRPAPIKey: []
       responses:
         '500':
           description: Эндпоинт отключен/устарел.
@@ -142,19 +142,19 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
               example:
                 code: 5018
-                message: 'Endpoint устарел. Используйте более новую версию API.'
+                message: Endpoint устарел. Используйте более новую версию API.
   /erlc/server/modcalls:
     get:
       tags:
-        - Moscow RolePlay API ER:LC V1
-      summary: Логи Вызовов Модераторов  
-      description: |
-        **ЭНДПОИНТ ОТКЛЮЧЕН** - Возвращает ошибку 500.
-        
-        Возвращает логи вызовов модераторов на сервере ER:LC.
+      - Moscow RolePlay API ER:LC V1
+      summary: Логи Вызовов Модераторов
+      description: '**Устарел.** Отвечает ошибкой `5028`. Используйте `GET /v3/erlc/server?ModCalls=true`.
+
+
+        Возвращает логи вызовов модераторов на сервере ER:LC.'
       deprecated: true
       security:
-        - MRPAPIKey: []
+      - MRPAPIKey: []
       responses:
         '500':
           description: Эндпоинт отключен/устарел.
@@ -164,16 +164,18 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
               example:
                 code: 5018
-                message: 'Endpoint устарел. Используйте более новую версию API.'
+                message: Endpoint устарел. Используйте более новую версию API.
   /erlc/server/bans:
     get:
       tags:
-        - Moscow RolePlay API ER:LC V1
+      - Moscow RolePlay API ER:LC V1
       summary: Список Банов Сервера
-      description: |
-        Возвращает список активных банов на сервере ER:LC.
+      description: 'Возвращает список активных банов на сервере ER:LC.
+
+
+        Работает. В API V3 то же самое — `GET /v3/erlc/server/bans`.'
       security:
-        - MRPAPIKey: []
+      - MRPAPIKey: []
       responses:
         '200':
           description: Список банов.
@@ -199,15 +201,15 @@ paths:
   /erlc/server/vehicles:
     get:
       tags:
-        - Moscow RolePlay API ER:LC V1
-      summary: Список Транспорта На Сервере  
-      description: |
-        **ЭНДПОИНТ ОТКЛЮЧЕН** - Возвращает ошибку 500.
-        
-        Возвращает список транспорта, находящегося на сервере ER:LC.
+      - Moscow RolePlay API ER:LC V1
+      summary: Список Транспорта На Сервере
+      description: '**Устарел.** Отвечает ошибкой `5028`. Используйте `GET /v3/erlc/server?Vehicles=true`.
+
+
+        Возвращает список транспорта, находящегося на сервере ER:LC.'
       deprecated: true
       security:
-        - MRPAPIKey: []
+      - MRPAPIKey: []
       responses:
         '500':
           description: Эндпоинт отключен/устарел.
@@ -217,19 +219,19 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
               example:
                 code: 5018
-                message: 'Endpoint устарел. Используйте более новую версию API.'
+                message: Endpoint устарел. Используйте более новую версию API.
   /erlc/server/staff:
     get:
       tags:
-        - Moscow RolePlay API ER:LC V1
-      summary: Список Персонала Сервера  
-      description: |
-        **ЭНДПОИНТ ОТКЛЮЧЕН** - Возвращает ошибку 500.
-        
-        Возвращает список членов персонала сервера ER:LC.
+      - Moscow RolePlay API ER:LC V1
+      summary: Список Персонала Сервера
+      description: '**Устарел.** Отвечает ошибкой `5028`. Используйте `GET /v3/erlc/server?Staff=true`.
+
+
+        Возвращает список членов персонала сервера ER:LC.'
       deprecated: true
       security:
-        - MRPAPIKey: []
+      - MRPAPIKey: []
       responses:
         '500':
           description: Эндпоинт отключен/устарел.
@@ -239,26 +241,25 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
               example:
                 code: 5018
-                message: 'Endpoint устарел. Используйте более новую версию API.'
+                message: Endpoint устарел. Используйте более новую версию API.
   /erlc/server/command:
     post:
       tags:
-        - Moscow RolePlay API ER:LC V1
-      summary: Отправка Команды На Сервер ER:LC  
-      description: >
-        **ЭНДПОИНТ ОТКЛЮЧЕН** - Возвращает ошибку 500.
-        
+      - Moscow RolePlay API ER:LC V1
+      summary: Отправка Команды На Сервер ER:LC
+      description: '**Устарел.** Отвечает ошибкой `5028`. Используйте `POST /v3/erlc/server/command`.
+
+
         Отправляет команду на выполнение на сервере ER:LC.
 
 
-        Команды добавляются в глобальную очередь с ограничением на максимальное
-        количество команд.
+        Команды добавляются в глобальную очередь с ограничением на максимальное количество команд.
 
 
-        **Примечание:** Этот эндпоинт **не подвержен** Rate Limiting (120 запросов/мин).
+        **Примечание:** Этот эндпоинт **не подвержен** Rate Limiting (120 запросов/мин).'
       deprecated: true
       security:
-        - MRPAPIKey: []
+      - MRPAPIKey: []
       requestBody:
         required: true
         description: Объект с Текстом Команды.
@@ -267,11 +268,11 @@ paths:
             schema:
               type: object
               required:
-                - command
+              - command
               properties:
                 command:
                   type: string
-                  example: ':h Тест API'
+                  example: :h Тест API
       responses:
         '500':
           description: Эндпоинт отключен/устарел.
@@ -281,19 +282,14 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
               example:
                 code: 5018
-                message: 'Endpoint устарел. Используйте более новую версию API.'
+                message: Endpoint устарел. Используйте более новую версию API.
 components:
   securitySchemes:
     MRPAPIKey:
-      type: http
-      scheme: bearer
-      bearerFormat: API Key
-      description: |
-        Стандартный API ключ для доступа к ER:LC эндпоинтам.
-
-        Передается в заголовке `Authorization: Bearer <ключ>`.
-
-        ОБЯЗАТЕЛЕН ДЛЯ ВСЕХ ER:LC ЭНДПОИНТОВ.
+      type: apiKey
+      in: header
+      name: erlcrussia-api-key
+      description: Единый заголовок API-ключа erlcrussia-api-key.
   responses:
     BadRequest:
       description: Неверный запрос.
@@ -459,8 +455,8 @@ components:
       type: object
       description: Стандартный формат ошибки.
       required:
-        - code
-        - message
+      - code
+      - message
       properties:
         code:
           type: integer
@@ -474,8 +470,8 @@ components:
       type: object
       description: Ошибка аутентификации (отсутствует или неверный токен).
       required:
-        - code
-        - message
+      - code
+      - message
       properties:
         code:
           type: integer
@@ -487,8 +483,8 @@ components:
       type: object
       description: Ошибка доступа (запрещено).
       required:
-        - code
-        - message
+      - code
+      - message
       properties:
         code:
           type: integer
@@ -500,10 +496,10 @@ components:
       type: object
       description: Ошибка превышения лимита запросов (120/мин). Возвращает details с информацией о счётчике.
       required:
-        - code
-        - message
-        - retry_after
-        - details
+      - code
+      - message
+      - retry_after
+      - details
       properties:
         code:
           type: integer

@@ -11,7 +11,7 @@ Il Gateway WebSocket ti consente di ricevere i dati del server ER:LC in tempo re
 
 Se ti connetti all'endpoint tramite protocollo HTTP standard (anziché WebSocket), verrà restituito un errore `426` con codice `5020`.
 
-## Avvio Rapido
+## Avvio rapido
 
 ```js
 const ws = new WebSocket('wss://api.erlcrussia.com/v2/gateway');
@@ -26,7 +26,7 @@ ws.on('message', (data) => {
 });
 ```
 
-## Ciclo di Vita della Connessione
+## Ciclo di vita della connessione
 
 1. **Connessione** — stabilire una connessione WebSocket
 2. **Autenticazione** — inviare il messaggio `auth` con il tuo token
@@ -37,7 +37,7 @@ ws.on('message', (data) => {
 
 ---
 
-## Messaggi del Client
+## Messaggi del client
 
 Tutti i messaggi vengono inviati in formato JSON con un campo `action`.
 
@@ -52,7 +52,7 @@ Il primo messaggio che deve essere inviato dopo la connessione. Senza autenticaz
 }
 ```
 
-### Risposta in Caso di Successo
+### Risposta in caso di successo
 
 ```json
 {
@@ -66,7 +66,7 @@ Dopo un'autenticazione riuscita, viene inviato automaticamente uno snapshot dell
 
 ---
 
-## Iscrizione ai Canali
+## Iscrizione ai canali
 
 Iscriviti a uno o più canali di dati.
 
@@ -95,7 +95,7 @@ Iscriviti a uno o più canali di dati.
 }
 ```
 
-### Iscrizione Negata
+### Iscrizione negata
 
 Se non disponi dell'accesso a un canale specifico:
 
@@ -109,7 +109,7 @@ Se non disponi dell'accesso a un canale specifico:
 
 ---
 
-## Annullamento Iscrizione ai Canali
+## Annullamento iscrizione ai canali
 
 Disiscriviti dai canali di cui non hai più bisogno.
 
@@ -131,7 +131,7 @@ Disiscriviti dai canali di cui non hai più bisogno.
 
 ---
 
-## Recupero della Cache
+## Recupero della cache
 
 Richiedi lo snapshot corrente della cache per le tue iscrizioni.
 
@@ -166,7 +166,7 @@ Verifica dello stato della connessione.
 
 ---
 
-## Canali Dati
+## Canali dati
 
 | Canale | Descrizione |
 | --- | --- |
@@ -183,7 +183,7 @@ Verifica dello stato della connessione.
 
 ---
 
-## Struttura dei Dati dei Canali
+## Struttura dei dati dei canali
 
 ### `Server`
 
@@ -328,7 +328,7 @@ Verifica dello stato della connessione.
 
 ## Messaggi del Server
 
-### Evento di Connessione
+### Evento di connessione
 
 Inviato immediatamente dopo aver stabilito la connessione:
 
@@ -340,7 +340,7 @@ Inviato immediatamente dopo aver stabilito la connessione:
 }
 ```
 
-### Aggiornamento Cache
+### Aggiornamento cache
 
 Quando i dati del server cambiano, viene inviato uno snapshot aggiornato a tutti i client iscritti:
 
@@ -355,7 +355,7 @@ Quando i dati del server cambiano, viene inviato uno snapshot aggiornato a tutti
 
 > I dati vengono restituiti solo per i canali a cui il client è iscritto.
 
-### Cache Vuota
+### Cache vuota
 
 Se la cache non è disponibile:
 
@@ -366,7 +366,7 @@ Se la cache non è disponibile:
 }
 ```
 
-### Snapshot Vuoto
+### Snapshot vuoto
 
 Se la cache esiste ma non ci sono dati per le tue iscrizioni:
 
@@ -388,7 +388,7 @@ Se la cache esiste ma non ci sono dati per le tue iscrizioni:
 
 ---
 
-## Keep-Alive (Controllo Attività)
+## Keep-Alive (Controllo attività)
 
 Il server invia un `ping` WebSocket ogni **30 secondi**. Il client deve rispondere con un `pong`. Se il client non risponde, la connessione verrà chiusa.
 
@@ -402,7 +402,7 @@ Per il controllo manuale della connessione, utilizza l'azione `ping`:
 
 ---
 
-## Esempio Completo
+## Esempio completo
 
 ```js
 const WebSocket = require('ws');

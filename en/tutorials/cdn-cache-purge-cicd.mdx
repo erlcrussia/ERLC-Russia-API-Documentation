@@ -1,6 +1,6 @@
 ---
 title: CDN in CI/CD and cache reset
-description: Release publishing and spot cleaning of Cloudflare and Go Edge.
+description: Release publishing and spot cleaning of the Cloudflare and CDN cache.
 icon: arrows-rotate
 ---
 
@@ -23,6 +23,8 @@ The response contains success, domain, cloudflarePurged, edgePurged and timestam
 
 ## Regular namespace and file groups
 
-`POST /v3/cdn/assets/purge?domain=YOUR_TEAM_SLUG&prefix=releases/RELEASE_ID/` accepts prefix and schedules Go Edge cleanup. This is a different contract. Without ids/path/prefix, the entire namespace is selected. success means acceptance of the operation; check subsequent delivery.
+`POST /v3/cdn/assets/purge?domain=YOUR_TEAM_SLUG&prefix=releases/RELEASE_ID/` accepts prefix and schedules a CDN cache purge. This is a different contract. Without ids/path/prefix, the entire namespace is selected. success means acceptance of the operation; check subsequent delivery.
 
-The new release URL is more reliable than replacing the old immutable file. HTTP 429 requires waiting Retry-After/retry_after; HTTP 409 means an existing object, not a successful download.
+The new release URL is more reliable than replacing the old immutable file. HTTP 429 requires waiting Retry-After; HTTP 409 means an existing object, not a successful download.
+
+Without ids/path/prefix, a whole-namespace purge runs in the background: HTTP 202, status=queued, acceptedCount counts selected assets, not completed work. One request per minute per team and namespace; respect Retry-After on 429. Completion or failure is recorded in the API audit log. Targeted purge keeps HTTP 200 and purgedCount. A new unique release URL usually needs no purge immediately after upload: doing so evicts the warmed cache.

@@ -1,4 +1,40 @@
 ---
-title: Ottenere chiavi e restrizioni
+title: "Le mie chiavi"
+description: "Le tue chiavi API e WebSocket. Passa `api=true` e/o `websocket=true`; `restrictions=true` aggiunge i permessi."
+icon: "key"
 openapi: /it/openapi/it-api-v3-openapi.yaml GET /keys
+keywords:
+- keys
+- tokens
+- chiavi
+- gettoni
+- restrizioni
+- restrictions
+- api
+- websocket
 ---
+
+Endpoint universale per ottenere un elenco di token (`API` e `WebSocket`) e i relativi diritti/restrizioni.
+
+### Autorizzazione
+L'intestazione `erlcrussia-api-key` **non è strettamente necessaria** se si utilizza una chiave WebSocket. Puoi passare:
+- `erlcrussia-api-key` - per l'autorizzazione e il funzionamento con chiavi API HTTP (`?api=true`).
+- `erlcrussia-websocket-key` - per l'autorizzazione e il funzionamento con le chiavi WebSocket (`?websocket=true`).
+- O entrambe le rubriche contemporaneamente.
+
+### Parametri della query
+
+| Parametro | Digitare | Descrizione |
+| :--- | :--- | :--- |
+| `api` | `boolean` | Richiedi chiavi API HTTP (`true`). |
+| `websocket` | `boolean` | Richiedi chiavi WebSocket (`true`). |
+| `restrictions` | `boolean` | Abilita le restrizioni per il tipo di chiave precedente (`true`). |
+
+<Tip>
+Il parametro `restrictions=true` è associato al parametro di tipo precedente. Ad esempio:
+- `?api=true&restrictions=true` - restituirà le chiavi API con le relative restrizioni.
+- `?api=true&websocket=true&restrictions=true`: restituirà le chiavi API senza restrizioni e le chiavi WebSocket con restrizioni.
+- `?api=true&restrictions=true&websocket=true&restrictions=true` - restituirà entrambi i tipi di chiavi con restrizioni.
+</Tip>
+
+Il segreto completo viene restituito solo alla creazione o rotazione. Gli elenchi delle chiavi IA, la rinomina e l’eliminazione restituiscono una maschera. GET /keys rivela solo la chiave chiamante; le altre, anche proprie, sono mascherate. teamId è l’ID del team associato o null.

@@ -1,4 +1,40 @@
 ---
-title: Obtaining Keys and Restrictions
+title: "My keys"
+description: "Your API and WebSocket keys. Pass `api=true` and/or `websocket=true`; `restrictions=true` adds permissions."
+icon: "key"
 openapi: /en/openapi/en-api-v3-openapi.yaml GET /keys
+keywords:
+- keys
+- tokens
+- keys
+- tokens
+- restrictions
+- restrictions
+- api
+- websocket
 ---
+
+Universal endpoint for obtaining a list of tokens (`API` and `WebSocket`) and their rights/restrictions.
+
+### Authorization
+The `erlcrussia-api-key` header is **not strictly required** if you are using a WebSocket key. You can pass:
+- `erlcrussia-api-key` - for authorization and working with HTTP API keys (`?api=true`).
+- `erlcrussia-websocket-key` - for authorization and working with WebSocket keys (`?websocket=true`).
+- Or both headings at the same time.
+
+### Query parameters
+
+| Parameter | Type | Description |
+| :--- | :--- | :--- |
+| `api` | `boolean` | Request HTTP API keys (`true`). |
+| `websocket` | `boolean` | Request WebSocket keys (`true`). |
+| `restrictions` | `boolean` | Enable restrictions for the previous key type (`true`). |
+
+<Tip>
+The `restrictions=true` parameter is bound to the preceding type parameter. For example:
+- `?api=true&restrictions=true` - will return API keys with their restrictions.
+- `?api=true&websocket=true&restrictions=true` - will return API keys without restrictions and WebSocket keys with restrictions.
+- `?api=true&restrictions=true&websocket=true&restrictions=true` - will return both types of keys with restrictions.
+</Tip>
+
+The full secret is returned only on creation or rotation. AI key lists, renaming and deletion return a masked token. GET /keys reveals only the calling key; all sibling keys, including your own, are masked. teamId is the bound team ID or null.

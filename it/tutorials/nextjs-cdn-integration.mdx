@@ -9,8 +9,8 @@ L'HTML e il codice del server rimangono in Next.js. Sulla CDN viene caricato sol
 ## 1. Seleziona l'indirizzo di consegna
 
 CDN generale: `https://cdn.erlcrussia.com/YOUR_TEAM_SLUG/releases/RELEASE_ID`.
-Dominio personalizzato: `https://files.example.com/releases/RELEASE_ID` dopo la registrazione, controllo DNS/TLS e routing dell'host in Go Edge.
-Nell'API, il campo `domain` è uno slug dell'organizzazione o un nome di dominio verificato, senza schema e senza prefisso di rilascio.
+Dominio personalizzato: `https://files.example.com/releases/RELEASE_ID` dopo la registrazione, controllo DNS/TLS.
+Nell'API, il campo `domain` è lo slug del team o un nome di dominio verificato, senza schema e senza prefisso di rilascio.
 
 ## 2. Configura una build di produzione
 
@@ -52,7 +52,7 @@ curl -X POST "$API_BASE/v3/cdn/assets" \
 
 Per i CSS utilizzare `text/css`, per i caratteri utilizzare MIME del formato appropriato. Non impostare manualmente il generico `Content-Type: multipart/form-data`: il confine viene aggiunto dal cliente. `compress=false` salva byte e assembly SHA-256. Per il tuo dominio, sostituisci `domain` con `files.example.com`.
 
-HTTP 200 restituisce `{ "success": true, "asset": { ... } }`. Un percorso esplicito occupato restituisce 409; non considerarla una riscrittura riuscita. Confronta lo SHA-256 di una risorsa esistente o utilizza un nuovo RELEASE_ID. A 429, attendere `Retry-After`/`retry_after` e ritentare solo la richiesta rifiutata. Carica in sequenza, tenendo conto del limite complessivo, anziché di centinaia di richieste parallele.
+HTTP 200 restituisce `{ "success": true, "asset": { ... } }`. Un percorso esplicito occupato restituisce 409; non considerarla una riscrittura riuscita. Confronta lo SHA-256 di una risorsa esistente o utilizza un nuovo RELEASE_ID. A 429, attendere `Retry-After`/`Retry-After` e ritentare solo la richiesta rifiutata. Carica in sequenza, tenendo conto del limite complessivo, anziché di centinaia di richieste parallele.
 
 Non scaricare l'intero `.next`: è lì che si trovano il codice del server e la configurazione. Pubblica le mappe sorgente `.map` solo se ce n'è una necessità consapevole. Conserva le versioni precedenti finché le schede aperte le utilizzano.
 
@@ -71,4 +71,4 @@ In Rete, controlla il dominio JS/CSS/font, MIME, CORS e HTTP 200. Confronta i by
 
 La CDN distribuisce file caricati in anticipo. `originUrl` specifica una destinazione di reindirizzamento per la radice del dominio o un oggetto mancante, non una fonte di download automatico. Carica i file tramite l’API prima di pubblicare la versione.
 
-I percorsi che iniziano con `_next/static/` vengono resi immutabili in Go Edge. Se `_next` è preceduto da un prefisso di rilascio, l'attuale implementazione utilizza un normale Cache-Control; controlla il titolo effettivo. Il ripristino di Go Edge non cancella la cache del browser e non conferma di per sé che Cloudflare l'abbia cancellata.
+I percorsi che iniziano con `_next/static/` vengono resi immutabili dalla CDN. Se `_next` è preceduto da un prefisso di rilascio, l'attuale implementazione utilizza un normale Cache-Control; controlla il titolo effettivo. Il ripristino di CDN non cancella la cache del browser e non conferma di per sé che Cloudflare l'abbia cancellata.

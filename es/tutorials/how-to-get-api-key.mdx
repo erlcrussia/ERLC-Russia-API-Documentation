@@ -1,46 +1,43 @@
 ---
-title: "¿Cómo Obtener una Clave de API?"
-description: "Guía paso a paso para obtener claves de API, acceso a WebSocket y gestión de webhooks."
+title: "Cómo obtener una clave"
+description: "Solicitar acceso, dónde ver tus claves y cómo enviarlas."
 icon: "key"
 ---
 
-Para integrarte con nuestros servicios, necesitarás el acceso correspondiente y claves de autorización. Ten en cuenta que el acceso a la API HTTP, a los servidores WebSocket y a la gestión de webhooks está separado por motivos de seguridad.
-
-## Cómo Obtener Acceso
+## Obtener acceso
 
 <Steps>
-  <Step title="Abrir un Ticket">
-    Para obtener acceso inicialmente a la API HTTP, a WebSocket o al sistema de gestión de webhooks, debes **abrir un ticket en nuestro servidor de Discord**. Describe tu proyecto y especifica qué funciones y accesos necesitarás para la implementación.
+  <Step title="Inicia sesión en el sitio">
+    Inicia sesión con Discord en la [página de claves](https://erlcrussia.com/my/tokens). Muestra los permisos y claves de tu cuenta. Si falta acceso, contacta con la administración del proyecto en Discord; los comandos de consulta no conceden permisos nuevos.
   </Step>
-  <Step title="Aprobación de la Solicitud">
-    Espera a que la administración del proyecto revise tu solicitud. Una vez aprobada tu petición, los derechos de acceso correspondientes se vincularán a tu cuenta de Discord.
+  <Step title="Espera la aprobación">
+    Tras la aprobación, los permisos se vinculan a tu cuenta de Discord.
   </Step>
-  <Step title="Visualización y Gestión de Claves">
-    Una vez concedidos los permisos, puedes generar, ver y gestionar tus tokens directamente dentro del servidor de Discord mediante comandos de barra diagonal (slash commands).
+  <Step title="Abre tus claves en el sitio">
+    Las claves y los webhooks están en [erlcrussia.com/my/tokens](https://erlcrussia.com/my/tokens) tras iniciar sesión con Discord.
   </Step>
 </Steps>
 
-## Tipos de Claves Disponibles y Comandos
+## Tipos de claves
 
-### 1. Clave de API HTTP
-El token principal utilizado para enviar solicitudes HTTP estándar a nuestros endpoints. Se envía en el encabezado `Authorization`.
-* **Comando para ver:** `/api view`
+| Clave | Para qué | Dónde verla |
+|---|---|---|
+| Clave de API | Solicitudes HTTP a la API V3 | `/my/tokens/api`, comando `/api view` |
+| Clave de WebSocket | Conectarse al [WebSocket](/es/other/websocket-gateway). La clave HTTP no sirve | `/my/tokens/websocket`, comando `/websocket view` |
+| Clave de IA (`sk-…`) | La [AI API](/es/openai-api/v1/overview) | `/my/tokens/studio` |
 
-### 2. Clave de WebSocket
-Para trabajar con eventos en tiempo real, se utiliza una **clave independiente separada**. No intentes utilizar el token HTTP estándar para conectarte a sockets; el servidor lo rechazará.
-* **Comando para ver:** `/websocket view`
+Los webhooks de eventos se configuran en `/my/tokens/webhooks`; también puedes verlos con el comando `/webhook view`. Consulta [Webhook de eventos](/es/other/event-webhook).
+
+## Cómo enviar la clave
+
+Envía la clave en la cabecera `erlcrussia-api-key`:
+
+```http
+erlcrussia-api-key: YOUR_API_KEY
+```
+
+También se acepta `Authorization: Bearer YOUR_API_KEY`. No se aceptan claves en parámetros de consulta.
+
 <Danger>
-  **Mantén siempre tus claves en secreto. Las claves de WebSocket y de la API HTTP son completamente autónomas y se gestionan de forma independiente.**
+  No publiques las claves ni las guardes en código que se ejecuta en el navegador. Si una clave se filtra, regénerala con [`POST /v3/keys`](/es/reference/v3/keys/regenerate-keys) y avisa a la administración del proyecto.
 </Danger>
-
-## Gestión de Webhooks
-
-Si tu servicio necesita recibir notificaciones automáticas sobre eventos del servidor, puedes configurar webhooks.
-
-El acceso al panel de gestión de webhooks también se concede **estrictamente a través de tickets** con la administración del proyecto. Una vez vinculados los permisos a tu cuenta, estará disponible un comando de configuración especial:
-
-* **Comando de gestión:** `/webhook manage`
-
-<Tip>
-  **Al usar este comando, el bot abrirá un menú interactivo donde podrás vincular, eliminar y ver las URLs activas para el envío de webhooks.**
-</Tip>

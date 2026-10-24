@@ -1,55 +1,40 @@
 ---
-title: Limiti delle richieste
-description: Finestre correnti, contatori condivisi, header e gestione di HTTP 429.
-icon: gauge-high
+title: "Limiti di richieste"
+description: "Come conoscere il tuo limite e cosa fare con HTTP 429."
+icon: "gauge-high"
 ---
 
-I limiti delle richieste nell'API di ER:LC Russia sono **personalizzati e dinamici**: vengono configurati tramite il motore delle policy, possono variare in base all'indirizzo IP e al tier della chiave API e aumentano automaticamente con i vantaggi degli abbonamenti attivi.
+Le intestazioni dei limiti sono incluse nelle rotte limitate. Le chiavi master e UNLIMITED_API_KEYS aggirano questo limite e possono non ricevere X-RateLimit-*. I nomi delle intestazioni HTTP non distinguono maiuscole e minuscole. Una nuova chiave valida usa prima il limite IP; dopo il riscaldamento della cache delle credenziali usa quello personale (ad esempio, 40 → 120 per le statistiche). Retry-After viene inviato in caso di limite.
 
-La tabella seguente mostra i **valori di base predefiniti**. I limiti effettivi applicati alla tua applicazione sono definiti esclusivamente dagli header di risposta del server. Si raccomanda a client e bot di non hardcodare valori statici, ma di orientarsi dinamicamente tramite gli header `X-RateLimit-*`.
-
-## Route standard
-
-| Gruppo | Limite di base |
+| Header | Significato |
 |---|---|
-| `/v3/cdn/*`, `/v3/user-assets/*`, `/v3/users`, `/v3/keys`, `/v3/points/*`, `/v3/health` | 20 richieste al minuto |
-| `/v3/erlc/*`, `/v3/civops/*`, `/v3/subscriptions/*`, `/v3/ads/*` | 120 richieste al minuto |
-| `/v3/stats` senza chiave API | 40 richieste al minuto |
-| `/v3/stats` con chiave API | 120 richieste al minuto |
-| `/v3/ai/*` | 120 richieste al secondo |
+| `X-RateLimit-Limit` | Richieste consentite nella finestra corrente |
+| `X-RateLimit-Remaining` | Richieste rimanenti |
+| `X-RateLimit-Reset` | Quando la finestra si azzera, tempo Unix in millisecondi |
+| `Retry-After` | Secondi di attesa prima di riprovare |
 
-Le route standard condividono un contatore per chiave tra metodi e route; senza credenziali viene usato l’IP. AI ha una finestra separata di un secondo. La verifica di un file con GET e il caricamento con POST contano come richieste distinte. Raggiunto il limite, interrompere l’invio e ripetere soltanto la richiesta rifiutata dopo l’attesa indicata negli header.
+Sui metodi compatibili con OpenAI `/v1/*` gli stessi valori usano i nomi di OpenAI: `x-ratelimit-limit-requests`, `x-ratelimit-remaining-requests` e `x-ratelimit-reset-requests` (tempo al reset, ad esempio `1s`). Vedi la [panoramica dell’API IA](/it/openai-api/v1/overview).
 
-## Autorizzazione
+## Risposta 429
 
-L’accesso OAuth e i callback consentono 10 richieste al minuto per utente con cookie di sessione firmato. Le altre route di autenticazione dell’utente consentono 250 richieste per sessione oppure 60 per visitatore anonimo.
-
-Le richieste anonime hanno anche un limite condiviso per IP: 120 al minuto per l’accesso e 240 per le altre route di autenticazione. La finestra si azzera all’inizio di ogni minuto.
-
-## Come orientarsi con gli header di risposta (HTTP Headers)
-
-A ogni richiesta, l'API restituisce un set di header che descrive lo stato della tua quota:
-
-| Header | Descrizione | Come utilizzarlo |
-|---|---|---|
-| `X-RateLimit-Limit` | Tetto massimo di richieste nella finestra attiva | Mostra il limite personalizzato della tua chiave in base a policy e abbonamenti |
-| `X-RateLimit-Remaining` | Numero di richieste rimanenti | Se si avvicina a `0`, il client deve rallentare la frequenza di invio (client-side throttling) |
-| `X-RateLimit-Reset` | Timestamp di reset della finestra (Unix ms) | Momento esatto in cui la quota `Remaining` viene completamente ripristinata |
-| `Retry-After` | Secondi di attesa obbligatori (con codice `429`) | Pausa obbligatoria prima di riprovare la richiesta rifiutata |
+Quando il limite viene superato, l'API risponde con HTTP 429. Il corpo contiene solo codice e messaggio; il tempo di attesa è negli header:
 
 ```json
 {
   "code": 5016,
-  "message": "Rate Limit Exceeded",
-  "retry_after": 30,
-  "details": {"limit": 20, "count": 21, "excess": 1, "reset_at": 1792083600000}
+  "message": "Rate Limit Exceeded"
 }
 ```
 
-Il limitatore di autenticazione omette details. Un blocco per spam del middleware standard restituisce code=5039, message=spam_blocked, blocked_until e remaining_seconds. La finestra standard ha una soglia di 400 richieste in eccesso e un blocco base di cinque minuti; AI usa una soglia di 200 richieste in eccesso al secondo.
+Se continui a inviare richieste dopo un 429, la chiave o l'IP vengono bloccati per un po': ricevi il codice `5039` e `Retry-After` indica quanto attendere.
 
-Il limitatore non rende idempotenti le operazioni di modifica. Dopo un’interruzione di rete, verificare prima lo stato della risorsa. Un conflitto di percorso esplicito nella CDN restituisce 409; non è una risposta 429 né conferma una sovrascrittura riuscita.
+## Come gestirlo
 
-## Protezione Cloudflare
+* Controlla `X-RateLimit-Remaining` e rallenta quando si avvicina a zero.
+* Dopo un 429 attendi `Retry-After` secondi e riprova solo la richiesta rifiutata.
+* Non ripetere alla cieca le richieste di scrittura dopo un errore di rete: verifica prima se sono state applicate.
+* Metti in cache le risposte che cambiano di rado.
 
-Cloudflare può anche rifiutare o bloccare richieste indipendentemente dai limiti dell’API, incluso un traffico elevato da un solo IP. Non esiste una soglia universale garantita di 10.000 richieste al secondo: il comportamento dipende dalle regole di sicurezza e dalle caratteristiche del traffico. [Cloudflare](https://developers.cloudflare.com/waf/rate-limiting-rules/).
+<Warning>
+  Davanti all'API c'è Cloudflare, con limiti propri. Se un IP invia troppe richieste, Cloudflare risponde con l'errore `1015` (HTTP 429): è una sua pagina, non JSON dell'API, e senza header `X-RateLimit-*`. Rallenta e attendi qualche minuto: riprovare durante il blocco lo prolunga.
+</Warning>

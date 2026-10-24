@@ -1,10 +1,11 @@
 ---
-title: Functionality check
+title: "API health"
+description: "API state. `status: degraded` with a 200 response means some data is temporarily unavailable; 503 means the API is down."
+icon: "heart-pulse"
 openapi: /en/openapi/en-api-v3-openapi.yaml GET /health
 keywords:
 - health
 - status
 - postgres
 - redis
-icon: heart-pulse
 ---

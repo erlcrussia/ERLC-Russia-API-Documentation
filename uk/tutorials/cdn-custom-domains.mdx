@@ -1,15 +1,32 @@
 ---
-title: Кастомні CDN-домени
-description: Реєстрація, перевірка DNS/TLS та маршрутизація запитів на Go Edge.
-icon: globe
+title: "Свої CDN-домени"
+description: "Як підключити свій домен до CDN команди."
+icon: "globe"
 ---
 
-1. Прив'яжіть API-ключ до організації через `PUT /v3/cdn/team`.
-2. Виконайте `POST /v3/cdn/custom-domains` із JSON `{ "domain": "files.example.com", "s3Backup": true }`. Відповідь 201 - об'єкт домену без обгортки success.
-3. Додайте DNS-записи з verification, виконайте `POST /v3/cdn/custom-domains/{id}/verify`. Перевіряйте isVerified, cnameVerified, cfStatus та cfSslStatus.
-4. Загальний ingress зберігає Host і спочатку звертається до Go Edge. Edge визначає CDN-домен через реєстр API. Тільки HTTP 421 для домену поза CDN-реєстром направляється в Redirect; помилки CDN 403/404/502 залишаються у CDN. Окремий сервер блок для кожного кастомного домену не потрібен.
-5. Завантажте файл через `POST /v3/cdn/assets`, передавши multipart domain=files.example.com та path=images/logo.png. Відкрийте `https://files.example.com/images/logo.png`.
+Свій домен дозволяє роздавати файли команди за адресою на кшталт `https://files.example.com/images/logo.png`. Для всіх операцій із доменами потрібен доступ до керування CDN команди.
 
-`GET /v3/cdn/custom-domains` повертає масив. Для цих операцій, включаючи читання, потрібно CDN manage. Видалення домену з ассетами заборонено. PATCH приймає originUrl та s3Backup; порожній originUrl вимикає зовнішній origin. Секрет deployHookToken призначений для серверного CI/CD.
+<Steps>
+  <Step title="Прив'яжіть ключ до команди">
+    Виконайте `PUT /v3/cdn/team` з `teamId` вашої команди.
+  </Step>
+  <Step title="Додайте домен">
+    Виконайте `POST /v3/cdn/custom-domains` з тілом `{ "domain": "files.example.com", "s3Backup": true }`. У відповіді будуть DNS-записи для перевірки.
+  </Step>
+  <Step title="Налаштуйте DNS">
+    Додайте в реєстратора записи з відповіді: CNAME домену на `cname.erlcrussia.com` і запис для перевірки володіння.
+  </Step>
+  <Step title="Перевірте домен">
+    Виконайте `POST /v3/cdn/custom-domains/{id}/verify`. Домен готовий, коли `isVerified` дорівнює `true`, а статус сертифіката `cfSslStatus` — `active`.
+  </Step>
+  <Step title="Завантажте файл">
+    Передайте `domain=files.example.com` під час завантаження через `POST /v3/cdn/assets` і відкрийте файл за адресою на своєму домені.
+  </Step>
+</Steps>
 
-Під час HTTP 400 Domain Not Verified перевірте, який сервіс сформував HTML. При HTTP 502 перевірте доступ Edge до реєстру доменів Go API та MinIO. Не змінюйте isVerified вручну для обходу перевірки.
+## Керування
+
+* `PATCH /v3/cdn/custom-domains/{id}` змінює зовнішнє джерело файлів (`originUrl`) і резервне копіювання (`s3Backup`). Порожній `originUrl` вимикає зовнішнє джерело.
+* Домен із файлами видалити не можна: спершу видаліть файли.
+* Токен `deployHookToken` потрібен для [скидання кешу з CI/CD](/uk/tutorials/cdn-cache-purge-cicd). Зберігайте його в секретах CI.
+* Якщо перевірка не проходить, переконайтеся, що DNS-записи збігаються з відповіддю й устигли оновитися.

@@ -1,113 +1,81 @@
 ---
-title: "Webhook per gli Eventi"
+title: "Webhook degli eventi"
+description: "Come ricevere gli eventi di gioco sul tuo URL e verificare la firma."
 icon: "webhook"
 ---
 
-Per ricevere webhook dal gioco:
+L'API inoltra gli eventi dei server di gioco al tuo URL. Ogni richiesta è firmata con Ed25519 e il tuo gestore deve verificare la firma.
 
-1. Puoi configurare i webhook in due modi:
-   - Nella tua area personale sul sito web: vai alla sezione **Token -> Webhook** (`/my/tokens?tab=webhooks`).
-   - Sul nostro server Discord: esegui il comando `/webhook manage`.
-2. Specifica l'URL del tuo webhook **personalizzato** e seleziona i server:
-   - **Tutti i server** (predefinito) — il webhook riceverà eventi da tutti i server del progetto.
-   - **Server specifici** — il webhook riceverà eventi solo dai server di gioco selezionati.
-3. Prima di salvare l'URL, assicurati di cliccare sul pulsante "Verifica" / "Test":
-   - Il sistema invierà un messaggio di ping di prova con firma. Se il tuo endpoint risponde con HTTP `200 OK`, il webhook è verificato e pronto all'uso.
-4. Dopo la corretta verifica, attiva la ricezione dei dati.
+## Configurazione
 
-<Danger>
-   **NON supportiamo webhook diretti di Discord. Il sistema funziona esclusivamente con webhook personalizzati (i tuoi endpoint/server dedicati).**
-</Danger>
+<Steps>
+  <Step title="Apri la pagina dei webhook">
+    Accedi e apri [erlcrussia.com/my/tokens/webhooks](https://erlcrussia.com/my/tokens/webhooks). L'accesso si ottiene tramite ticket; vedi [Come ottenere una chiave](/it/tutorials/how-to-get-api-key).
+  </Step>
+  <Step title="Aggiungi un URL">
+    Inserisci l'indirizzo del gestore e premi «Verifica». L'API invia due richieste di prova: una con firma valida e una falsa.
+  </Step>
+  <Step title="Supera la verifica">
+    L'URL viene salvato solo se il gestore risponde 2xx alla richiesta valida e 4xx a quella falsa.
+  </Step>
+</Steps>
 
-Il tuo endpoint deve verificare le firme Ed25519 su ogni richiesta. Il gioco salverà solo gli URL che superano la verifica.
+<Warning>
+  I link dei webhook di Discord non funzionano: serve un tuo gestore.
+</Warning>
 
----
+## Requisiti del gestore
 
-### Intestazioni e Routing Multi-Server
+1. Accettare `POST` con corpo JSON.
+2. Leggere gli header `X-Signature-Timestamp` (tempo Unix come stringa) e `X-Signature-Ed25519` (firma in hex).
+3. Verificare la firma di `timestamp + corpo grezzo`: i byte UTF-8 del timestamp seguiti dai byte del corpo invariati.
+4. Rispondere 2xx solo con firma valida, altrimenti 4xx.
 
-Ogni webhook inviato contiene informazioni sul server di origine dell'evento:
+## Chiave pubblica
 
-#### Intestazioni HTTP:
-* `X-Signature-Ed25519` — firma Ed25519 codificata in hex.
-* `X-Signature-Timestamp` — timestamp Unix (in secondi).
-* `X-Server-ID` — identificatore del server di gioco in cui si è verificato l'evento.
-* `X-Server-Name` — nome/alias descrittivo del server (ad esempio, `MRP 1`, `MVD`), se configurato dagli amministratori.
-
-#### Corpo della Richiesta (JSON):
-* `server_id` (string) — ID del server di gioco.
-* `server_name` (string) — nome/alias del server.
-* Carico utile dell'evento (comandi chat, chiamate d'emergenza, ecc.).
-
----
-
-### Requisiti
-
-#### Il tuo endpoint deve accettare
-
-* Richieste `POST` con corpo JSON.
-* Queste intestazioni su ogni richiesta firmata:
-  * `X-Signature-Ed25519` (firma Ed25519 codificata in hex).
-  * `X-Signature-Timestamp` (stringa timestamp Unix).
-  * `X-Server-ID` (identificatore del server).
-  * `X-Server-Name` (nome del server).
-
-#### Il Tuo Endpoint Deve:
-
-1. Leggere i **byte grezzi del corpo della richiesta** esattamente come ricevuti (non riserializzare il JSON).
-2. Leggere `X-Signature-Timestamp`.
-3. Leggere `X-Signature-Ed25519`.
-4. Verificare la firma per:
-
-   `message = timestamp + raw_body`
-
-   Dove `timestamp` è il valore dell'intestazione come stringa, concatenato direttamente con i byte grezzi del corpo.
-5. Restituire:
-   * **2xx** solo se la firma è valida.
-   * **4xx** se le intestazioni mancano, non sono valide o la verifica della firma fallisce.
-
----
-
-### Chiave Pubblica
-
-Utilizza questa chiave pubblica Ed25519 (base64, SubjectPublicKeyInfo / SPKI):
+Ed25519, base64, formato SPKI:
 
 ```
 MCowBQYDK2VwAyEArbRTkyh3A035YUWWZdyF3vck4QN3I7uU8cp7YaxocFE=
 ```
 
----
+## Esempio in Node.js
 
-### Dettagli di Implementazione
+```javascript
+import crypto from "node:crypto";
+import express from "express";
 
-#### Dati di Input
+const publicKey = crypto.createPublicKey({
+  key: Buffer.from("MCowBQYDK2VwAyEArbRTkyh3A035YUWWZdyF3vck4QN3I7uU8cp7YaxocFE=", "base64"),
+  format: "der",
+  type: "spki",
+});
 
-* `timestamp`: stringa esatta da `X-Signature-Timestamp`.
-* `sigHex`: stringa esatta da `X-Signature-Ed25519` (hex).
-* `rawBody`: byte grezzi del corpo della richiesta.
+const app = express();
+app.post("/erlc-webhook", express.raw({ type: "*/*" }), (req, res) => {
+  const timestamp = req.get("X-Signature-Timestamp");
+  const signature = req.get("X-Signature-Ed25519");
+  if (!timestamp || !signature) return res.sendStatus(401);
 
-#### Passaggi
+  const message = Buffer.concat([Buffer.from(timestamp, "utf8"), req.body]);
+  const ok = crypto.verify(null, message, publicKey, Buffer.from(signature, "hex"));
+  if (!ok) return res.sendStatus(401);
 
-1. Decodifica `sigHex` da esadecimale a byte.
-2. Costruisci `message` come:
-   * Byte di `timestamp` in UTF-8
-   * Subito dopo `rawBody`
-3. Verifica la firma Ed25519 usando la chiave pubblica sopra.
+  const event = JSON.parse(req.body.toString("utf8"));
+  res.sendStatus(204);
+});
+```
 
-#### Errori Comuni
+Errori frequenti:
 
-* Non utilizzare un oggetto JSON analizzato per la verifica. Utilizza solo byte grezzi del corpo.
-* Non aggiungere separatori o spazi tra timestamp e corpo.
-* Tratta la firma come hex, non base64.
-* Assicurati che il tuo framework non consumi il corpo prima di acquisirlo.
+* verificare il JSON già analizzato e riserializzato invece dei byte grezzi;
+* aggiungere uno spazio o un separatore tra timestamp e corpo;
+* decodificare la firma come base64 invece che hex;
+* il framework consuma il corpo prima che tu ottenga i byte grezzi.
 
----
+## Quali eventi vengono inviati
 
-### Quali eventi vengono inviati?
+* messaggi di gioco che iniziano con `;`, per i tuoi comandi in gioco;
+* chiamate di emergenza.
 
-Attualmente il gioco invia webhook per:
-
-* Messaggi che iniziano con **;**
-  * Questo consente di creare comandi personalizzati nel gioco!
-* Chiamate d'emergenza (Emergency Calls)
-
-In futuro potrebbero essere aggiunti nuovi eventi. Nota: il sistema di webhook non è inteso a sostituire il polling dell'API HTTP o il WebSocket.
+Potranno essere aggiunti altri eventi. I webhook non sostituiscono l'API HTTP né il [WebSocket](/it/other/websocket-gateway).

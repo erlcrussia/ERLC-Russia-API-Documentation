@@ -1,0 +1,56 @@
+---
+title: "Voice mode (Realtime)"
+description: "WebSocket for spoken answers of the emmy-voice-1 model over the OpenAI Realtime protocol."
+icon: "waveform-lines"
+---
+
+Address: `wss://api.erlcrussia.com/v1/realtime?model=emmy-voice-1`. The `model` parameter is optional.
+
+Authentication works as in OpenAI:
+
+* on a server, use the `Authorization: Bearer sk-voice-…` header;
+* in a browser, use the WebSocket subprotocols `realtime` and `openai-insecure-api-key.sk-voice-…`.
+
+The [OpenAI Realtime SDK](https://platform.openai.com/docs/guides/realtime) works here: you send text or voice, and the model answers with speech and a text transcript. Event fields the API does not use (such as `instructions` or `tools`) are ignored.
+
+## Session
+
+After connecting, the server sends `session.created`. Change settings with `session.update`:
+
+```json
+{"type":"session.update","session":{"type":"realtime","language":"en","audio":{"input":{"format":{"type":"audio/pcm","rate":24000},"turn_detection":null},"output":{"voice":"F1","format":{"type":"audio/pcm","rate":24000}}}}}
+```
+
+Languages: `ru`, `en`, `uk`, `be`, `es`, `it`, `fr`, `zh`, `ja`, `ko`. Voices: `F1`, `F2`. Audio in both directions is PCM16, mono, 24 kHz.
+
+Turns are manual: `turn_detection` must be `null`, and `input_audio_buffer.commit` ends a turn. Automatic voice detection (`server_vad`) is not supported.
+
+## Text request
+
+```json
+{"type":"conversation.item.create","item":{"type":"message","role":"user","content":[{"type":"input_text","text":"What does RD stand for?"}]}}
+{"type":"response.create"}
+```
+
+The item `id` is optional. The role can be `user` or `system`.
+
+## Voice request
+
+```json
+{"type":"input_audio_buffer.append","audio":"<base64 PCM16 24 kHz>"}
+{"type":"input_audio_buffer.commit"}
+{"type":"response.create"}
+```
+
+After `commit`, the server sends `input_audio_buffer.committed` and `conversation.item.added`. Once the speech is recognized, `conversation.item.input_audio_transcription.completed` with the text and `conversation.item.done` arrive. If recognition fails, you get `conversation.item.input_audio_transcription.failed`. You can send `response.create` right after `commit`: the answer starts when recognition finishes.
+
+`input_audio_buffer.clear` empties the buffer. Voice can also be sent as one `conversation.item.create` item with an `input_audio` part.
+
+## Response
+
+The server sends `response.created`, then `response.output_audio_transcript.delta` (text) and `response.output_audio.delta` (base64 PCM), and finally `response.done` with `usage`.
+
+* Voice recognition costs the same as [speech recognition](/en/openai-api/v1/transcriptions).
+* `event_id` is optional (up to 128 characters). When sent, a repeated event with the same `event_id` is ignored.
+* One response at a time. A text request is 1 to 12,000 characters; voice is 100 ms to 120 seconds.
+* After 100 exchanges or 4096 events, open a new connection.

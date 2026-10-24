@@ -1,4 +1,6 @@
 ---
-title: Restablecer la caché del dominio CDN
+title: "Purgar caché del dominio"
+description: "Purga la caché del dominio CDN. Pasa las rutas en `paths`; sin ellas se purga todo. Revisa `success`: un 200 puede indicar un fallo parcial."
+icon: "broom"
 openapi: /es/openapi/es-api-v3-openapi.yaml POST /cdn/custom-domains/{id}/purge
 ---

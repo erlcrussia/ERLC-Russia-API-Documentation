@@ -1,6 +1,6 @@
 ---
 title: "Error Codes"
-description: "If the ER:LC Russia API rejects a request, it returns a JSON response with an error code. Use this page to understand what went wrong and how your service can resolve it."
+description: "API error codes and what to do about each of them."
 icon: "triangle-exclamation"
 ---
 
@@ -22,10 +22,12 @@ All errors are returned in JSON format with `code` and `message` fields.
   <Accordion title="Authentication and Token Errors">
     | Code | Description | Meaning |
     | :---: | :--- | :--- |
+    | `5006` | Invalid Master Key | Invalid master key. Check the `erlcrussia-api-master-key` header |
     | `5007` | Missing Token | Authorization token is missing. Add the `Authorization: Bearer <token>` or `erlcrussia-api-key: <token>` header |
-    | `5008` | Invalid Token | Token is invalid, deactivated, or missing from the database |
+    | `5008` | Invalid Token | The token is invalid, disabled or deleted |
+    | `5033` | Unauthorized | No valid session or key for this route |
     | `5009` | Forbidden | Access to this endpoint or action is forbidden for your token |
-    | `5010` | Api Version Forbidden | Access to the requested API version (V3/V2) is forbidden for your key |
+    | `5010` | Api Version Forbidden | The key is not allowed to use this API version |
     | `5011` | Query Param Forbidden | Access to the specified query parameters is forbidden by key permissions |
     | `5037` | Invalid Signature | Invalid ED25519 digital signature on the request |
   </Accordion>
@@ -38,8 +40,8 @@ All errors are returned in JSON format with `code` and `message` fields.
     | `5003` | Invalid Version | Invalid API version in route. Use the current `v3` version |
     | `5004` | Invalid Param Name | Invalid query parameter name |
     | `5005` | Missing Command | Command was not sent. Add the `command` field to the request body |
-    | `5012` | Discord Id Not Found | User with this Discord ID was not found in the database |
-    | `5013` | Token Not Found | Token not found in the database |
+    | `5012` | Discord Id Not Found | No user with this Discord ID |
+    | `5013` | Token Not Found | Token not found |
     | `5014` | Token Not Found Or Deleted | Token not found or was deleted |
     | `5020` | Not Found | Requested resource or endpoint was not found |
     | `5021` | Webhook Url Already Exists | Webhook URL is already registered in the system |
@@ -61,14 +63,15 @@ All errors are returned in JSON format with `code` and `message` fields.
     | `5047` | Points Limit Exceeded | Daily points limit exceeded |
     | `5048` | Insufficient Points | Insufficient points to perform the operation |
     | `5050` | Roblox Account Not Linked | Roblox account is not linked to Discord |
+    | `5051` | Webhook Verification Failed | The webhook URL failed the signature check. The reason is in `reason`: `private_host`, `unreachable`, `signed_rejected`, `forged_accepted`, `signing_unavailable` |
   </Accordion>
 
   <Accordion title="Server, Queue and Limit Errors">
     | Code | Description | Meaning |
     | :---: | :--- | :--- |
     | `5015` | Command Queue Full | Command queue is full. Try again later |
-    | `5016` | Rate Limit Exceeded | Request limit exceeded. Wait for reset (see `retry_after`) |
-    | `5017` | Internal Error | Internal server error. The error has been logged |
+    | `5016` | Rate Limit Exceeded | Request limit exceeded. Wait for reset (see `Retry-After`) |
+    | `5017` | Internal Error | Internal server error. Retry later |
     | `5018` | Server Error | Error communicating with upstream external API |
     | `5019` | Prc Api Error | Error from the official PRC API. See `prc_code` field |
     | `5024` | Cache Expired | Cache has expired and is temporarily unavailable |
@@ -102,9 +105,10 @@ All errors are returned in JSON format with `code` and `message` fields.
     | `5135` | CDN Path Already Exists | File path already exists. Automatic overwrite is disabled |
     | `5136` | CDN Folder Slug Already Exists | Folder slug is already taken. Choose another folder slug |
     | `5137` | CDN Folder Not Found | CDN folder with specified ID was not found |
-    | `5138` | CDN Storage Unavailable | MinIO / S3 storage is temporarily unavailable |
+    | `5138` | CDN Storage Unavailable | CDN storage is temporarily unavailable |
     | `5139` | CDN Source Unavailable | External source failed to deliver file during import |
     | `5140` | AI Response Unavailable | AI model produced no usable response |
+    | `5141` | AI Model Unavailable | AI model is temporarily unavailable |
   </Accordion>
 
   <Accordion title="Economy API Errors">
