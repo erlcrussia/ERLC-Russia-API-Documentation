@@ -149,8 +149,7 @@
                     "en/reference/v3/subscriptions/purchase-with-coins",
                     "en/reference/v3/subscriptions/get-user-limits",
                     "en/reference/v3/subscriptions/get-subscriptions-purchases",
-                    "en/reference/v3/subscriptions/get-subscriptions-purchases-id",
-                    "en/reference/v3/subscriptions/post-subscriptions-promo-validate"
+                    "en/reference/v3/subscriptions/get-subscriptions-purchases-id"
                   ]
                 },
                 {
@@ -197,19 +196,6 @@
                         "en/reference/v3/cdn/post-cdn-webhook-purge"
                       ]
                     }
-                  ]
-                },
-                {
-                  "group": "Personal files",
-                  "icon": "file-user",
-                  "pages": [
-                    "en/reference/v3/user-assets/get-user-assets",
-                    "en/reference/v3/user-assets/post-user-assets",
-                    "en/reference/v3/user-assets/get-user-assets-id",
-                    "en/reference/v3/user-assets/delete-user-assets-id",
-                    "en/reference/v3/user-assets/get-user-assets-id-content",
-                    "en/reference/v3/user-assets/head-user-assets-id-content",
-                    "en/reference/v3/user-assets/get-user-assets-authorize"
                   ]
                 },
                 {
@@ -271,9 +257,7 @@
                   "icon": "sparkles",
                   "pages": [
                     "en/reference/v3/ai/get-credits-balance",
-                    "en/reference/v3/ai/exchange-credits",
                     "en/reference/v3/ai/list-studio-keys",
-                    "en/reference/v3/ai/create-studio-key",
                     "en/reference/v3/ai/delete-ai-keys-id",
                     "en/reference/v3/ai/generate-title",
                     "en/reference/v3/ai/patch-studio-key-id",
@@ -297,46 +281,6 @@
                     "en/reference/v3/ads/get-ads-channel-orders-code",
                     "en/reference/v3/ads/post-ads-channel-orders-code-redeem",
                     "en/reference/v3/ads/post-ads-campaigns-id-channel-order"
-                  ]
-                },
-                {
-                  "group": "Authentication",
-                  "icon": "shield-halved",
-                  "pages": [
-                    {
-                      "group": "Sign-in",
-                      "icon": "arrow-right-to-bracket",
-                      "pages": [
-                        "en/reference/v3/auth/discord-login",
-                        "en/reference/v3/auth/discord-callback",
-                        "en/reference/v3/auth/session-init",
-                        "en/reference/v3/auth/session-init-post",
-                        "en/reference/v3/auth/session-token",
-                        "en/reference/v3/auth/get-session",
-                        "en/reference/v3/auth/logout"
-                      ]
-                    },
-                    {
-                      "group": "Sessions",
-                      "icon": "fingerprint",
-                      "pages": [
-                        "en/reference/v3/auth/get-user-sessions",
-                        "en/reference/v3/auth/delete-user-session",
-                        "en/reference/v3/auth/delete-all-user-sessions"
-                      ]
-                    },
-                    {
-                      "group": "Roblox and profile",
-                      "icon": "link",
-                      "pages": [
-                        "en/reference/v3/auth/roblox-login",
-                        "en/reference/v3/auth/roblox-callback",
-                        "en/reference/v3/auth/link-roblox",
-                        "en/reference/v3/auth/unlink-roblox",
-                        "en/reference/v3/auth/refresh-roblox",
-                        "en/reference/v3/auth/refresh-profile"
-                      ]
-                    }
                   ]
                 },
                 {

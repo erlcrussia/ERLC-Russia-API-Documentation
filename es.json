@@ -149,8 +149,7 @@
                     "es/reference/v3/subscriptions/purchase-with-coins",
                     "es/reference/v3/subscriptions/get-user-limits",
                     "es/reference/v3/subscriptions/get-subscriptions-purchases",
-                    "es/reference/v3/subscriptions/get-subscriptions-purchases-id",
-                    "es/reference/v3/subscriptions/post-subscriptions-promo-validate"
+                    "es/reference/v3/subscriptions/get-subscriptions-purchases-id"
                   ]
                 },
                 {
@@ -197,19 +196,6 @@
                         "es/reference/v3/cdn/post-cdn-webhook-purge"
                       ]
                     }
-                  ]
-                },
-                {
-                  "group": "Archivos personales",
-                  "icon": "file-user",
-                  "pages": [
-                    "es/reference/v3/user-assets/get-user-assets",
-                    "es/reference/v3/user-assets/post-user-assets",
-                    "es/reference/v3/user-assets/get-user-assets-id",
-                    "es/reference/v3/user-assets/delete-user-assets-id",
-                    "es/reference/v3/user-assets/get-user-assets-id-content",
-                    "es/reference/v3/user-assets/head-user-assets-id-content",
-                    "es/reference/v3/user-assets/get-user-assets-authorize"
                   ]
                 },
                 {
@@ -271,9 +257,7 @@
                   "icon": "sparkles",
                   "pages": [
                     "es/reference/v3/ai/get-credits-balance",
-                    "es/reference/v3/ai/exchange-credits",
                     "es/reference/v3/ai/list-studio-keys",
-                    "es/reference/v3/ai/create-studio-key",
                     "es/reference/v3/ai/delete-ai-keys-id",
                     "es/reference/v3/ai/generate-title",
                     "es/reference/v3/ai/patch-studio-key-id",
@@ -297,46 +281,6 @@
                     "es/reference/v3/ads/get-ads-channel-orders-code",
                     "es/reference/v3/ads/post-ads-channel-orders-code-redeem",
                     "es/reference/v3/ads/post-ads-campaigns-id-channel-order"
-                  ]
-                },
-                {
-                  "group": "Autenticación",
-                  "icon": "shield-halved",
-                  "pages": [
-                    {
-                      "group": "Inicio de sesión",
-                      "icon": "arrow-right-to-bracket",
-                      "pages": [
-                        "es/reference/v3/auth/discord-login",
-                        "es/reference/v3/auth/discord-callback",
-                        "es/reference/v3/auth/session-init",
-                        "es/reference/v3/auth/session-init-post",
-                        "es/reference/v3/auth/session-token",
-                        "es/reference/v3/auth/get-session",
-                        "es/reference/v3/auth/logout"
-                      ]
-                    },
-                    {
-                      "group": "Sesiones",
-                      "icon": "fingerprint",
-                      "pages": [
-                        "es/reference/v3/auth/get-user-sessions",
-                        "es/reference/v3/auth/delete-user-session",
-                        "es/reference/v3/auth/delete-all-user-sessions"
-                      ]
-                    },
-                    {
-                      "group": "Roblox y perfil",
-                      "icon": "link",
-                      "pages": [
-                        "es/reference/v3/auth/roblox-login",
-                        "es/reference/v3/auth/roblox-callback",
-                        "es/reference/v3/auth/link-roblox",
-                        "es/reference/v3/auth/unlink-roblox",
-                        "es/reference/v3/auth/refresh-roblox",
-                        "es/reference/v3/auth/refresh-profile"
-                      ]
-                    }
                   ]
                 },
                 {

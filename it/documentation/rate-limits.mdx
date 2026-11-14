@@ -4,7 +4,7 @@ description: "Come conoscere il tuo limite e cosa fare con HTTP 429."
 icon: "gauge-high"
 ---
 
-Le intestazioni dei limiti sono incluse nelle rotte limitate. Le chiavi master e UNLIMITED_API_KEYS aggirano questo limite e possono non ricevere X-RateLimit-*. I nomi delle intestazioni HTTP non distinguono maiuscole e minuscole. Una nuova chiave valida usa prima il limite IP; dopo il riscaldamento della cache delle credenziali usa quello personale (ad esempio, 40 → 120 per le statistiche). Retry-After viene inviato in caso di limite.
+Le intestazioni dei limiti sono incluse nelle rotte limitate. Le chiavi di servizio e le chiavi di `UNLIMITED_API_KEYS` aggirano questo limite e possono non ricevere X-RateLimit-*. I nomi delle intestazioni HTTP non distinguono maiuscole e minuscole. Una nuova chiave valida usa prima il limite IP; dopo il riscaldamento della cache delle credenziali usa quello personale (ad esempio, 40 → 120 per le statistiche). Retry-After viene inviato in caso di limite.
 
 | Header | Significato |
 |---|---|

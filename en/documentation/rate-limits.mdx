@@ -4,7 +4,7 @@ description: "How to find your limit and what to do on HTTP 429."
 icon: "gauge-high"
 ---
 
-Rate-limit headers are returned on rate-limited routes. Master keys and UNLIMITED_API_KEYS bypass this limiter and may have no X-RateLimit-* headers. HTTP header names are case-insensitive: X-Ratelimit-Limit and X-RateLimit-Limit are equivalent. A new valid key first uses the IP bucket; after credential-cache warm-up it uses its personal limit (for example, 40 → 120 for stats). Retry-After is returned when limited.
+Rate-limit headers are returned on rate-limited routes. Service keys and keys from `UNLIMITED_API_KEYS` bypass this limiter and may have no X-RateLimit-* headers. HTTP header names are case-insensitive: X-Ratelimit-Limit and X-RateLimit-Limit are equivalent. A new valid key first uses the IP bucket; after credential-cache warm-up it uses its personal limit (for example, 40 → 120 for stats). Retry-After is returned when limited.
 
 | Header | Meaning |
 |---|---|

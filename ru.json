@@ -149,8 +149,7 @@
                     "ru/reference/v3/subscriptions/purchase-with-coins",
                     "ru/reference/v3/subscriptions/get-user-limits",
                     "ru/reference/v3/subscriptions/get-subscriptions-purchases",
-                    "ru/reference/v3/subscriptions/get-subscriptions-purchases-id",
-                    "ru/reference/v3/subscriptions/post-subscriptions-promo-validate"
+                    "ru/reference/v3/subscriptions/get-subscriptions-purchases-id"
                   ]
                 },
                 {
@@ -197,19 +196,6 @@
                         "ru/reference/v3/cdn/post-cdn-webhook-purge"
                       ]
                     }
-                  ]
-                },
-                {
-                  "group": "Личные файлы",
-                  "icon": "file-user",
-                  "pages": [
-                    "ru/reference/v3/user-assets/get-user-assets",
-                    "ru/reference/v3/user-assets/post-user-assets",
-                    "ru/reference/v3/user-assets/get-user-assets-id",
-                    "ru/reference/v3/user-assets/delete-user-assets-id",
-                    "ru/reference/v3/user-assets/get-user-assets-id-content",
-                    "ru/reference/v3/user-assets/head-user-assets-id-content",
-                    "ru/reference/v3/user-assets/get-user-assets-authorize"
                   ]
                 },
                 {
@@ -271,9 +257,7 @@
                   "icon": "sparkles",
                   "pages": [
                     "ru/reference/v3/ai/get-credits-balance",
-                    "ru/reference/v3/ai/exchange-credits",
                     "ru/reference/v3/ai/list-studio-keys",
-                    "ru/reference/v3/ai/create-studio-key",
                     "ru/reference/v3/ai/delete-ai-keys-id",
                     "ru/reference/v3/ai/generate-title",
                     "ru/reference/v3/ai/patch-studio-key-id",
@@ -297,46 +281,6 @@
                     "ru/reference/v3/ads/get-ads-channel-orders-code",
                     "ru/reference/v3/ads/post-ads-channel-orders-code-redeem",
                     "ru/reference/v3/ads/post-ads-campaigns-id-channel-order"
-                  ]
-                },
-                {
-                  "group": "Авторизация",
-                  "icon": "shield-halved",
-                  "pages": [
-                    {
-                      "group": "Вход",
-                      "icon": "arrow-right-to-bracket",
-                      "pages": [
-                        "ru/reference/v3/auth/discord-login",
-                        "ru/reference/v3/auth/discord-callback",
-                        "ru/reference/v3/auth/session-init",
-                        "ru/reference/v3/auth/session-init-post",
-                        "ru/reference/v3/auth/session-token",
-                        "ru/reference/v3/auth/get-session",
-                        "ru/reference/v3/auth/logout"
-                      ]
-                    },
-                    {
-                      "group": "Сессии",
-                      "icon": "fingerprint",
-                      "pages": [
-                        "ru/reference/v3/auth/get-user-sessions",
-                        "ru/reference/v3/auth/delete-user-session",
-                        "ru/reference/v3/auth/delete-all-user-sessions"
-                      ]
-                    },
-                    {
-                      "group": "Roblox и профиль",
-                      "icon": "link",
-                      "pages": [
-                        "ru/reference/v3/auth/roblox-login",
-                        "ru/reference/v3/auth/roblox-callback",
-                        "ru/reference/v3/auth/link-roblox",
-                        "ru/reference/v3/auth/unlink-roblox",
-                        "ru/reference/v3/auth/refresh-roblox",
-                        "ru/reference/v3/auth/refresh-profile"
-                      ]
-                    }
                   ]
                 },
                 {

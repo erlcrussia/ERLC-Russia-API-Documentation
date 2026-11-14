@@ -25,24 +25,8 @@ tags:
   description: Иерархическая структура и сортировка папок медиатеки CDN.
 - name: API Наказаний
   description: Управление балансом и историей транзакций баллов игроков.
-- name: API Токенов
-  description: Управление API токенами интеграции и проверка активных подписок.
 - name: API Подписок
   description: Каталог планов, заказы FunPay, начисление бенефитов и активация подписок.
-- name: API Авторизации
-  description: Вход через Discord и Roblox OAuth2, управление сессиями пользователя и связывание аккаунтов.
-- name: Реальное Время и Вебхуки
-  description: WebSocket шлюз событий и обработчик входящих вебхуков PRC с криптографической подписью Ed25519.
-- name: API Управления - Ключи
-  description: Выпуск, аудит, деактивация и разграничение прав API ключей.
-- name: API Управления - Ограничения
-  description: Тонкая настройка разрешенных версий, эндпоинтов, действий (actions) и query-параметров.
-- name: API Управления - WebSocket Ключи
-  description: Управление ключами доступа к WebSocket шлюзу и подписками на каналы.
-- name: API Управления - Вебхуки
-  description: Регистрация, валидация доступности и мониторинг пользовательских вебхуков.
-- name: API Управления - Панель
-  description: Управление пользователями, подписками, тарифами, ручной баланс и системная статистика.
 - name: API Состояния
   description: Мониторинг работоспособности сервиса, подключений к PostgreSQL и Redis.
 paths:
@@ -1077,48 +1061,24 @@ paths:
       tags:
       - API Статистики
       summary: Статистика серверов
-      description: Онлайн ER:LC и численность серверов Discord. Можно запросить несколько серверов и метрик сразу.
+      description: Возвращает метрики для одного или нескольких серверов. Для membercount, allmembercount и botcount указывайте ID гильдии Discord, для playercount — ID сервера ER:LC из конфигурации API. Параметры servers и metrics можно повторять; значения через запятую сопоставляются по позиции.
       parameters:
       - name: servers
         in: query
         required: true
-        description: 'Имена серверов. Выберите один или несколько серверов из выпадающего списка:
-
-          - `MRP` — Moscow RolePlay (поддерживает все 4 метрики)
-
-          - `MVD`, `FSB`, `MCHS`, `MZ`, `112` — поддерживают `membercount`, `allmembercount`, `botcount`
-
-          - `DOT` — поддерживает только `membercount`
-
-          '
+        description: ID серверов. Для Discord — числовой ID гильдии (снежинка), например 1331331077553262765. Для playercount — ID сервера ER:LC из ERLC_SERVER_IDS (40 символов), например a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0. Параметр можно повторять или перечислять ID через запятую.
         schema:
           type: array
           items:
             type: string
-            enum:
-            - MRP
-            - MVD
-            - FSB
-            - MCHS
-            - MZ
-            - '112'
-            - DOT
+        style: form
+        explode: true
         example:
-        - MRP
+        - '1331331077553262765'
       - name: metrics
         in: query
         required: true
-        description: 'Типы запрашиваемых метрик:
-
-          - `playercount` — онлайн игроков в игре ER:LC (**доступен ТОЛЬКО для `MRP`**)
-
-          - `membercount` — количество участников Discord онлайн (доступен для всех)
-
-          - `allmembercount` — общее число участников Discord сервера (все кроме `DOT`)
-
-          - `botcount` — количество ботов на сервере (все кроме `DOT`)
-
-          '
+        description: Запрашиваемые метрики. membercount — участники без ботов, allmembercount — общее число участников Discord, botcount — боты, playercount — текущий онлайн сервера ER:LC.
         schema:
           type: array
           items:
@@ -1128,11 +1088,15 @@ paths:
             - allmembercount
             - botcount
             - playercount
+        style: form
+        explode: true
         example:
-        - playercount
+        - membercount
+        - allmembercount
+        - botcount
       responses:
         '200':
-          description: Объект со статистикой по каждому серверу и запрошенным метрикам.
+          description: Объект с метриками по каждому серверу и запрошенным метрикам.
           content:
             application/json:
               schema:
@@ -1141,15 +1105,19 @@ paths:
                   type: object
                   additionalProperties:
                     type: integer
-                example:
-                  MRP:
-                    membercount: 1450
-                    playercount: 38
-                  MVD:
-                    membercount: 320
-                    playercount: 12
+              example:
+                '1331331077553262765':
+                  membercount: 4210
+                  allmembercount: 5380
+                  botcount: 117
+                a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0:
+                  playercount: 38
         '400':
           $ref: '#/components/responses/BadRequestError'
+        '404':
+          description: Сервер не найден или скрыт в конфигурации.
+        '503':
+          description: Данные бота или кэш ER:LC временно недоступны.
   /users:
     get:
       tags:
@@ -4134,7 +4102,7 @@ paths:
         required: false
         schema:
           type: string
-        description: Discord ID пользователя (если не указан, берется из сессии).
+        description: Discord ID пользователя (если не указан, берётся из владельца API-ключа).
       security:
       - ApiKeyHeader: []
       responses:
@@ -4170,661 +4138,16 @@ paths:
                 hasBooster: false
                 hasTverskaya: false
                 hasKreml: true
-  /auth/discord:
-    get:
-      tags:
-      - API Авторизации
-      summary: Вход через Discord
-      description: Отправляет пользователя на страницу входа Discord.
-      responses:
-        '307':
-          description: Переадресация на страницу входа.
-  /auth/discord/callback:
-    get:
-      tags:
-      - API Авторизации
-      summary: Возврат из Discord
-      parameters:
-      - name: code
-        in: query
-        required: true
-        schema:
-          type: string
-      - name: state
-        in: query
-        required: true
-        schema:
-          type: string
-      responses:
-        '200':
-          description: Успешный ответ.
-          content:
-            text/html:
-              example: '<!DOCTYPE html><html><head><meta charset="utf-8"><title>Redirecting...</title></head><body><script>window.opener ? window.opener.location.replace("https://erlcrussia.com/ru/my") : window.location.replace("https://erlcrussia.com/ru/my");</script></body></html>'
-              schema:
-                type: string
-      description: Discord возвращает сюда пользователя после входа; API создаёт сессию.
-  /auth/roblox:
-    get:
-      tags:
-      - API Авторизации
-      summary: Привязка через Roblox
-      description: Отправляет пользователя на страницу входа Roblox. Нужна активная сессия Discord.
-      parameters:
-      - name: token
-        in: query
-        description: HMAC токен бота для связывания сессии.
-        schema:
-          type: string
-      responses:
-        '307':
-          description: Переадресация на страницу входа.
-  /auth/roblox/callback:
-    get:
-      tags:
-      - API Авторизации
-      summary: Возврат из Roblox
-      parameters:
-      - name: code
-        in: query
-        required: true
-        schema:
-          type: string
-      - name: state
-        in: query
-        required: true
-        schema:
-          type: string
-      responses:
-        '200':
-          description: Успешный ответ.
-          content:
-            text/html:
-              example: '<!DOCTYPE html><html><head><meta charset="utf-8"><title>Redirecting...</title></head><body><script>window.opener ? window.opener.location.replace("https://erlcrussia.com/ru/my") : window.location.replace("https://erlcrussia.com/ru/my");</script></body></html>'
-              schema:
-                type: string
-      description: Roblox возвращает сюда пользователя; API привязывает аккаунт к его Discord-сессии.
-  /auth/session:
-    get:
-      tags:
-      - API Авторизации
-      summary: Текущая сессия
-      description: Проверяет сессию и возвращает профиль пользователя.
-      security:
-      - CookieAuth: []
-      - BearerAuth: []
-      responses:
-        '200':
-          description: Данные активной сессии и профиля.
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  user:
-                    type: object
-                    properties:
-                      id:
-                        type: string
-                      name:
-                        type: string
-                      image:
-                        type: string
-                      discordId:
-                        type: string
-                      discordAvatar:
-                        type: string
-                      discordAvatarDecoration:
-                        type:
-                        - string
-                        - 'null'
-                      robloxId:
-                        type: string
-                      robloxName:
-                        type: string
-                      robloxDisplayName:
-                        type: string
-                      robloxAvatar:
-                        type: string
-                      username:
-                        type: string
-                      provider:
-                        type: string
-                      eCoins:
-                        type: integer
-              example:
-                user:
-                  id: '123456789012345678'
-                  name: player
-                  image: https://cdn.discordapp.com/avatars/123456789012345678/a_1b2c3d4e5f.gif?size=256
-                  discordId: '123456789012345678'
-                  discordAvatar: a_1b2c3d4e5f
-                  discordAvatarDecoration: null
-                  robloxId: '156'
-                  robloxName: Builderman
-                  robloxDisplayName: Builder
-                  robloxAvatar: https://tr.rbxcdn.com/avatar.png
-                  username: player
-                  provider: discord
-                  eCoins: 250
-  /auth/logout:
-    post:
-      tags:
-      - API Авторизации
-      summary: Выход
-      security:
-      - CookieAuth: []
-      responses:
-        '200':
-          description: Сессия удалена, куки очищены.
-          content:
-            application/json:
-              example:
-                success: true
-              schema:
-                type: object
-                properties:
-                  success:
-                    type: boolean
-      description: Завершает текущую сессию.
-  /auth/user/roblox:
-    post:
-      tags:
-      - API Авторизации
-      summary: Привязка Roblox
-      security:
-      - CookieAuth: []
-      - MasterKeyHeader: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                code:
-                  type: string
-            example:
-              code: roblox-oauth-code
-      responses:
-        '200':
-          description: Roblox аккаунт привязан.
-          content:
-            application/json:
-              example:
-                success: true
-                user:
-                  id: '123456789012345678'
-                  name: player
-                  image: https://cdn.discordapp.com/avatars/123456789012345678/a_1b2c3d4e5f.gif?size=256
-                  discordId: '123456789012345678'
-                  discordAvatar: a_1b2c3d4e5f
-                  discordAvatarDecoration: null
-                  robloxId: '156'
-                  robloxName: Builderman
-                  robloxDisplayName: Builder
-                  robloxAvatar: https://tr.rbxcdn.com/avatar.png
-                  username: player
-                  provider: discord
-                  eCoins: 250
-              schema:
-                type: object
-                properties:
-                  success:
-                    type: boolean
-                  user:
-                    type: object
-                    properties:
-                      id:
-                        type: string
-                      name:
-                        type: string
-                      image:
-                        type: string
-                      discordId:
-                        type: string
-                      discordAvatar:
-                        type: string
-                      discordAvatarDecoration:
-                        type:
-                        - string
-                        - 'null'
-                      robloxId:
-                        type: string
-                      robloxName:
-                        type: string
-                      robloxDisplayName:
-                        type: string
-                      robloxAvatar:
-                        type: string
-                      username:
-                        type: string
-                      provider:
-                        type: string
-                      eCoins:
-                        type: integer
-      description: Привязывает Roblox-аккаунт к текущему пользователю.
-    delete:
-      tags:
-      - API Авторизации
-      summary: Отвязка Roblox
-      security:
-      - CookieAuth: []
-      - MasterKeyHeader: []
-      responses:
-        '200':
-          description: Roblox аккаунт отвязан.
-          content:
-            application/json:
-              example:
-                success: true
-                message: Roblox account unlinked successfully
-              schema:
-                type: object
-                properties:
-                  success:
-                    type: boolean
-                  message:
-                    type: string
-      description: Отвязывает Roblox-аккаунт от текущего пользователя.
-  /auth/user/roblox/refresh:
-    patch:
-      tags:
-      - API Авторизации
-      summary: Обновление профиля Roblox
-      security:
-      - CookieAuth: []
-      responses:
-        '200':
-          description: Данные и аватар Roblox обновлены.
-          content:
-            application/json:
-              example:
-                updated: true
-                user:
-                  id: '123456789012345678'
-                  name: player
-                  image: https://cdn.discordapp.com/avatars/123456789012345678/a_1b2c3d4e5f.gif?size=256
-                  discordId: '123456789012345678'
-                  discordAvatar: a_1b2c3d4e5f
-                  discordAvatarDecoration: null
-                  robloxId: '156'
-                  robloxName: Builderman
-                  robloxDisplayName: Builder
-                  robloxAvatar: https://tr.rbxcdn.com/avatar.png
-                  username: player
-                  provider: discord
-                  eCoins: 250
-              schema:
-                type: object
-                properties:
-                  updated:
-                    type: boolean
-                  user:
-                    type: object
-                    properties:
-                      id:
-                        type: string
-                      name:
-                        type: string
-                      image:
-                        type: string
-                      discordId:
-                        type: string
-                      discordAvatar:
-                        type: string
-                      discordAvatarDecoration:
-                        type:
-                        - string
-                        - 'null'
-                      robloxId:
-                        type: string
-                      robloxName:
-                        type: string
-                      robloxDisplayName:
-                        type: string
-                      robloxAvatar:
-                        type: string
-                      username:
-                        type: string
-                      provider:
-                        type: string
-                      eCoins:
-                        type: integer
-      description: Заново загружает ник и аватар привязанного Roblox-аккаунта.
-  /auth/user/sessions:
-    get:
-      tags:
-      - API Авторизации
-      summary: Мои сессии
-      description: Активные сессии пользователя с устройствами и IP.
-      security:
-      - CookieAuth: []
-      responses:
-        '200':
-          description: Список сессий.
-          content:
-            application/json:
-              example:
-              - id: sess_9f2c1a
-                ipAddress: 203.0.113.24
-                country: RU
-                city: Москва
-                device: Chrome на Windows
-                deviceType: desktop
-                lastActive: '2026-10-21T12:00:00Z'
-                isCurrent: true
-              schema:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    id:
-                      type: string
-                    ipAddress:
-                      type: string
-                    country:
-                      type: string
-                    city:
-                      type: string
-                    device:
-                      type: string
-                    deviceType:
-                      type: string
-                    lastActive:
-                      type: string
-                      format: date-time
-                    isCurrent:
-                      type: boolean
-    delete:
-      tags:
-      - API Авторизации
-      summary: Выход на других устройствах
-      security:
-      - CookieAuth: []
-      responses:
-        '200':
-          description: Все сессии кроме текущей завершены.
-          content:
-            application/json:
-              example:
-                success: true
-                message: All other sessions terminated successfully
-              schema:
-                type: object
-                properties:
-                  success:
-                    type: boolean
-                  message:
-                    type: string
-      description: Завершает все сессии, кроме текущей.
-  /auth/user/sessions/{id}:
-    delete:
-      tags:
-      - API Авторизации
-      summary: Завершение сессии
-      parameters:
-      - name: id
-        in: path
-        required: true
-        schema:
-          type: string
-      security:
-      - CookieAuth: []
-      responses:
-        '200':
-          description: Сессия отозвана.
-          content:
-            application/json:
-              example:
-                success: true
-                message: Session terminated successfully
-              schema:
-                type: object
-                properties:
-                  success:
-                    type: boolean
-                  message:
-                    type: string
-      description: Завершает одну сессию пользователя.
-  /auth/session/init:
-    get:
-      tags:
-      - API Авторизации
-      summary: Состояние входа
-      description: Есть ли сессия, профиль и блокировки пользователя.
-      security:
-      - CookieAuth: []
-      - BearerAuth: []
-      responses:
-        '200':
-          description: Сессия валидна.
-          content:
-            application/json:
-              example:
-                user:
-                  id: '123456789012345678'
-                  name: player
-                  image: https://cdn.discordapp.com/avatars/123456789012345678/a_1b2c3d4e5f.gif?size=256
-                  discordId: '123456789012345678'
-                  discordAvatar: a_1b2c3d4e5f
-                  discordAvatarDecoration: null
-                  robloxId: '156'
-                  robloxName: Builderman
-                  robloxDisplayName: Builder
-                  robloxAvatar: https://tr.rbxcdn.com/avatar.png
-                  username: player
-                  provider: discord
-                  eCoins: 250
-                initialized: true
-              schema:
-                type: object
-                properties:
-                  user:
-                    type: object
-                    properties:
-                      id:
-                        type: string
-                      name:
-                        type: string
-                      image:
-                        type: string
-                      discordId:
-                        type: string
-                      discordAvatar:
-                        type: string
-                      discordAvatarDecoration:
-                        type:
-                        - string
-                        - 'null'
-                      robloxId:
-                        type: string
-                      robloxName:
-                        type: string
-                      robloxDisplayName:
-                        type: string
-                      robloxAvatar:
-                        type: string
-                      username:
-                        type: string
-                      provider:
-                        type: string
-                      eCoins:
-                        type: integer
-                  initialized:
-                    type: boolean
-        '401':
-          description: Сессия не авторизована.
-    post:
-      tags:
-      - API Авторизации
-      summary: Установка сессии
-      description: Сохраняет cookie `erlc_auth` по токену сессии.
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                token:
-                  type: string
-                  description: Токен сессии.
-            example:
-              token: eyJhbGciOiJIUzI1NiJ9.eyJkaXNjb3JkSWQiOiIxMjM0NTY3ODkwMTIzNDU2NzgifQ.signature
-      responses:
-        '200':
-          description: Сессия успешно установлена.
-          content:
-            application/json:
-              example:
-                user:
-                  id: '123456789012345678'
-                  name: player
-                  image: https://cdn.discordapp.com/avatars/123456789012345678/a_1b2c3d4e5f.gif?size=256
-                  discordId: '123456789012345678'
-                  discordAvatar: a_1b2c3d4e5f
-                  discordAvatarDecoration: null
-                  robloxId: '156'
-                  robloxName: Builderman
-                  robloxDisplayName: Builder
-                  robloxAvatar: https://tr.rbxcdn.com/avatar.png
-                  username: player
-                  provider: discord
-                  eCoins: 250
-                initialized: true
-              schema:
-                type: object
-                properties:
-                  user:
-                    type: object
-                    properties:
-                      id:
-                        type: string
-                      name:
-                        type: string
-                      image:
-                        type: string
-                      discordId:
-                        type: string
-                      discordAvatar:
-                        type: string
-                      discordAvatarDecoration:
-                        type:
-                        - string
-                        - 'null'
-                      robloxId:
-                        type: string
-                      robloxName:
-                        type: string
-                      robloxDisplayName:
-                        type: string
-                      robloxAvatar:
-                        type: string
-                      username:
-                        type: string
-                      provider:
-                        type: string
-                      eCoins:
-                        type: integer
-                  initialized:
-                    type: boolean
-        '401':
-          description: Недействительный токен.
-  /auth/session/token:
-    get:
-      tags:
-      - API Авторизации
-      summary: Токен сессии
-      description: Возвращает токен текущей сессии.
-      security:
-      - CookieAuth: []
-      - BearerAuth: []
-      responses:
-        '200':
-          description: Токен сессии.
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  token:
-                    type: string
-              example:
-                token: eyJhbGciOiJIUzI1NiJ9.eyJkaXNjb3JkSWQiOiIxMjM0NTY3ODkwMTIzNDU2NzgifQ.signature
-  /auth/user/profile:
-    patch:
-      tags:
-      - API Авторизации
-      summary: Обновление профиля Discord
-      description: Заново загружает ник и аватар из Discord.
-      security:
-      - CookieAuth: []
-      - BearerAuth: []
-      responses:
-        '200':
-          description: Профиль успешно обновлен.
-          content:
-            application/json:
-              example:
-                updated: true
-                user:
-                  id: '123456789012345678'
-                  name: player
-                  image: https://cdn.discordapp.com/avatars/123456789012345678/a_1b2c3d4e5f.gif?size=256
-                  discordId: '123456789012345678'
-                  discordAvatar: a_1b2c3d4e5f
-                  discordAvatarDecoration: https://cdn.discordapp.com/avatar-decoration-presets/a_decor.png
-                  robloxId: '156'
-                  robloxName: Builderman
-                  robloxDisplayName: Builder
-                  robloxAvatar: https://tr.rbxcdn.com/avatar.png
-                  username: player
-                  provider: discord
-                  eCoins: 250
-              schema:
-                type: object
-                properties:
-                  updated:
-                    type: boolean
-                  user:
-                    type: object
-                    properties:
-                      id:
-                        type: string
-                      name:
-                        type: string
-                      image:
-                        type: string
-                      discordId:
-                        type: string
-                      discordAvatar:
-                        type: string
-                      discordAvatarDecoration:
-                        type: string
-                      robloxId:
-                        type: string
-                      robloxName:
-                        type: string
-                      robloxDisplayName:
-                        type: string
-                      robloxAvatar:
-                        type: string
-                      username:
-                        type: string
-                      provider:
-                        type: string
-                      eCoins:
-                        type: integer
   /ai/credits/balance:
     get:
       tags:
       - AI Studio
       summary: Баланс AI-кредитов
-      description: Ваш баланс кредитов и коинов, курс обмена и цены моделей. Нужна сессия или ключ управления, исполнительный `sk-…` ключ не подходит.
+      description: Ваш баланс кредитов и коинов, курс обмена и цены моделей. Нужен AI-ключ управления или API-ключ; исполнительный `sk-…` ключ не подходит.
       security:
       - AIManagementKeyHeader: []
-      - CookieAuth: []
+      - ApiKeyHeader: []
+      - BearerAuth: []
       responses:
         '200':
           description: Баланс кредитов и коинов.
@@ -4925,56 +4248,6 @@ paths:
                             type: string
         '401':
           description: Не авторизован.
-  /ai/credits/exchange:
-    post:
-      tags:
-      - AI Studio
-      summary: Обмен коинов на кредиты
-      security:
-      - CookieAuth: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                coins:
-                  type: integer
-                  minimum: 1
-            example:
-              coins: 100
-      responses:
-        '403':
-          description: Owner session required; an ordinary HTTP key cannot authorize this operation.
-        '200':
-          description: Коины обменены (success, exchanged_coins, credits_added, new_credits, remaining_coins).
-          content:
-            application/json:
-              example:
-                success: true
-                exchanged_coins: 100
-                credits_added: 100
-                new_credits: 252.4
-                remaining_coins: 150
-              schema:
-                type: object
-                properties:
-                  success:
-                    type: boolean
-                  exchanged_coins:
-                    type: integer
-                  credits_added:
-                    type: integer
-                  new_credits:
-                    type: number
-                  remaining_coins:
-                    type: integer
-      description: 'Обменивает ваши коины на AI-кредиты по курсу 1:1.
-
-
-        Создание AI-ключа и обмен коинов требуют сессию владельца. Обычный HTTP-ключ, даже с полным доступом, не разрешает эти операции. Доверенные сервисы используют административные методы
-        с мастер-ключом.'
   /ai/keys:
     get:
       tags:
@@ -4987,7 +4260,8 @@ paths:
         включая собственные соседние ключи, замаскированы. teamId — идентификатор привязанной команды или null.'
       security:
       - AIManagementKeyHeader: []
-      - CookieAuth: []
+      - ApiKeyHeader: []
+      - BearerAuth: []
       responses:
         '200':
           description: Список ключей.
@@ -5021,69 +4295,6 @@ paths:
                       type: boolean
                     tools_enabled:
                       type: boolean
-    post:
-      tags:
-      - AI Studio
-      summary: Новый AI-ключ
-      security:
-      - CookieAuth: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                name:
-                  type: string
-                  default: Studio Key
-                scope:
-                  type: string
-                  enum:
-                  - agent
-                  - chat
-                  - voice
-            example:
-              name: Discord-бот
-              scope: chat
-      responses:
-        '403':
-          description: Owner session required; an ordinary HTTP key cannot authorize this operation.
-        '200':
-          description: Ключ создан (id, token, name, scope, created_at, is_active, tools_enabled).
-          content:
-            application/json:
-              example:
-                id: '21'
-                token: sk-chat-3f9c2a1e5b7d4e9fa1c32b4d6e8f0a1c3f9c2a1e5b7d4e9fa1c32b4d6e8f0a1c
-                name: Discord-бот
-                scope: chat
-                created_at: '2026-10-21T12:00:00Z'
-                is_active: true
-                tools_enabled: false
-              schema:
-                type: object
-                properties:
-                  id:
-                    type: string
-                  token:
-                    type: string
-                  name:
-                    type: string
-                  scope:
-                    type: string
-                  created_at:
-                    type: string
-                    format: date-time
-                  is_active:
-                    type: boolean
-                  tools_enabled:
-                    type: boolean
-      description: 'Создаёт AI-ключ для OpenAI-совместимого API: agent, chat или voice.
-
-
-        Создание AI-ключа и обмен коинов требуют сессию владельца. Обычный HTTP-ключ, даже с полным доступом, не разрешает эти операции. Доверенные сервисы используют административные методы
-        с мастер-ключом.'
   /ai/keys/{id}:
     delete:
       tags:
@@ -5103,7 +4314,8 @@ paths:
           type: string
       security:
       - AIManagementKeyHeader: []
-      - CookieAuth: []
+      - ApiKeyHeader: []
+      - BearerAuth: []
       responses:
         '200':
           description: AI-ключ успешно удалён.
@@ -5129,7 +4341,8 @@ paths:
       summary: Переименование AI-ключа
       security:
       - AIManagementKeyHeader: []
-      - CookieAuth: []
+      - ApiKeyHeader: []
+      - BearerAuth: []
       parameters:
       - name: id
         in: path
@@ -5188,6 +4401,10 @@ paths:
       - AI Audio
       summary: Цены голосового API
       description: Стоимость и ограничения распознавания и синтеза речи.
+      security:
+      - AIManagementKeyHeader: []
+      - ApiKeyHeader: []
+      - BearerAuth: []
       responses:
         '200':
           description: Параметры голосового API.
@@ -5228,7 +4445,9 @@ paths:
       summary: Название диалога
       description: Придумывает название диалога из 2–4 слов. Списывает AI-кредиты за токены.
       security:
-      - AIExecutionKeyHeader: []
+      - AIManagementKeyHeader: []
+      - ApiKeyHeader: []
+      - BearerAuth: []
       requestBody:
         required: true
         content:
@@ -5285,7 +4504,7 @@ paths:
       summary: Загрузка баннера
       description: 'Загружает изображение баннера: до 5 МБ, PNG, JPEG, WebP, GIF или AVIF.'
       security:
-      - CookieAuth: []
+      - ApiKeyHeader: []
       - BearerAuth: []
       requestBody:
         required: true
@@ -5321,17 +4540,21 @@ paths:
         '400':
           description: Недопустимый формат файла или повреждённые данные.
         '401':
-          description: Требуется авторизация пользователя.
+          description: Требуется действующий API-ключ.
         '413':
           description: Размер файла превышает 5 МБ.
+        '403':
+          description: Нет нужного права, либо ключ командный или без владельца.
+        '503':
+          description: Проверка авторизации временно недоступна.
   /ads/campaigns:
     get:
       tags:
       - Рекламные кампании V3
       summary: Мои рекламные кампании
-      description: Рекламные кампании владельца ключа или сессии.
+      description: Рекламные кампании владельца API-ключа.
       security:
-      - CookieAuth: []
+      - ApiKeyHeader: []
       - BearerAuth: []
       responses:
         '200':
@@ -5416,13 +4639,19 @@ paths:
                   clicksCount: 12
                   createdAt: '2026-10-19T12:00:00Z'
                   updatedAt: '2026-10-21T12:00:00Z'
+        '401':
+          description: Требуется действующий API-ключ.
+        '403':
+          description: Нет нужного права, либо ключ командный или без владельца.
+        '503':
+          description: Проверка авторизации временно недоступна.
     post:
       tags:
       - Рекламные кампании V3
       summary: Новая рекламная кампания
       description: Создаёт заявку на кампанию. За модерацию списывается 10 коинов.
       security:
-      - CookieAuth: []
+      - ApiKeyHeader: []
       - BearerAuth: []
       requestBody:
         required: true
@@ -5524,6 +4753,12 @@ paths:
           description: Ошибка валидации параметров.
         '402':
           description: Недостаточно eCoins для оплаты модерации (требуется 10 eCoins).
+        '401':
+          description: Требуется действующий API-ключ.
+        '403':
+          description: Нет нужного права, либо ключ командный или без владельца.
+        '503':
+          description: Проверка авторизации временно недоступна.
   /ads/campaigns/{id}:
     get:
       tags:
@@ -5531,7 +4766,7 @@ paths:
       summary: Рекламная кампания
       description: Кампания по ID.
       security:
-      - CookieAuth: []
+      - ApiKeyHeader: []
       - BearerAuth: []
       parameters:
       - name: id
@@ -5597,6 +4832,10 @@ paths:
           description: Доступ запрещён (кампания принадлежит другому пользователю).
         '404':
           description: Кампания не найдена.
+        '401':
+          description: Требуется действующий API-ключ.
+        '503':
+          description: Проверка авторизации временно недоступна.
   /ads/campaigns/{id}/buy:
     post:
       tags:
@@ -5604,7 +4843,7 @@ paths:
       summary: Покупка показов
       description: Покупает пакет показов для одобренной кампании.
       security:
-      - CookieAuth: []
+      - ApiKeyHeader: []
       - BearerAuth: []
       parameters:
       - name: id
@@ -5678,6 +4917,12 @@ paths:
           description: Кампания ещё не одобрена модератором или выбран неверный пакет.
         '402':
           description: Недостаточно eCoins на балансе пользователя.
+        '401':
+          description: Требуется действующий API-ключ.
+        '403':
+          description: Нет нужного права, либо ключ командный или без владельца.
+        '503':
+          description: Проверка авторизации временно недоступна.
   /ads/campaigns/{id}/toggle:
     post:
       tags:
@@ -5685,7 +4930,7 @@ paths:
       summary: Пауза и запуск кампании
       description: Останавливает показы или возобновляет их, если показы ещё остались.
       security:
-      - CookieAuth: []
+      - ApiKeyHeader: []
       - BearerAuth: []
       parameters:
       - name: id
@@ -5731,6 +4976,12 @@ paths:
                 deliveredImpressions: 180
                 clicksCount: 12
                 updatedAt: '2026-10-21T12:05:00Z'
+        '401':
+          description: Требуется действующий API-ключ.
+        '403':
+          description: Нет нужного права, либо ключ командный или без владельца.
+        '503':
+          description: Проверка авторизации временно недоступна.
   /ads/packages:
     get:
       tags:
@@ -8368,291 +7619,15 @@ paths:
               paths:
               - releases/RELEASE_ID/logo.png
       description: Сбрасывает кэш CDN-домена по токену домена из CI/CD. Пути передавайте в `paths`; без них очищается весь домен.
-  /user-assets:
-    get:
-      tags:
-      - Личные файлы и библиотека
-      description: Ваши личные файлы.
-      security:
-      - CookieAuth: []
-      - BearerAuth: []
-      summary: Личные файлы
-      responses:
-        '200':
-          description: Требуется действующая сессия владельца. Ответы не кэшируются публично.
-          content:
-            application/json:
-              schema:
-                type: object
-                required:
-                - assets
-                - maxFileBytes
-                - maxStorageBytes
-                properties:
-                  assets:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/UserAsset'
-                  maxFileBytes:
-                    type: integer
-                  maxStorageBytes:
-                    type: integer
-              example:
-                assets:
-                - id: 0123456789abcdef0123456789abcdef
-                  domain: userassets.erlcrussia.com
-                  path: _private/users/123456789012345678/upload/0123456789abcdef0123456789abcdef/original
-                  name: example.png
-                  mimeType: image/png
-                  size: 68
-                  kind: upload
-                  status: ready
-                  createdAt: '2026-10-15T19:00:00Z'
-                  expiresAt: null
-                  url: https://userassets.erlcrussia.com/_private/users/123456789012345678/upload/0123456789abcdef0123456789abcdef/original
-                maxFileBytes: 26214400
-                maxStorageBytes: 1073741824
-        '401':
-          description: 401 — нет действующей сессии; 404 — чужой, удалённый или истёкший файл; 413 — размер или квота; 415 — неверный формат аудио; 429 — лимит запросов; 503 — домен не подтверждён или зависимость недоступна.
-        '429':
-          description: 401 — нет действующей сессии; 404 — чужой, удалённый или истёкший файл; 413 — размер или квота; 415 — неверный формат аудио; 429 — лимит запросов; 503 — домен не подтверждён или зависимость недоступна.
-        '503':
-          description: 401 — нет действующей сессии; 404 — чужой, удалённый или истёкший файл; 413 — размер или квота; 415 — неверный формат аудио; 429 — лимит запросов; 503 — домен не подтверждён или зависимость недоступна.
-    post:
-      tags:
-      - Личные файлы и библиотека
-      description: 'Загружает файл в ваше личное хранилище: до 25 МБ.'
-      security:
-      - CookieAuth: []
-      - BearerAuth: []
-      summary: Загрузка личного файла
-      parameters:
-      - name: name
-        in: query
-        required: false
-        schema:
-          type: string
-      - name: kind
-        in: query
-        schema:
-          type: string
-          enum:
-          - upload
-          - recording
-          - speech
-          default: upload
-      requestBody:
-        required: true
-        content:
-          application/octet-stream:
-            schema:
-              type: string
-              format: binary
-      responses:
-        '201':
-          description: Требуется действующая сессия владельца. Ответы не кэшируются публично.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/UserAsset'
-              example:
-                id: 0123456789abcdef0123456789abcdef
-                domain: userassets.erlcrussia.com
-                path: _private/users/123456789012345678/upload/0123456789abcdef0123456789abcdef/original
-                name: example.png
-                mimeType: image/png
-                size: 68
-                kind: upload
-                status: ready
-                createdAt: '2026-10-15T19:00:00Z'
-                expiresAt: null
-                url: https://userassets.erlcrussia.com/_private/users/123456789012345678/upload/0123456789abcdef0123456789abcdef/original
-        '401':
-          description: 401 — нет действующей сессии; 404 — чужой, удалённый или истёкший файл; 413 — размер или квота; 415 — неверный формат аудио; 429 — лимит запросов; 503 — домен не подтверждён или зависимость недоступна.
-        '404':
-          description: 401 — нет действующей сессии; 404 — чужой, удалённый или истёкший файл; 413 — размер или квота; 415 — неверный формат аудио; 429 — лимит запросов; 503 — домен не подтверждён или зависимость недоступна.
-        '413':
-          description: 401 — нет действующей сессии; 404 — чужой, удалённый или истёкший файл; 413 — размер или квота; 415 — неверный формат аудио; 429 — лимит запросов; 503 — домен не подтверждён или зависимость недоступна.
-        '415':
-          description: 401 — нет действующей сессии; 404 — чужой, удалённый или истёкший файл; 413 — размер или квота; 415 — неверный формат аудио; 429 — лимит запросов; 503 — домен не подтверждён или зависимость недоступна.
-        '429':
-          description: 401 — нет действующей сессии; 404 — чужой, удалённый или истёкший файл; 413 — размер или квота; 415 — неверный формат аудио; 429 — лимит запросов; 503 — домен не подтверждён или зависимость недоступна.
-        '503':
-          description: 401 — нет действующей сессии; 404 — чужой, удалённый или истёкший файл; 413 — размер или квота; 415 — неверный формат аудио; 429 — лимит запросов; 503 — домен не подтверждён или зависимость недоступна.
-  /user-assets/{id}:
-    parameters:
-    - name: id
-      in: path
-      required: true
-      schema:
-        type: string
-        pattern: ^[a-f0-9]{32}$
-    get:
-      tags:
-      - Личные файлы и библиотека
-      description: 'Данные личного файла: имя, тип, размер и срок хранения.'
-      security:
-      - CookieAuth: []
-      - BearerAuth: []
-      summary: Личный файл
-      responses:
-        '200':
-          description: Требуется действующая сессия владельца. Ответы не кэшируются публично.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/UserAsset'
-              example:
-                id: 0123456789abcdef0123456789abcdef
-                domain: userassets.erlcrussia.com
-                path: _private/users/123456789012345678/upload/0123456789abcdef0123456789abcdef/original
-                name: example.png
-                mimeType: image/png
-                size: 68
-                kind: upload
-                status: ready
-                createdAt: '2026-10-15T19:00:00Z'
-                expiresAt: null
-                url: https://userassets.erlcrussia.com/_private/users/123456789012345678/upload/0123456789abcdef0123456789abcdef/original
-        '401':
-          description: 401 — нет действующей сессии; 404 — чужой, удалённый или истёкший файл; 413 — размер или квота; 415 — неверный формат аудио; 429 — лимит запросов; 503 — домен не подтверждён или зависимость недоступна.
-        '404':
-          description: 401 — нет действующей сессии; 404 — чужой, удалённый или истёкший файл; 413 — размер или квота; 415 — неверный формат аудио; 429 — лимит запросов; 503 — домен не подтверждён или зависимость недоступна.
-        '429':
-          description: 401 — нет действующей сессии; 404 — чужой, удалённый или истёкший файл; 413 — размер или квота; 415 — неверный формат аудио; 429 — лимит запросов; 503 — домен не подтверждён или зависимость недоступна.
-        '503':
-          description: 401 — нет действующей сессии; 404 — чужой, удалённый или истёкший файл; 413 — размер или квота; 415 — неверный формат аудио; 429 — лимит запросов; 503 — домен не подтверждён или зависимость недоступна.
-    delete:
-      tags:
-      - Личные файлы и библиотека
-      description: Удаляет ваш личный файл.
-      security:
-      - CookieAuth: []
-      - BearerAuth: []
-      summary: Удаление личного файла
-      responses:
-        '204':
-          description: Удалить личный файл
-        '401':
-          description: 401 — нет действующей сессии; 404 — чужой, удалённый или истёкший файл; 413 — размер или квота; 415 — неверный формат аудио; 429 — лимит запросов; 503 — домен не подтверждён или зависимость недоступна.
-        '404':
-          description: 401 — нет действующей сессии; 404 — чужой, удалённый или истёкший файл; 413 — размер или квота; 415 — неверный формат аудио; 429 — лимит запросов; 503 — домен не подтверждён или зависимость недоступна.
-        '429':
-          description: 401 — нет действующей сессии; 404 — чужой, удалённый или истёкший файл; 413 — размер или квота; 415 — неверный формат аудио; 429 — лимит запросов; 503 — домен не подтверждён или зависимость недоступна.
-        '503':
-          description: 401 — нет действующей сессии; 404 — чужой, удалённый или истёкший файл; 413 — размер или квота; 415 — неверный формат аудио; 429 — лимит запросов; 503 — домен не подтверждён или зависимость недоступна.
-  /user-assets/{id}/content:
-    parameters:
-    - name: id
-      in: path
-      required: true
-      schema:
-        type: string
-        pattern: ^[a-f0-9]{32}$
-    get:
-      tags:
-      - Личные файлы и библиотека
-      description: Отдаёт содержимое личного файла владельцу.
-      security:
-      - CookieAuth: []
-      - BearerAuth: []
-      summary: Скачивание личного файла
-      parameters:
-      - name: Range
-        in: header
-        schema:
-          type: string
-          example: bytes=0-7
-      responses:
-        '200':
-          description: Получить содержимое файла
-          content:
-            application/octet-stream:
-              schema:
-                type: string
-                format: binary
-        '206':
-          description: Partial Content
-        '416':
-          description: Range Not Satisfiable
-        '401':
-          description: 401 — нет действующей сессии; 404 — чужой, удалённый или истёкший файл; 413 — размер или квота; 415 — неверный формат аудио; 429 — лимит запросов; 503 — домен не подтверждён или зависимость недоступна.
-        '404':
-          description: 401 — нет действующей сессии; 404 — чужой, удалённый или истёкший файл; 413 — размер или квота; 415 — неверный формат аудио; 429 — лимит запросов; 503 — домен не подтверждён или зависимость недоступна.
-        '429':
-          description: 401 — нет действующей сессии; 404 — чужой, удалённый или истёкший файл; 413 — размер или квота; 415 — неверный формат аудио; 429 — лимит запросов; 503 — домен не подтверждён или зависимость недоступна.
-        '503':
-          description: 401 — нет действующей сессии; 404 — чужой, удалённый или истёкший файл; 413 — размер или квота; 415 — неверный формат аудио; 429 — лимит запросов; 503 — домен не подтверждён или зависимость недоступна.
-    head:
-      tags:
-      - Личные файлы и библиотека
-      description: Проверяет, что файл доступен, не передавая содержимое.
-      security:
-      - CookieAuth: []
-      - BearerAuth: []
-      summary: Проверка личного файла
-      responses:
-        '200':
-          description: Получить содержимое файла
-        '401':
-          description: 401 — нет действующей сессии; 404 — чужой, удалённый или истёкший файл; 413 — размер или квота; 415 — неверный формат аудио; 429 — лимит запросов; 503 — домен не подтверждён или зависимость недоступна.
-        '404':
-          description: 401 — нет действующей сессии; 404 — чужой, удалённый или истёкший файл; 413 — размер или квота; 415 — неверный формат аудио; 429 — лимит запросов; 503 — домен не подтверждён или зависимость недоступна.
-        '429':
-          description: 401 — нет действующей сессии; 404 — чужой, удалённый или истёкший файл; 413 — размер или квота; 415 — неверный формат аудио; 429 — лимит запросов; 503 — домен не подтверждён или зависимость недоступна.
-        '503':
-          description: 401 — нет действующей сессии; 404 — чужой, удалённый или истёкший файл; 413 — размер или квота; 415 — неверный формат аудио; 429 — лимит запросов; 503 — домен не подтверждён или зависимость недоступна.
-  /user-assets/authorize:
-    get:
-      summary: Проверка доступа к файлу
-      description: Есть ли у текущего пользователя доступ к личному файлу. Нужно серверу CDN перед отдачей.
-      security:
-      - CookieAuth: []
-      parameters:
-      - name: domain
-        in: query
-        required: true
-        schema:
-          type: string
-      - name: path
-        in: query
-        required: true
-        schema:
-          type: string
-      responses:
-        '200':
-          description: Проверить доступ к приватному CDN-файлу
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/UserAsset'
-              example:
-                id: 0123456789abcdef0123456789abcdef
-                domain: userassets.erlcrussia.com
-                path: _private/users/123456789012345678/upload/0123456789abcdef0123456789abcdef/original
-                name: example.png
-                mimeType: image/png
-                size: 68
-                kind: upload
-                status: ready
-                createdAt: '2026-10-15T19:00:00Z'
-                expiresAt: null
-        '401':
-          description: 'Требуется действующая сессия владельца файла.'
-        '404':
-          description: 'Файл не найден или недоступен этому пользователю.'
-        '429':
-          description: 'Превышен лимит запросов авторизации.'
-        '503':
-          description: 'Сервис CDN временно недоступен.'
   /ads/analytics:
     get:
       tags:
       - Рекламные кампании V3
       summary: 'Реклама: аналитика'
-      description: 'Агрегированная статистика показов и кликов владельца сессии. Период `24h`, `7d` (по умолчанию) или `30d`; `campaignId` сужает выборку до одной кампании.'
+      description: 'Агрегированная статистика показов и кликов владельца API-ключа. Период `24h`, `7d` (по умолчанию) или `30d`; `campaignId` сужает выборку до одной кампании.'
       security:
-      - CookieAuth: []
+      - ApiKeyHeader: []
+      - BearerAuth: []
       parameters:
       - name: period
         in: query
@@ -8680,9 +7655,13 @@ paths:
         '400':
           description: 'Неверные или отсутствующие параметры.'
         '401':
-          description: 'Требуется действующая сессия пользователя.'
+          description: 'Требуется действующий API-ключ.'
         '429':
           description: 'Слишком много попыток подтверждения; повторите через 5 минут.'
+        '403':
+          description: Нет нужного права, либо ключ командный или без владельца.
+        '503':
+          description: Проверка авторизации временно недоступна.
   /ads/channel-products:
     get:
       tags:
@@ -8705,7 +7684,8 @@ paths:
       summary: 'Реклама: состояние заказа'
       description: 'Состояние заказа на размещение в Discord: `pending`, `paid`, `sent`, `failed` или `expired`.'
       security:
-      - CookieAuth: []
+      - ApiKeyHeader: []
+      - BearerAuth: []
       parameters:
       - name: code
         in: path
@@ -8721,9 +7701,13 @@ paths:
               example:
                 {"state":"pending"}
         '401':
-          description: 'Требуется действующая сессия пользователя.'
+          description: 'Требуется действующий API-ключ.'
         '404':
           description: 'Заказ, покупка или промокод не найден.'
+        '403':
+          description: Нет нужного права, либо ключ командный или без владельца.
+        '503':
+          description: Проверка авторизации временно недоступна.
   /ads/channel-orders/{code}/redeem:
     post:
       tags:
@@ -8731,7 +7715,8 @@ paths:
       summary: 'Реклама: подтвердить оплату'
       description: 'Подтверждение оплаты заказа кодом FunPay. Код заказа и код оплаты должны совпадать; после успешной проверки публикация сразу отправляется в Discord.'
       security:
-      - CookieAuth: []
+      - ApiKeyHeader: []
+      - BearerAuth: []
       parameters:
       - name: code
         in: path
@@ -8763,13 +7748,15 @@ paths:
         '400':
           description: 'Неверные или отсутствующие параметры.'
         '401':
-          description: 'Требуется действующая сессия пользователя.'
+          description: 'Требуется действующий API-ключ.'
         '409':
           description: 'Заказ уже использован, не оплачен или не совпадает с кодом оплаты.'
         '429':
           description: 'Слишком много попыток подтверждения; повторите через 5 минут.'
         '503':
           description: 'Сервис размещения или каталог временно недоступны.'
+        '403':
+          description: Нет нужного права, либо ключ командный или без владельца.
   /ads/campaigns/{id}/channel-order:
     post:
       tags:
@@ -8777,7 +7764,8 @@ paths:
       summary: 'Реклама: заказ размещения'
       description: 'Создаёт заказ на Discord-размещение для одобренной кампании и выбранного продукта. Возвращает код заказа и ссылку на оплату FunPay.'
       security:
-      - CookieAuth: []
+      - ApiKeyHeader: []
+      - BearerAuth: []
       parameters:
       - name: id
         in: path
@@ -8809,17 +7797,19 @@ paths:
         '400':
           description: 'Неверные или отсутствующие параметры.'
         '401':
-          description: 'Требуется действующая сессия пользователя.'
+          description: 'Требуется действующий API-ключ.'
         '503':
           description: 'Сервис размещения или каталог временно недоступны.'
+        '403':
+          description: Нет нужного права, либо ключ командный или без владельца.
   /subscriptions/purchases:
     get:
       tags:
       - API Подписок
       summary: 'Подписки: история покупок'
-      description: 'История покупок текущего пользователя. Ключ с правом `subscription.read` или мастер-ключ обязаны передать `discordId`; сессия видит только свои покупки.'
+      description: 'История покупок владельца API-ключа. Ключ с правом `subscription.read` обязан передать `discordId`.'
       security:
-      - CookieAuth: []
+      - ApiKeyHeader: []
       - BearerAuth: []
       parameters:
       - name: discordId
@@ -8880,7 +7870,7 @@ paths:
         '400':
           description: 'Неверные или отсутствующие параметры.'
         '401':
-          description: 'Требуется действующая сессия пользователя.'
+          description: 'Требуется действующий API-ключ.'
         '403':
           description: 'Недостаточно прав или запрошен чужой пользователь.'
   /subscriptions/purchases/{id}:
@@ -8888,9 +7878,9 @@ paths:
       tags:
       - API Подписок
       summary: 'Подписки: покупка'
-      description: 'Одна покупка текущего пользователя по её ID.'
+      description: 'Одна покупка владельца API-ключа по её ID.'
       security:
-      - CookieAuth: []
+      - ApiKeyHeader: []
       - BearerAuth: []
       parameters:
       - name: id
@@ -8907,67 +7897,16 @@ paths:
               example:
                 {"success":true,"purchase":{}}
         '401':
-          description: 'Требуется действующая сессия пользователя.'
+          description: 'Требуется действующий API-ключ.'
         '404':
           description: 'Заказ, покупка или промокод не найден.'
-  /subscriptions/promo/validate:
-    post:
-      tags:
-      - API Подписок
-      summary: 'Подписки: проверка промокода'
-      description: 'Предварительная проверка промокода. Код не резервируется: повторная проверка выполняется при оплате. `discordId` можно не передавать при наличии сессии; чужой ID доступен только мастер-ключу.'
-      security:
-      - CookieAuth: []
-      - BearerAuth: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              required:
-              - code
-              - productId
-              properties:
-                code:
-                  type: string
-                  description: 'Промокод.'
-                productId:
-                  type: string
-                  description: 'ID продукта размещения.'
-                discordId:
-                  type: string
-                  description: 'Discord ID покупателя.'
-                duration:
-                  type: string
-                  description: 'Длительность подписки, по умолчанию `1month`.'
-            example:
-              code: SAVE10
-              productId: kreml
-              duration: 1month
-      responses:
-        '200':
-          description: 'Расчёт скидки.'
-          content:
-            application/json:
-              example:
-                {"success":true,"quote":{"code":"SAVE10","percent":10,"productId":"kreml","duration":"1month","originalCoins":400,"discountCoins":40,"finalCoins":360}}
-        '400':
-          description: 'Неверные или отсутствующие параметры.'
-        '401':
-          description: 'Требуется действующая сессия пользователя.'
-        '403':
-          description: 'Недостаточно прав или запрошен чужой пользователь.'
-        '404':
-          description: 'Заказ, покупка или промокод не найден.'
-
 components:
   securitySchemes:
     AIManagementKeyHeader:
       type: apiKey
       in: header
       name: erlcrussia-api-ai-key
-      description: Обычный HTTP-ключ для просмотра баланса, замаскированных AI-ключей и управления существующими ключами. Создание ключей и обмен коинов требуют сессию владельца; исполнительные AI-ключи запрещены.
+      description: Обычный HTTP-ключ для просмотра баланса, замаскированных AI-ключей и управления существующими ключами. Создание ключей и обмен коинов выполняются в кабинете; исполнительные AI-ключи запрещены.
     AIExecutionKeyHeader:
       type: apiKey
       in: header
@@ -8987,16 +7926,6 @@ components:
       in: header
       name: erlcrussia-websocket-key
       description: Единый заголовок WebSocket-ключа erlcrussia-websocket-key.
-    MasterKeyHeader:
-      type: apiKey
-      in: header
-      name: erlcrussia-api-master-key
-      description: Служебный master-ключ, только для внутренних интеграций.
-    CookieAuth:
-      type: apiKey
-      in: cookie
-      name: erlc_auth
-      description: Сессионная HTTP-Only кука авторизации на портале.
     SignatureTimestamp:
       type: apiKey
       in: header
@@ -9017,236 +7946,12 @@ components:
       in: header
       name: X-User-Id
       description: Discord ID вызывающего пользователя (интеграционные операции).
-    SessionIdHeader:
-      type: apiKey
-      in: header
-      name: x-session-token
-      description: Токен сессии портала (альтернатива куке erlc_auth).
     CDNDeployToken:
       type: apiKey
       in: header
       name: erlcrussia-api-cdn-token
       description: Отдельный deploy-токен подтверждённого CDN-домена.
   schemas:
-    AdminAIChatCompletionRequest:
-      type: object
-      required:
-      - messages
-      properties:
-        model:
-          type: string
-          enum:
-          - niya-1
-          - emmy-1
-          - hubert-1
-          - default
-          default: niya-1
-          description: 'Идентификатор модели:
-
-            - `niya-1` — Ния (основная модель для общих задач и модерации, 200k контекст)
-
-            - `emmy-1` — Эмми (интеллектуальная модель с пошаговым рассуждением, 1M контекст)
-
-            - `hubert-1` — Хуберт (кастомная модель, 200k контекст)
-
-            '
-          example: niya-1
-        messages:
-          type: array
-          description: Список предшествующих сообщений беседы.
-          items:
-            $ref: '#/components/schemas/AdminAIChatMessage'
-        files:
-          type: array
-          description: Дополнительный список файлов или изображений, прикреплённых к запросу.
-          items:
-            $ref: '#/components/schemas/AdminAIFilePart'
-        stream:
-          type: boolean
-          default: false
-          description: Включение потоковой передачи ответов Server-Sent Events (SSE).
-        thinking:
-          type: boolean
-          description: Включение режима пошагового размышления (цепочки рассуждений).
-          example: true
-        surzhyk:
-          type: boolean
-          default: false
-          description: Для модели hubert-1 включает фирменный суржик. По умолчанию Хуберт отвечает на языке последнего сообщения пользователя.
-        effort:
-          type: string
-          enum:
-          - low
-          - medium
-          - high
-          - extra
-          - max
-          description: 'Степень детализации рассуждений (уровень размышлений):
-
-            - `low` — базовая проверка фактов;
-
-            - `medium` — сбалансированный анализ (по умолчанию);
-
-            - `high` — исчерпывающий пошаговый разбор;
-
-            - `extra` / `max` — предельный уровень аналитики.
-
-            '
-          example: medium
-        session_id:
-          type: string
-          description: Публичный идентификатор сессии чата (UUIDv4). Позволяет сохранять контекст между запросами.
-          example: f47ac10b-58cc-4372-a567-0e02b2c3d479
-        opencode_session_id:
-          type: string
-          description: Внутренний ID сессии в инференс-кластере (если известен).
-        regenerate:
-          type: boolean
-          description: Флаг принудительной повторной генерации последнего ответа.
-        revert_last:
-          type: boolean
-          description: Флаг предварительного отката последнего ответа ассистента перед обработкой текущего запроса.
-    AdminAIChatMessage:
-      type: object
-      required:
-      - role
-      - content
-      properties:
-        role:
-          type: string
-          enum:
-          - system
-          - user
-          - assistant
-          description: 'Роль автора сообщения:
-
-            - `system` — системные инструкции и правила поведения модели;
-
-            - `user` — запрос или реплика пользователя;
-
-            - `assistant` — предыдущий ответ модели для сохранения контекста.
-
-            '
-          example: user
-        content:
-          oneOf:
-          - type: string
-            description: Текстовое содержимое сообщения.
-            example: Привет! Чем ты можешь помочь?
-          - type: array
-            description: Мультимодальный массив блоков (текст, изображения, файлы).
-            items:
-              type: object
-              properties:
-                type:
-                  type: string
-                  enum:
-                  - text
-                  - image_url
-                  - file
-                text:
-                  type: string
-                image_url:
-                  type: object
-                  properties:
-                    url:
-                      type: string
-                      example: https://cdn.erlcrussia.com/images/screenshot.png
-                file:
-                  type: object
-                  properties:
-                    url:
-                      type: string
-                    mime:
-                      type: string
-                    filename:
-                      type: string
-    AdminAIFilePart:
-      type: object
-      required:
-      - type
-      properties:
-        type:
-          type: string
-          enum:
-          - file
-          example: file
-        mime:
-          type: string
-          example: image/png
-        filename:
-          type: string
-          example: screenshot.png
-        url:
-          type: string
-          example: https://cdn.erlcrussia.com/images/screenshot.png
-    AdminAIChatCompletionResponse:
-      type: object
-      properties:
-        id:
-          type: string
-          example: chatcmpl-f47ac10b-58cc-4372-a567-0e02b2c3d479
-        session_id:
-          type: string
-          example: f47ac10b-58cc-4372-a567-0e02b2c3d479
-        opencode_session_id:
-          type: string
-          example: ses_01j8m4n5p6q7r8
-        object:
-          type: string
-          example: chat.completion
-        created:
-          type: integer
-          example: 1726838400
-        model:
-          type: string
-          example: niya-1
-        choices:
-          type: array
-          items:
-            type: object
-            properties:
-              index:
-                type: integer
-                example: 0
-              message:
-                type: object
-                properties:
-                  role:
-                    type: string
-                    example: assistant
-                  content:
-                    type: string
-                    example: Здравствуйте! Чем я могу вам помочь?
-                  reasoning:
-                    type: string
-                    description: Текст цепочки рассуждений модели (если включен thinking).
-                  reasoning_content:
-                    type: string
-                    description: Дублирующее поле reasoning для совместимости с различными клиентами (DeepSeek/vLLM формат).
-              finish_reason:
-                type: string
-                example: stop
-    AdminAIErrorResponse:
-      type: object
-      properties:
-        error:
-          type: object
-          properties:
-            message:
-              type: string
-              example: 'Incorrect API key provided: sk-studio-***.'
-            type:
-              type: string
-              example: invalid_request_error
-            param:
-              type:
-              - string
-              - 'null'
-              example: null
-            code:
-              type: string
-              example: invalid_api_key
     UserAsset:
       type: object
       required:
@@ -9408,51 +8113,6 @@ components:
         TeamBalance:
           type: boolean
           example: true
-    AdminFormattedToken:
-      type: object
-      properties:
-        id:
-          type: string
-          example: '12'
-        name:
-          type: string
-          example: 'API Key #12 (12345678)'
-        key:
-          type: string
-          example: erlc_sec_xxxxxxxxxxxx
-        apiKey:
-          type: string
-          example: erlc_sec_xxxxxxxxxxxx
-        maskedKey:
-          type: string
-          example: erlc_s...xxxx
-        permissions:
-          type: array
-          items:
-            type: string
-          example:
-          - erlc.server
-          - query:Players
-          - action:balance
-        accessMode:
-          type: string
-          enum:
-          - full
-          - restricted
-          example: restricted
-        userId:
-          type: string
-          example: '403258784102940682'
-        serverId:
-          type: string
-          example: '12345678'
-        isActive:
-          type: boolean
-          example: true
-        createdAt:
-          type: string
-          format: date-time
-          example: '2026-03-30T12:00:00Z'
     CDNAsset:
       type: object
       properties:
@@ -9499,33 +8159,6 @@ components:
         totalFolders:
           type: integer
           example: 14
-    AuthSessionResponse:
-      type: object
-      properties:
-        valid:
-          type: boolean
-          example: true
-        user:
-          type: object
-          properties:
-            discordId:
-              type: string
-              example: '1133665013794607114'
-            discordUsername:
-              type: string
-              example: AdminDev
-            robloxId:
-              type: string
-              example: '450123984'
-            robloxUsername:
-              type: string
-              example: Admin_RBLX
-            roles:
-              type: array
-              items:
-                type: string
-              example:
-              - SUPER_ADMIN
     HealthResponse:
       type: object
       properties:

@@ -117,6 +117,526 @@
     {
       "source": "/it/index",
       "destination": "/it/introduction"
+    },
+    {
+      "source": "/ru/reference/v3/auth/delete-all-user-sessions",
+      "destination": "/ru/introduction"
+    },
+    {
+      "source": "/ru/reference/v3/auth/delete-user-session",
+      "destination": "/ru/introduction"
+    },
+    {
+      "source": "/ru/reference/v3/auth/discord-callback",
+      "destination": "/ru/introduction"
+    },
+    {
+      "source": "/ru/reference/v3/auth/discord-login",
+      "destination": "/ru/introduction"
+    },
+    {
+      "source": "/ru/reference/v3/auth/get-session",
+      "destination": "/ru/introduction"
+    },
+    {
+      "source": "/ru/reference/v3/auth/get-user-sessions",
+      "destination": "/ru/introduction"
+    },
+    {
+      "source": "/ru/reference/v3/auth/link-roblox",
+      "destination": "/ru/introduction"
+    },
+    {
+      "source": "/ru/reference/v3/auth/logout",
+      "destination": "/ru/introduction"
+    },
+    {
+      "source": "/ru/reference/v3/auth/refresh-profile",
+      "destination": "/ru/introduction"
+    },
+    {
+      "source": "/ru/reference/v3/auth/refresh-roblox",
+      "destination": "/ru/introduction"
+    },
+    {
+      "source": "/ru/reference/v3/auth/roblox-callback",
+      "destination": "/ru/introduction"
+    },
+    {
+      "source": "/ru/reference/v3/auth/roblox-login",
+      "destination": "/ru/introduction"
+    },
+    {
+      "source": "/ru/reference/v3/auth/session-init-post",
+      "destination": "/ru/introduction"
+    },
+    {
+      "source": "/ru/reference/v3/auth/session-init",
+      "destination": "/ru/introduction"
+    },
+    {
+      "source": "/ru/reference/v3/auth/session-token",
+      "destination": "/ru/introduction"
+    },
+    {
+      "source": "/ru/reference/v3/auth/unlink-roblox",
+      "destination": "/ru/introduction"
+    },
+    {
+      "source": "/ru/reference/v3/user-assets/delete-user-assets-id",
+      "destination": "/ru/other/user-assets"
+    },
+    {
+      "source": "/ru/reference/v3/user-assets/get-user-assets-authorize",
+      "destination": "/ru/other/user-assets"
+    },
+    {
+      "source": "/ru/reference/v3/user-assets/get-user-assets-id-content",
+      "destination": "/ru/other/user-assets"
+    },
+    {
+      "source": "/ru/reference/v3/user-assets/get-user-assets-id",
+      "destination": "/ru/other/user-assets"
+    },
+    {
+      "source": "/ru/reference/v3/user-assets/get-user-assets",
+      "destination": "/ru/other/user-assets"
+    },
+    {
+      "source": "/ru/reference/v3/user-assets/head-user-assets-id-content",
+      "destination": "/ru/other/user-assets"
+    },
+    {
+      "source": "/ru/reference/v3/user-assets/post-user-assets",
+      "destination": "/ru/other/user-assets"
+    },
+    {
+      "source": "/ru/reference/v3/subscriptions/post-subscriptions-promo-validate",
+      "destination": "/ru/reference/v3/subscriptions/get-store"
+    },
+    {
+      "source": "/ru/reference/v3/ai/exchange-credits",
+      "destination": "/ru/reference/v3/ai/list-studio-keys"
+    },
+    {
+      "source": "/ru/reference/v3/ai/create-studio-key",
+      "destination": "/ru/reference/v3/ai/list-studio-keys"
+    },
+    {
+      "source": "/en/reference/v3/auth/delete-all-user-sessions",
+      "destination": "/en/introduction"
+    },
+    {
+      "source": "/en/reference/v3/auth/delete-user-session",
+      "destination": "/en/introduction"
+    },
+    {
+      "source": "/en/reference/v3/auth/discord-callback",
+      "destination": "/en/introduction"
+    },
+    {
+      "source": "/en/reference/v3/auth/discord-login",
+      "destination": "/en/introduction"
+    },
+    {
+      "source": "/en/reference/v3/auth/get-session",
+      "destination": "/en/introduction"
+    },
+    {
+      "source": "/en/reference/v3/auth/get-user-sessions",
+      "destination": "/en/introduction"
+    },
+    {
+      "source": "/en/reference/v3/auth/link-roblox",
+      "destination": "/en/introduction"
+    },
+    {
+      "source": "/en/reference/v3/auth/logout",
+      "destination": "/en/introduction"
+    },
+    {
+      "source": "/en/reference/v3/auth/refresh-profile",
+      "destination": "/en/introduction"
+    },
+    {
+      "source": "/en/reference/v3/auth/refresh-roblox",
+      "destination": "/en/introduction"
+    },
+    {
+      "source": "/en/reference/v3/auth/roblox-callback",
+      "destination": "/en/introduction"
+    },
+    {
+      "source": "/en/reference/v3/auth/roblox-login",
+      "destination": "/en/introduction"
+    },
+    {
+      "source": "/en/reference/v3/auth/session-init-post",
+      "destination": "/en/introduction"
+    },
+    {
+      "source": "/en/reference/v3/auth/session-init",
+      "destination": "/en/introduction"
+    },
+    {
+      "source": "/en/reference/v3/auth/session-token",
+      "destination": "/en/introduction"
+    },
+    {
+      "source": "/en/reference/v3/auth/unlink-roblox",
+      "destination": "/en/introduction"
+    },
+    {
+      "source": "/en/reference/v3/user-assets/delete-user-assets-id",
+      "destination": "/en/other/user-assets"
+    },
+    {
+      "source": "/en/reference/v3/user-assets/get-user-assets-authorize",
+      "destination": "/en/other/user-assets"
+    },
+    {
+      "source": "/en/reference/v3/user-assets/get-user-assets-id-content",
+      "destination": "/en/other/user-assets"
+    },
+    {
+      "source": "/en/reference/v3/user-assets/get-user-assets-id",
+      "destination": "/en/other/user-assets"
+    },
+    {
+      "source": "/en/reference/v3/user-assets/get-user-assets",
+      "destination": "/en/other/user-assets"
+    },
+    {
+      "source": "/en/reference/v3/user-assets/head-user-assets-id-content",
+      "destination": "/en/other/user-assets"
+    },
+    {
+      "source": "/en/reference/v3/user-assets/post-user-assets",
+      "destination": "/en/other/user-assets"
+    },
+    {
+      "source": "/en/reference/v3/subscriptions/post-subscriptions-promo-validate",
+      "destination": "/en/reference/v3/subscriptions/get-store"
+    },
+    {
+      "source": "/en/reference/v3/ai/exchange-credits",
+      "destination": "/en/reference/v3/ai/list-studio-keys"
+    },
+    {
+      "source": "/en/reference/v3/ai/create-studio-key",
+      "destination": "/en/reference/v3/ai/list-studio-keys"
+    },
+    {
+      "source": "/uk/reference/v3/auth/delete-all-user-sessions",
+      "destination": "/uk/introduction"
+    },
+    {
+      "source": "/uk/reference/v3/auth/delete-user-session",
+      "destination": "/uk/introduction"
+    },
+    {
+      "source": "/uk/reference/v3/auth/discord-callback",
+      "destination": "/uk/introduction"
+    },
+    {
+      "source": "/uk/reference/v3/auth/discord-login",
+      "destination": "/uk/introduction"
+    },
+    {
+      "source": "/uk/reference/v3/auth/get-session",
+      "destination": "/uk/introduction"
+    },
+    {
+      "source": "/uk/reference/v3/auth/get-user-sessions",
+      "destination": "/uk/introduction"
+    },
+    {
+      "source": "/uk/reference/v3/auth/link-roblox",
+      "destination": "/uk/introduction"
+    },
+    {
+      "source": "/uk/reference/v3/auth/logout",
+      "destination": "/uk/introduction"
+    },
+    {
+      "source": "/uk/reference/v3/auth/refresh-profile",
+      "destination": "/uk/introduction"
+    },
+    {
+      "source": "/uk/reference/v3/auth/refresh-roblox",
+      "destination": "/uk/introduction"
+    },
+    {
+      "source": "/uk/reference/v3/auth/roblox-callback",
+      "destination": "/uk/introduction"
+    },
+    {
+      "source": "/uk/reference/v3/auth/roblox-login",
+      "destination": "/uk/introduction"
+    },
+    {
+      "source": "/uk/reference/v3/auth/session-init-post",
+      "destination": "/uk/introduction"
+    },
+    {
+      "source": "/uk/reference/v3/auth/session-init",
+      "destination": "/uk/introduction"
+    },
+    {
+      "source": "/uk/reference/v3/auth/session-token",
+      "destination": "/uk/introduction"
+    },
+    {
+      "source": "/uk/reference/v3/auth/unlink-roblox",
+      "destination": "/uk/introduction"
+    },
+    {
+      "source": "/uk/reference/v3/user-assets/delete-user-assets-id",
+      "destination": "/uk/other/user-assets"
+    },
+    {
+      "source": "/uk/reference/v3/user-assets/get-user-assets-authorize",
+      "destination": "/uk/other/user-assets"
+    },
+    {
+      "source": "/uk/reference/v3/user-assets/get-user-assets-id-content",
+      "destination": "/uk/other/user-assets"
+    },
+    {
+      "source": "/uk/reference/v3/user-assets/get-user-assets-id",
+      "destination": "/uk/other/user-assets"
+    },
+    {
+      "source": "/uk/reference/v3/user-assets/get-user-assets",
+      "destination": "/uk/other/user-assets"
+    },
+    {
+      "source": "/uk/reference/v3/user-assets/head-user-assets-id-content",
+      "destination": "/uk/other/user-assets"
+    },
+    {
+      "source": "/uk/reference/v3/user-assets/post-user-assets",
+      "destination": "/uk/other/user-assets"
+    },
+    {
+      "source": "/uk/reference/v3/subscriptions/post-subscriptions-promo-validate",
+      "destination": "/uk/reference/v3/subscriptions/get-store"
+    },
+    {
+      "source": "/uk/reference/v3/ai/exchange-credits",
+      "destination": "/uk/reference/v3/ai/list-studio-keys"
+    },
+    {
+      "source": "/uk/reference/v3/ai/create-studio-key",
+      "destination": "/uk/reference/v3/ai/list-studio-keys"
+    },
+    {
+      "source": "/es/reference/v3/auth/delete-all-user-sessions",
+      "destination": "/es/introduction"
+    },
+    {
+      "source": "/es/reference/v3/auth/delete-user-session",
+      "destination": "/es/introduction"
+    },
+    {
+      "source": "/es/reference/v3/auth/discord-callback",
+      "destination": "/es/introduction"
+    },
+    {
+      "source": "/es/reference/v3/auth/discord-login",
+      "destination": "/es/introduction"
+    },
+    {
+      "source": "/es/reference/v3/auth/get-session",
+      "destination": "/es/introduction"
+    },
+    {
+      "source": "/es/reference/v3/auth/get-user-sessions",
+      "destination": "/es/introduction"
+    },
+    {
+      "source": "/es/reference/v3/auth/link-roblox",
+      "destination": "/es/introduction"
+    },
+    {
+      "source": "/es/reference/v3/auth/logout",
+      "destination": "/es/introduction"
+    },
+    {
+      "source": "/es/reference/v3/auth/refresh-profile",
+      "destination": "/es/introduction"
+    },
+    {
+      "source": "/es/reference/v3/auth/refresh-roblox",
+      "destination": "/es/introduction"
+    },
+    {
+      "source": "/es/reference/v3/auth/roblox-callback",
+      "destination": "/es/introduction"
+    },
+    {
+      "source": "/es/reference/v3/auth/roblox-login",
+      "destination": "/es/introduction"
+    },
+    {
+      "source": "/es/reference/v3/auth/session-init-post",
+      "destination": "/es/introduction"
+    },
+    {
+      "source": "/es/reference/v3/auth/session-init",
+      "destination": "/es/introduction"
+    },
+    {
+      "source": "/es/reference/v3/auth/session-token",
+      "destination": "/es/introduction"
+    },
+    {
+      "source": "/es/reference/v3/auth/unlink-roblox",
+      "destination": "/es/introduction"
+    },
+    {
+      "source": "/es/reference/v3/user-assets/delete-user-assets-id",
+      "destination": "/es/other/user-assets"
+    },
+    {
+      "source": "/es/reference/v3/user-assets/get-user-assets-authorize",
+      "destination": "/es/other/user-assets"
+    },
+    {
+      "source": "/es/reference/v3/user-assets/get-user-assets-id-content",
+      "destination": "/es/other/user-assets"
+    },
+    {
+      "source": "/es/reference/v3/user-assets/get-user-assets-id",
+      "destination": "/es/other/user-assets"
+    },
+    {
+      "source": "/es/reference/v3/user-assets/get-user-assets",
+      "destination": "/es/other/user-assets"
+    },
+    {
+      "source": "/es/reference/v3/user-assets/head-user-assets-id-content",
+      "destination": "/es/other/user-assets"
+    },
+    {
+      "source": "/es/reference/v3/user-assets/post-user-assets",
+      "destination": "/es/other/user-assets"
+    },
+    {
+      "source": "/es/reference/v3/subscriptions/post-subscriptions-promo-validate",
+      "destination": "/es/reference/v3/subscriptions/get-store"
+    },
+    {
+      "source": "/es/reference/v3/ai/exchange-credits",
+      "destination": "/es/reference/v3/ai/list-studio-keys"
+    },
+    {
+      "source": "/es/reference/v3/ai/create-studio-key",
+      "destination": "/es/reference/v3/ai/list-studio-keys"
+    },
+    {
+      "source": "/it/reference/v3/auth/delete-all-user-sessions",
+      "destination": "/it/introduction"
+    },
+    {
+      "source": "/it/reference/v3/auth/delete-user-session",
+      "destination": "/it/introduction"
+    },
+    {
+      "source": "/it/reference/v3/auth/discord-callback",
+      "destination": "/it/introduction"
+    },
+    {
+      "source": "/it/reference/v3/auth/discord-login",
+      "destination": "/it/introduction"
+    },
+    {
+      "source": "/it/reference/v3/auth/get-session",
+      "destination": "/it/introduction"
+    },
+    {
+      "source": "/it/reference/v3/auth/get-user-sessions",
+      "destination": "/it/introduction"
+    },
+    {
+      "source": "/it/reference/v3/auth/link-roblox",
+      "destination": "/it/introduction"
+    },
+    {
+      "source": "/it/reference/v3/auth/logout",
+      "destination": "/it/introduction"
+    },
+    {
+      "source": "/it/reference/v3/auth/refresh-profile",
+      "destination": "/it/introduction"
+    },
+    {
+      "source": "/it/reference/v3/auth/refresh-roblox",
+      "destination": "/it/introduction"
+    },
+    {
+      "source": "/it/reference/v3/auth/roblox-callback",
+      "destination": "/it/introduction"
+    },
+    {
+      "source": "/it/reference/v3/auth/roblox-login",
+      "destination": "/it/introduction"
+    },
+    {
+      "source": "/it/reference/v3/auth/session-init-post",
+      "destination": "/it/introduction"
+    },
+    {
+      "source": "/it/reference/v3/auth/session-init",
+      "destination": "/it/introduction"
+    },
+    {
+      "source": "/it/reference/v3/auth/session-token",
+      "destination": "/it/introduction"
+    },
+    {
+      "source": "/it/reference/v3/auth/unlink-roblox",
+      "destination": "/it/introduction"
+    },
+    {
+      "source": "/it/reference/v3/user-assets/delete-user-assets-id",
+      "destination": "/it/other/user-assets"
+    },
+    {
+      "source": "/it/reference/v3/user-assets/get-user-assets-authorize",
+      "destination": "/it/other/user-assets"
+    },
+    {
+      "source": "/it/reference/v3/user-assets/get-user-assets-id-content",
+      "destination": "/it/other/user-assets"
+    },
+    {
+      "source": "/it/reference/v3/user-assets/get-user-assets-id",
+      "destination": "/it/other/user-assets"
+    },
+    {
+      "source": "/it/reference/v3/user-assets/get-user-assets",
+      "destination": "/it/other/user-assets"
+    },
+    {
+      "source": "/it/reference/v3/user-assets/head-user-assets-id-content",
+      "destination": "/it/other/user-assets"
+    },
+    {
+      "source": "/it/reference/v3/user-assets/post-user-assets",
+      "destination": "/it/other/user-assets"
+    },
+    {
+      "source": "/it/reference/v3/subscriptions/post-subscriptions-promo-validate",
+      "destination": "/it/reference/v3/subscriptions/get-store"
+    },
+    {
+      "source": "/it/reference/v3/ai/exchange-credits",
+      "destination": "/it/reference/v3/ai/list-studio-keys"
+    },
+    {
+      "source": "/it/reference/v3/ai/create-studio-key",
+      "destination": "/it/reference/v3/ai/list-studio-keys"
     }
   ]
 }

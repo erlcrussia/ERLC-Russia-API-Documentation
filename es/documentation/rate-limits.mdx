@@ -4,7 +4,7 @@ description: "Cómo conocer tu límite y qué hacer ante HTTP 429."
 icon: "gauge-high"
 ---
 
-Las cabeceras de límite se incluyen en rutas limitadas. Las claves maestras y UNLIMITED_API_KEYS omiten este límite y pueden no recibir X-RateLimit-*. Los nombres de cabecera HTTP no distinguen mayúsculas. Una clave válida nueva usa primero el límite por IP; tras calentar la caché de credenciales usa el personal (por ejemplo, 40 → 120 en estadísticas). Retry-After se envía al limitar.
+Las cabeceras de límite se incluyen en rutas limitadas. Las claves de servicio y las claves de `UNLIMITED_API_KEYS` omiten este límite y pueden no recibir X-RateLimit-*. Los nombres de cabecera HTTP no distinguen mayúsculas. Una clave válida nueva usa primero el límite por IP; tras calentar la caché de credenciales usa el personal (por ejemplo, 40 → 120 en estadísticas). Retry-After se envía al limitar.
 
 | Cabecera | Significado |
 |---|---|

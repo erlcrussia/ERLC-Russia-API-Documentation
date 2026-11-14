@@ -149,8 +149,7 @@
                     "uk/reference/v3/subscriptions/purchase-with-coins",
                     "uk/reference/v3/subscriptions/get-user-limits",
                     "uk/reference/v3/subscriptions/get-subscriptions-purchases",
-                    "uk/reference/v3/subscriptions/get-subscriptions-purchases-id",
-                    "uk/reference/v3/subscriptions/post-subscriptions-promo-validate"
+                    "uk/reference/v3/subscriptions/get-subscriptions-purchases-id"
                   ]
                 },
                 {
@@ -197,19 +196,6 @@
                         "uk/reference/v3/cdn/post-cdn-webhook-purge"
                       ]
                     }
-                  ]
-                },
-                {
-                  "group": "Особисті файли",
-                  "icon": "file-user",
-                  "pages": [
-                    "uk/reference/v3/user-assets/get-user-assets",
-                    "uk/reference/v3/user-assets/post-user-assets",
-                    "uk/reference/v3/user-assets/get-user-assets-id",
-                    "uk/reference/v3/user-assets/delete-user-assets-id",
-                    "uk/reference/v3/user-assets/get-user-assets-id-content",
-                    "uk/reference/v3/user-assets/head-user-assets-id-content",
-                    "uk/reference/v3/user-assets/get-user-assets-authorize"
                   ]
                 },
                 {
@@ -271,9 +257,7 @@
                   "icon": "sparkles",
                   "pages": [
                     "uk/reference/v3/ai/get-credits-balance",
-                    "uk/reference/v3/ai/exchange-credits",
                     "uk/reference/v3/ai/list-studio-keys",
-                    "uk/reference/v3/ai/create-studio-key",
                     "uk/reference/v3/ai/delete-ai-keys-id",
                     "uk/reference/v3/ai/generate-title",
                     "uk/reference/v3/ai/patch-studio-key-id",
@@ -297,46 +281,6 @@
                     "uk/reference/v3/ads/get-ads-channel-orders-code",
                     "uk/reference/v3/ads/post-ads-channel-orders-code-redeem",
                     "uk/reference/v3/ads/post-ads-campaigns-id-channel-order"
-                  ]
-                },
-                {
-                  "group": "Авторизація",
-                  "icon": "shield-halved",
-                  "pages": [
-                    {
-                      "group": "Вхід",
-                      "icon": "arrow-right-to-bracket",
-                      "pages": [
-                        "uk/reference/v3/auth/discord-login",
-                        "uk/reference/v3/auth/discord-callback",
-                        "uk/reference/v3/auth/session-init",
-                        "uk/reference/v3/auth/session-init-post",
-                        "uk/reference/v3/auth/session-token",
-                        "uk/reference/v3/auth/get-session",
-                        "uk/reference/v3/auth/logout"
-                      ]
-                    },
-                    {
-                      "group": "Сесії",
-                      "icon": "fingerprint",
-                      "pages": [
-                        "uk/reference/v3/auth/get-user-sessions",
-                        "uk/reference/v3/auth/delete-user-session",
-                        "uk/reference/v3/auth/delete-all-user-sessions"
-                      ]
-                    },
-                    {
-                      "group": "Roblox і профіль",
-                      "icon": "link",
-                      "pages": [
-                        "uk/reference/v3/auth/roblox-login",
-                        "uk/reference/v3/auth/roblox-callback",
-                        "uk/reference/v3/auth/link-roblox",
-                        "uk/reference/v3/auth/unlink-roblox",
-                        "uk/reference/v3/auth/refresh-roblox",
-                        "uk/reference/v3/auth/refresh-profile"
-                      ]
-                    }
                   ]
                 },
                 {

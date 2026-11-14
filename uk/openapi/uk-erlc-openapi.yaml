@@ -322,7 +322,7 @@ components:
                 code: 5008
                 message: invalid_token
             invalid_master_key:
-              summary: Invalid master key.
+              summary: Invalid API key.
               value:
                 code: 5006
                 message: invalid_master_key

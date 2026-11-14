@@ -2019,11 +2019,11 @@ components:
               value:
                 code: 5008
                 message: Invalid Token
-            Invalid Master Key:
-              summary: Invalid master key.
+            Invalid API Key:
+              summary: Invalid API key.
               value:
                 code: 5006
-                message: Invalid Master Key
+                message: Invalid API Key
     Forbidden:
       description: Access forbidden.
       content:
@@ -2776,7 +2776,7 @@ components:
         authorId:
           type: string
           description: Operation author ID.
-          example: admin_001
+          example: staff_001
     StoreAddItemRequest:
       type: object
       description: Request to add item to store (action=addItem).

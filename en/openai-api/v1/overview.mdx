@@ -449,4 +449,3 @@ prompt_tokens includes service system context and supplied conversation history,
 
 The full secret is returned only on creation or rotation. AI key lists, renaming and deletion return a masked token. GET /keys reveals only the calling key; all sibling keys, including your own, are masked. teamId is the bound team ID or null.
 
-Creating an AI key and exchanging coins require the owner session. An ordinary HTTP key, even with full access, cannot perform these operations. Trusted services use the admin endpoints with a master key.

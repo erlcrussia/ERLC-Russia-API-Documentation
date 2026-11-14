@@ -314,11 +314,11 @@ components:
               value:
                 code: 5008
                 message: Invalid Token
-            Invalid Master Key:
-              summary: Неверный мастер-ключ.
+            Invalid API Key:
+              summary: Неверный API-ключ.
               value:
                 code: 5006
-                message: Invalid Master Key
+                message: Invalid API Key
     Forbidden:
       description: Доступ запрещён.
       content:
