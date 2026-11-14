@@ -280,7 +280,7 @@ paths:
               example:
                 {"userId": "123456789012345678", "cash": 15000, "bank": 82000, "rank": 14}
         '400':
-          description: 'Parámetros ausentes o inválidos; el importe no es un entero positivo.'
+          description: 'Parámetros ausentes o inválidos.'
         '429':
           description: 'Se superó el límite de peticiones.'
         '500':
@@ -289,7 +289,7 @@ paths:
       tags:
       - Economía
       summary: 'Economía: operaciones con dinero'
-      description: 'Operaciones de dinero. `amount` es un entero positivo; la operación no se ejecuta si faltan fondos. Acciones: `transfer` (`fromUserId`, `toUserId`, `amount`), `deposit` y `withdraw` (`userId`, `amount`), `add` y `remove` (`userId`, `amount`, `type`: `cash` o `bank`), `reset` (`userId`), `resetCooldown` (`userId`, `command` opcional). Los parámetros de la acción van en la query; para POST, en el cuerpo JSON.'
+      description: 'Operaciones de dinero. `amount` es un entero positivo; si faltan fondos se devuelve 409. Acciones: `transfer` (`fromUserId`, `toUserId`, `amount`), `deposit` y `withdraw` (`userId`, `amount`), `add` y `remove` (`userId`, `amount`, `type`: `cash` o `bank`), `reset` (`userId`), `resetCooldown` (`userId`, `command` opcional). Los parámetros de la acción van en la query; para POST, en el cuerpo JSON.'
       security:
       - BearerAuth: []
       parameters:
@@ -335,7 +335,9 @@ paths:
               example:
                 {"success": true, "userId": "123456789012345678", "amount": 5000, "newBalance": 87000}
         '400':
-          description: 'Parámetros ausentes o inválidos; el importe no es un entero positivo.'
+          description: 'Parámetros ausentes o inválidos, o el importe no es un entero positivo (`INVALID_AMOUNT`, `AMOUNT_TOO_SMALL`).'
+        '409':
+          description: 'Fondos o activos insuficientes (`INSUFFICIENT_FUNDS`, `NOT_ENOUGH_ASSETS`).'
         '429':
           description: 'Se superó el límite de peticiones.'
         '500':
@@ -390,9 +392,7 @@ paths:
               example:
                 {"userId": "123456789012345678", "inventory": [{"name": "Аптечка", "amount": 2}]}
         '400':
-          description: 'Parámetros ausentes o inválidos; el importe no es un entero positivo.'
-        '404':
-          description: 'No se encontró el negocio, la mafia, el jugador o el artículo.'
+          description: 'Parámetros ausentes o inválidos.'
         '429':
           description: 'Se superó el límite de peticiones.'
         '500':
@@ -439,9 +439,9 @@ paths:
               example:
                 {"success": true, "userId": "123456789012345678"}
         '400':
-          description: 'Parámetros ausentes o inválidos; el importe no es un entero positivo.'
-        '404':
-          description: 'No se encontró el negocio, la mafia, el jugador o el artículo.'
+          description: 'Parámetros ausentes o inválidos, o el importe no es un entero positivo (`INVALID_AMOUNT`, `AMOUNT_TOO_SMALL`).'
+        '409':
+          description: 'Fondos o activos insuficientes (`INSUFFICIENT_FUNDS`, `NOT_ENOUGH_ASSETS`).'
         '429':
           description: 'Se superó el límite de peticiones.'
         '500':
@@ -509,11 +509,9 @@ paths:
               example:
                 {"page": 1, "total": 1, "businesses": [{"id": "B7K2Q9XZ", "name": "Кафе «Арбат»", "bank": 120000}]}
         '400':
-          description: 'Parámetros ausentes o inválidos; el importe no es un entero positivo.'
+          description: 'Parámetros ausentes o inválidos.'
         '404':
           description: 'No se encontró el negocio, la mafia, el jugador o el artículo.'
-        '409':
-          description: 'Fondos insuficientes o conflicto de estado.'
         '429':
           description: 'Se superó el límite de peticiones.'
         '500':
@@ -589,11 +587,11 @@ paths:
               example:
                 {"success": true, "businessId": "B7K2Q9XZ", "added": 5000, "newBalance": 125000}
         '400':
-          description: 'Parámetros ausentes o inválidos; el importe no es un entero positivo.'
+          description: 'Parámetros ausentes o inválidos, o el importe no es un entero positivo (`INVALID_AMOUNT`, `AMOUNT_TOO_SMALL`).'
         '404':
           description: 'No se encontró el negocio, la mafia, el jugador o el artículo.'
         '409':
-          description: 'Fondos insuficientes o conflicto de estado.'
+          description: 'Fondos o activos insuficientes (`INSUFFICIENT_FUNDS`, `NOT_ENOUGH_ASSETS`).'
         '429':
           description: 'Se superó el límite de peticiones.'
         '500':
@@ -658,11 +656,9 @@ paths:
               example:
                 {"page": 1, "total": 1, "mafias": [{"id": "M3X8P1", "name": "Солнцевские", "bank": 54000}]}
         '400':
-          description: 'Parámetros ausentes o inválidos; el importe no es un entero positivo.'
+          description: 'Parámetros ausentes o inválidos.'
         '404':
           description: 'No se encontró el negocio, la mafia, el jugador o el artículo.'
-        '409':
-          description: 'Fondos insuficientes o conflicto de estado.'
         '429':
           description: 'Se superó el límite de peticiones.'
         '500':
@@ -720,11 +716,11 @@ paths:
               example:
                 {"success": true, "mafiaId": "M3X8P1", "added": 1000, "newBalance": 55000}
         '400':
-          description: 'Parámetros ausentes o inválidos; el importe no es un entero positivo.'
+          description: 'Parámetros ausentes o inválidos, o el importe no es un entero positivo (`INVALID_AMOUNT`, `AMOUNT_TOO_SMALL`).'
         '404':
           description: 'No se encontró el negocio, la mafia, el jugador o el artículo.'
         '409':
-          description: 'Fondos insuficientes o conflicto de estado.'
+          description: 'Fondos o activos insuficientes (`INSUFFICIENT_FUNDS`, `NOT_ENOUGH_ASSETS`).'
         '429':
           description: 'Se superó el límite de peticiones.'
         '500':
@@ -773,9 +769,7 @@ paths:
               example:
                 {"balance": {"bank": 2500000}}
         '400':
-          description: 'Parámetros ausentes o inválidos; el importe no es un entero positivo.'
-        '409':
-          description: 'Fondos insuficientes o conflicto de estado.'
+          description: 'Parámetros ausentes o inválidos.'
         '429':
           description: 'Se superó el límite de peticiones.'
         '500':
@@ -824,9 +818,9 @@ paths:
               example:
                 {"success": true, "added": 10000, "newBalance": 2510000}
         '400':
-          description: 'Parámetros ausentes o inválidos; el importe no es un entero positivo.'
+          description: 'Parámetros ausentes o inválidos, o el importe no es un entero positivo (`INVALID_AMOUNT`, `AMOUNT_TOO_SMALL`).'
         '409':
-          description: 'Fondos insuficientes o conflicto de estado.'
+          description: 'Fondos o activos insuficientes (`INSUFFICIENT_FUNDS`, `NOT_ENOUGH_ASSETS`).'
         '429':
           description: 'Se superó el límite de peticiones.'
         '500':
@@ -869,7 +863,7 @@ paths:
               example:
                 {"count": 1, "items": [{"name": "Аптечка", "price_buy": 250, "price_sell": 100}]}
         '400':
-          description: 'Parámetros ausentes o inválidos; el importe no es un entero positivo.'
+          description: 'Parámetros ausentes o inválidos.'
         '404':
           description: 'No se encontró el negocio, la mafia, el jugador o el artículo.'
         '429':
@@ -880,7 +874,7 @@ paths:
       tags:
       - Economía
       summary: 'Economía: acciones de la tienda'
-      description: 'Acciones: `addItem` (`item`), `removeItem` (`itemName`), `buy` (`userId`, `itemName`), `sellToStore` (`userId`, `itemName`). 404 significa que falta el artículo; 400 significa artículo no vendible. Los parámetros de la acción van en la query; para POST, en el cuerpo JSON.'
+      description: 'Acciones: `addItem` (`item`), `removeItem` (`itemName`), `buy` (`userId`, `itemName`), `sellToStore` (`userId`, `itemName`). 404 significa que falta el artículo; 400 significa importe inválido; 409 significa fondos insuficientes. Los parámetros de la acción van en la query; para POST, en el cuerpo JSON.'
       security:
       - BearerAuth: []
       parameters:
@@ -916,9 +910,11 @@ paths:
               example:
                 {"success": true, "userId": "123456789012345678", "itemName": "Аптечка"}
         '400':
-          description: 'Parámetros ausentes o inválidos; el importe no es un entero positivo.'
+          description: 'Parámetros ausentes o inválidos, o el importe no es un entero positivo (`INVALID_AMOUNT`, `AMOUNT_TOO_SMALL`).'
         '404':
           description: 'No se encontró el negocio, la mafia, el jugador o el artículo.'
+        '409':
+          description: 'Fondos o activos insuficientes (`INSUFFICIENT_FUNDS`, `NOT_ENOUGH_ASSETS`).'
         '429':
           description: 'Se superó el límite de peticiones.'
         '500':
@@ -966,7 +962,7 @@ paths:
               example:
                 {"page": 1, "total": 0, "ads": []}
         '400':
-          description: 'Parámetros ausentes o inválidos; el importe no es un entero positivo.'
+          description: 'Parámetros ausentes o inválidos.'
         '429':
           description: 'Se superó el límite de peticiones.'
         '500':
@@ -1013,7 +1009,9 @@ paths:
               example:
                 {"success": true}
         '400':
-          description: 'Parámetros ausentes o inválidos; el importe no es un entero positivo.'
+          description: 'Parámetros ausentes o inválidos, o el importe no es un entero positivo (`INVALID_AMOUNT`, `AMOUNT_TOO_SMALL`).'
+        '409':
+          description: 'Fondos o activos insuficientes (`INSUFFICIENT_FUNDS`, `NOT_ENOUGH_ASSETS`).'
         '429':
           description: 'Se superó el límite de peticiones.'
         '500':

@@ -281,7 +281,7 @@ paths:
               example:
                 {"userId": "123456789012345678", "cash": 15000, "bank": 82000, "rank": 14}
         '400':
-          description: 'Parametri mancanti o non validi; l''importo non è un intero positivo.'
+          description: 'Parametri mancanti o non validi.'
         '429':
           description: 'Limite di richieste superato.'
         '500':
@@ -336,7 +336,9 @@ paths:
               example:
                 {"success": true, "userId": "123456789012345678", "amount": 5000, "newBalance": 87000}
         '400':
-          description: 'Parametri mancanti o non validi; l''importo non è un intero positivo.'
+          description: 'Parametri mancanti o non validi, oppure l''importo non è un intero positivo (`INVALID_AMOUNT`, `AMOUNT_TOO_SMALL`).'
+        '409':
+          description: 'Fondi o asset insufficienti (`INSUFFICIENT_FUNDS`, `NOT_ENOUGH_ASSETS`).'
         '429':
           description: 'Limite di richieste superato.'
         '500':
@@ -391,9 +393,7 @@ paths:
               example:
                 {"userId": "123456789012345678", "inventory": [{"name": "Аптечка", "amount": 2}]}
         '400':
-          description: 'Parametri mancanti o non validi; l''importo non è un intero positivo.'
-        '404':
-          description: 'Business, mafia, giocatore o articolo non trovato.'
+          description: 'Parametri mancanti o non validi.'
         '429':
           description: 'Limite di richieste superato.'
         '500':
@@ -440,9 +440,9 @@ paths:
               example:
                 {"success": true, "userId": "123456789012345678"}
         '400':
-          description: 'Parametri mancanti o non validi; l''importo non è un intero positivo.'
-        '404':
-          description: 'Business, mafia, giocatore o articolo non trovato.'
+          description: 'Parametri mancanti o non validi, oppure l''importo non è un intero positivo (`INVALID_AMOUNT`, `AMOUNT_TOO_SMALL`).'
+        '409':
+          description: 'Fondi o asset insufficienti (`INSUFFICIENT_FUNDS`, `NOT_ENOUGH_ASSETS`).'
         '429':
           description: 'Limite di richieste superato.'
         '500':
@@ -510,11 +510,9 @@ paths:
               example:
                 {"page": 1, "total": 1, "businesses": [{"id": "B7K2Q9XZ", "name": "Кафе «Арбат»", "bank": 120000}]}
         '400':
-          description: 'Parametri mancanti o non validi; l''importo non è un intero positivo.'
+          description: 'Parametri mancanti o non validi.'
         '404':
           description: 'Business, mafia, giocatore o articolo non trovato.'
-        '409':
-          description: 'Fondi insufficienti o conflitto di stato.'
         '429':
           description: 'Limite di richieste superato.'
         '500':
@@ -590,11 +588,11 @@ paths:
               example:
                 {"success": true, "businessId": "B7K2Q9XZ", "added": 5000, "newBalance": 125000}
         '400':
-          description: 'Parametri mancanti o non validi; l''importo non è un intero positivo.'
+          description: 'Parametri mancanti o non validi, oppure l''importo non è un intero positivo (`INVALID_AMOUNT`, `AMOUNT_TOO_SMALL`).'
         '404':
           description: 'Business, mafia, giocatore o articolo non trovato.'
         '409':
-          description: 'Fondi insufficienti o conflitto di stato.'
+          description: 'Fondi o asset insufficienti (`INSUFFICIENT_FUNDS`, `NOT_ENOUGH_ASSETS`).'
         '429':
           description: 'Limite di richieste superato.'
         '500':
@@ -659,11 +657,9 @@ paths:
               example:
                 {"page": 1, "total": 1, "mafias": [{"id": "M3X8P1", "name": "Солнцевские", "bank": 54000}]}
         '400':
-          description: 'Parametri mancanti o non validi; l''importo non è un intero positivo.'
+          description: 'Parametri mancanti o non validi.'
         '404':
           description: 'Business, mafia, giocatore o articolo non trovato.'
-        '409':
-          description: 'Fondi insufficienti o conflitto di stato.'
         '429':
           description: 'Limite di richieste superato.'
         '500':
@@ -721,11 +717,11 @@ paths:
               example:
                 {"success": true, "mafiaId": "M3X8P1", "added": 1000, "newBalance": 55000}
         '400':
-          description: 'Parametri mancanti o non validi; l''importo non è un intero positivo.'
+          description: 'Parametri mancanti o non validi, oppure l''importo non è un intero positivo (`INVALID_AMOUNT`, `AMOUNT_TOO_SMALL`).'
         '404':
           description: 'Business, mafia, giocatore o articolo non trovato.'
         '409':
-          description: 'Fondi insufficienti o conflitto di stato.'
+          description: 'Fondi o asset insufficienti (`INSUFFICIENT_FUNDS`, `NOT_ENOUGH_ASSETS`).'
         '429':
           description: 'Limite di richieste superato.'
         '500':
@@ -774,9 +770,7 @@ paths:
               example:
                 {"balance": {"bank": 2500000}}
         '400':
-          description: 'Parametri mancanti o non validi; l''importo non è un intero positivo.'
-        '409':
-          description: 'Fondi insufficienti o conflitto di stato.'
+          description: 'Parametri mancanti o non validi.'
         '429':
           description: 'Limite di richieste superato.'
         '500':
@@ -825,9 +819,9 @@ paths:
               example:
                 {"success": true, "added": 10000, "newBalance": 2510000}
         '400':
-          description: 'Parametri mancanti o non validi; l''importo non è un intero positivo.'
+          description: 'Parametri mancanti o non validi, oppure l''importo non è un intero positivo (`INVALID_AMOUNT`, `AMOUNT_TOO_SMALL`).'
         '409':
-          description: 'Fondi insufficienti o conflitto di stato.'
+          description: 'Fondi o asset insufficienti (`INSUFFICIENT_FUNDS`, `NOT_ENOUGH_ASSETS`).'
         '429':
           description: 'Limite di richieste superato.'
         '500':
@@ -870,7 +864,7 @@ paths:
               example:
                 {"count": 1, "items": [{"name": "Аптечка", "price_buy": 250, "price_sell": 100}]}
         '400':
-          description: 'Parametri mancanti o non validi; l''importo non è un intero positivo.'
+          description: 'Parametri mancanti o non validi.'
         '404':
           description: 'Business, mafia, giocatore o articolo non trovato.'
         '429':
@@ -881,7 +875,7 @@ paths:
       tags:
       - Economia
       summary: 'Economia: azioni del negozio'
-      description: 'Azioni: `addItem` (`item`), `removeItem` (`itemName`), `buy` (`userId`, `itemName`), `sellToStore` (`userId`, `itemName`). 404 indica articolo assente; 400 indica articolo non vendibile. I parametri dell''azione vanno nella query; per POST, nel corpo JSON.'
+      description: 'Azioni: `addItem` (`item`), `removeItem` (`itemName`), `buy` (`userId`, `itemName`), `sellToStore` (`userId`, `itemName`). 404 indica articolo assente; 400 indica importo non valido; 409 indica fondi insufficienti. I parametri dell''azione vanno nella query; per POST, nel corpo JSON.'
       security:
       - BearerAuth: []
       parameters:
@@ -917,9 +911,11 @@ paths:
               example:
                 {"success": true, "userId": "123456789012345678", "itemName": "Аптечка"}
         '400':
-          description: 'Parametri mancanti o non validi; l''importo non è un intero positivo.'
+          description: 'Parametri mancanti o non validi, oppure l''importo non è un intero positivo (`INVALID_AMOUNT`, `AMOUNT_TOO_SMALL`).'
         '404':
           description: 'Business, mafia, giocatore o articolo non trovato.'
+        '409':
+          description: 'Fondi o asset insufficienti (`INSUFFICIENT_FUNDS`, `NOT_ENOUGH_ASSETS`).'
         '429':
           description: 'Limite di richieste superato.'
         '500':
@@ -967,7 +963,7 @@ paths:
               example:
                 {"page": 1, "total": 0, "ads": []}
         '400':
-          description: 'Parametri mancanti o non validi; l''importo non è un intero positivo.'
+          description: 'Parametri mancanti o non validi.'
         '429':
           description: 'Limite di richieste superato.'
         '500':
@@ -1014,7 +1010,9 @@ paths:
               example:
                 {"success": true}
         '400':
-          description: 'Parametri mancanti o non validi; l''importo non è un intero positivo.'
+          description: 'Parametri mancanti o non validi, oppure l''importo non è un intero positivo (`INVALID_AMOUNT`, `AMOUNT_TOO_SMALL`).'
+        '409':
+          description: 'Fondi o asset insufficienti (`INSUFFICIENT_FUNDS`, `NOT_ENOUGH_ASSETS`).'
         '429':
           description: 'Limite di richieste superato.'
         '500':

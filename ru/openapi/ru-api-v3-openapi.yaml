@@ -274,7 +274,7 @@ paths:
               example:
                 {"userId": "123456789012345678", "cash": 15000, "bank": 82000, "rank": 14}
         '400':
-          description: 'Неверные или отсутствующие параметры; сумма не является положительным целым числом.'
+          description: 'Неверные или отсутствующие параметры.'
         '429':
           description: 'Превышен лимит запросов.'
         '500':
@@ -283,7 +283,7 @@ paths:
       tags:
       - Экономика
       summary: 'Экономика: операции с деньгами'
-      description: 'Денежные операции. `amount` — положительное целое; при нехватке средств операция не выполняется. Действия: `transfer` (`fromUserId`, `toUserId`, `amount`), `deposit` и `withdraw` (`userId`, `amount`), `add` и `remove` (`userId`, `amount`, `type`: `cash` или `bank`), `reset` (`userId`), `resetCooldown` (`userId`, необязательный `command`). Параметры действия передаются в query; для POST — в JSON-теле.'
+      description: 'Денежные операции. `amount` — положительное целое; при нехватке средств возвращается 409. Действия: `transfer` (`fromUserId`, `toUserId`, `amount`), `deposit` и `withdraw` (`userId`, `amount`), `add` и `remove` (`userId`, `amount`, `type`: `cash` или `bank`), `reset` (`userId`), `resetCooldown` (`userId`, необязательный `command`). Параметры действия передаются в query; для POST — в JSON-теле.'
       security:
       - BearerAuth: []
       parameters:
@@ -329,7 +329,9 @@ paths:
               example:
                 {"success": true, "userId": "123456789012345678", "amount": 5000, "newBalance": 87000}
         '400':
-          description: 'Неверные или отсутствующие параметры; сумма не является положительным целым числом.'
+          description: 'Неверные или отсутствующие параметры, либо сумма не является положительным целым (`INVALID_AMOUNT`, `AMOUNT_TOO_SMALL`).'
+        '409':
+          description: 'Недостаточно средств или активов (`INSUFFICIENT_FUNDS`, `NOT_ENOUGH_ASSETS`).'
         '429':
           description: 'Превышен лимит запросов.'
         '500':
@@ -384,9 +386,7 @@ paths:
               example:
                 {"userId": "123456789012345678", "inventory": [{"name": "Аптечка", "amount": 2}]}
         '400':
-          description: 'Неверные или отсутствующие параметры; сумма не является положительным целым числом.'
-        '404':
-          description: 'Бизнес, мафия, игрок или товар не найден.'
+          description: 'Неверные или отсутствующие параметры.'
         '429':
           description: 'Превышен лимит запросов.'
         '500':
@@ -433,9 +433,9 @@ paths:
               example:
                 {"success": true, "userId": "123456789012345678"}
         '400':
-          description: 'Неверные или отсутствующие параметры; сумма не является положительным целым числом.'
-        '404':
-          description: 'Бизнес, мафия, игрок или товар не найден.'
+          description: 'Неверные или отсутствующие параметры, либо сумма не является положительным целым (`INVALID_AMOUNT`, `AMOUNT_TOO_SMALL`).'
+        '409':
+          description: 'Недостаточно средств или активов (`INSUFFICIENT_FUNDS`, `NOT_ENOUGH_ASSETS`).'
         '429':
           description: 'Превышен лимит запросов.'
         '500':
@@ -503,11 +503,9 @@ paths:
               example:
                 {"page": 1, "total": 1, "businesses": [{"id": "B7K2Q9XZ", "name": "Кафе «Арбат»", "bank": 120000}]}
         '400':
-          description: 'Неверные или отсутствующие параметры; сумма не является положительным целым числом.'
+          description: 'Неверные или отсутствующие параметры.'
         '404':
           description: 'Бизнес, мафия, игрок или товар не найден.'
-        '409':
-          description: 'Недостаточно средств или конфликт состояния.'
         '429':
           description: 'Превышен лимит запросов.'
         '500':
@@ -583,11 +581,11 @@ paths:
               example:
                 {"success": true, "businessId": "B7K2Q9XZ", "added": 5000, "newBalance": 125000}
         '400':
-          description: 'Неверные или отсутствующие параметры; сумма не является положительным целым числом.'
+          description: 'Неверные или отсутствующие параметры, либо сумма не является положительным целым (`INVALID_AMOUNT`, `AMOUNT_TOO_SMALL`).'
         '404':
           description: 'Бизнес, мафия, игрок или товар не найден.'
         '409':
-          description: 'Недостаточно средств или конфликт состояния.'
+          description: 'Недостаточно средств или активов (`INSUFFICIENT_FUNDS`, `NOT_ENOUGH_ASSETS`).'
         '429':
           description: 'Превышен лимит запросов.'
         '500':
@@ -652,11 +650,9 @@ paths:
               example:
                 {"page": 1, "total": 1, "mafias": [{"id": "M3X8P1", "name": "Солнцевские", "bank": 54000}]}
         '400':
-          description: 'Неверные или отсутствующие параметры; сумма не является положительным целым числом.'
+          description: 'Неверные или отсутствующие параметры.'
         '404':
           description: 'Бизнес, мафия, игрок или товар не найден.'
-        '409':
-          description: 'Недостаточно средств или конфликт состояния.'
         '429':
           description: 'Превышен лимит запросов.'
         '500':
@@ -714,11 +710,11 @@ paths:
               example:
                 {"success": true, "mafiaId": "M3X8P1", "added": 1000, "newBalance": 55000}
         '400':
-          description: 'Неверные или отсутствующие параметры; сумма не является положительным целым числом.'
+          description: 'Неверные или отсутствующие параметры, либо сумма не является положительным целым (`INVALID_AMOUNT`, `AMOUNT_TOO_SMALL`).'
         '404':
           description: 'Бизнес, мафия, игрок или товар не найден.'
         '409':
-          description: 'Недостаточно средств или конфликт состояния.'
+          description: 'Недостаточно средств или активов (`INSUFFICIENT_FUNDS`, `NOT_ENOUGH_ASSETS`).'
         '429':
           description: 'Превышен лимит запросов.'
         '500':
@@ -767,9 +763,7 @@ paths:
               example:
                 {"balance": {"bank": 2500000}}
         '400':
-          description: 'Неверные или отсутствующие параметры; сумма не является положительным целым числом.'
-        '409':
-          description: 'Недостаточно средств или конфликт состояния.'
+          description: 'Неверные или отсутствующие параметры.'
         '429':
           description: 'Превышен лимит запросов.'
         '500':
@@ -818,9 +812,9 @@ paths:
               example:
                 {"success": true, "added": 10000, "newBalance": 2510000}
         '400':
-          description: 'Неверные или отсутствующие параметры; сумма не является положительным целым числом.'
+          description: 'Неверные или отсутствующие параметры, либо сумма не является положительным целым (`INVALID_AMOUNT`, `AMOUNT_TOO_SMALL`).'
         '409':
-          description: 'Недостаточно средств или конфликт состояния.'
+          description: 'Недостаточно средств или активов (`INSUFFICIENT_FUNDS`, `NOT_ENOUGH_ASSETS`).'
         '429':
           description: 'Превышен лимит запросов.'
         '500':
@@ -863,7 +857,7 @@ paths:
               example:
                 {"count": 1, "items": [{"name": "Аптечка", "price_buy": 250, "price_sell": 100}]}
         '400':
-          description: 'Неверные или отсутствующие параметры; сумма не является положительным целым числом.'
+          description: 'Неверные или отсутствующие параметры.'
         '404':
           description: 'Бизнес, мафия, игрок или товар не найден.'
         '429':
@@ -874,7 +868,7 @@ paths:
       tags:
       - Экономика
       summary: 'Экономика: действия с магазином'
-      description: 'Действия: `addItem` (`item`), `removeItem` (`itemName`), `buy` (`userId`, `itemName`), `sellToStore` (`userId`, `itemName`). Ошибка 404 — товар не найден; 400 — товар нельзя продать. Параметры действия передаются в query; для POST — в JSON-теле.'
+      description: 'Действия: `addItem` (`item`), `removeItem` (`itemName`), `buy` (`userId`, `itemName`), `sellToStore` (`userId`, `itemName`). Ошибка 404 — товар не найден; 400 — неверная сумма; 409 — недостаточно средств. Параметры действия передаются в query; для POST — в JSON-теле.'
       security:
       - BearerAuth: []
       parameters:
@@ -910,9 +904,11 @@ paths:
               example:
                 {"success": true, "userId": "123456789012345678", "itemName": "Аптечка"}
         '400':
-          description: 'Неверные или отсутствующие параметры; сумма не является положительным целым числом.'
+          description: 'Неверные или отсутствующие параметры, либо сумма не является положительным целым (`INVALID_AMOUNT`, `AMOUNT_TOO_SMALL`).'
         '404':
           description: 'Бизнес, мафия, игрок или товар не найден.'
+        '409':
+          description: 'Недостаточно средств или активов (`INSUFFICIENT_FUNDS`, `NOT_ENOUGH_ASSETS`).'
         '429':
           description: 'Превышен лимит запросов.'
         '500':
@@ -960,7 +956,7 @@ paths:
               example:
                 {"page": 1, "total": 0, "ads": []}
         '400':
-          description: 'Неверные или отсутствующие параметры; сумма не является положительным целым числом.'
+          description: 'Неверные или отсутствующие параметры.'
         '429':
           description: 'Превышен лимит запросов.'
         '500':
@@ -1007,7 +1003,9 @@ paths:
               example:
                 {"success": true}
         '400':
-          description: 'Неверные или отсутствующие параметры; сумма не является положительным целым числом.'
+          description: 'Неверные или отсутствующие параметры, либо сумма не является положительным целым (`INVALID_AMOUNT`, `AMOUNT_TOO_SMALL`).'
+        '409':
+          description: 'Недостаточно средств или активов (`INSUFFICIENT_FUNDS`, `NOT_ENOUGH_ASSETS`).'
         '429':
           description: 'Превышен лимит запросов.'
         '500':

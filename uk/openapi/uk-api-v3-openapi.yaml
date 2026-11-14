@@ -281,7 +281,7 @@ paths:
               example:
                 {"userId": "123456789012345678", "cash": 15000, "bank": 82000, "rank": 14}
         '400':
-          description: 'Невірні або відсутні параметри; сума не є додатним цілим числом.'
+          description: 'Невірні або відсутні параметри.'
         '429':
           description: 'Перевищено ліміт запитів.'
         '500':
@@ -290,7 +290,7 @@ paths:
       tags:
       - Економіка
       summary: 'Економіка: операції з грошима'
-      description: 'Грошові операції. `amount` — додатне ціле; за нестачі коштів операція не виконується. Дії: `transfer` (`fromUserId`, `toUserId`, `amount`), `deposit` і `withdraw` (`userId`, `amount`), `add` і `remove` (`userId`, `amount`, `type`: `cash` або `bank`), `reset` (`userId`), `resetCooldown` (`userId`, необов''язковий `command`). Параметри дії передаються в query; для POST — у JSON-тілі.'
+      description: 'Грошові операції. `amount` — додатне ціле; за нестачі коштів повертається 409. Дії: `transfer` (`fromUserId`, `toUserId`, `amount`), `deposit` і `withdraw` (`userId`, `amount`), `add` і `remove` (`userId`, `amount`, `type`: `cash` або `bank`), `reset` (`userId`), `resetCooldown` (`userId`, необов''язковий `command`). Параметри дії передаються в query; для POST — у JSON-тілі.'
       security:
       - BearerAuth: []
       parameters:
@@ -336,7 +336,9 @@ paths:
               example:
                 {"success": true, "userId": "123456789012345678", "amount": 5000, "newBalance": 87000}
         '400':
-          description: 'Невірні або відсутні параметри; сума не є додатним цілим числом.'
+          description: 'Невірні або відсутні параметри, або сума не є додатним цілим (`INVALID_AMOUNT`, `AMOUNT_TOO_SMALL`).'
+        '409':
+          description: 'Недостатньо коштів або активів (`INSUFFICIENT_FUNDS`, `NOT_ENOUGH_ASSETS`).'
         '429':
           description: 'Перевищено ліміт запитів.'
         '500':
@@ -391,9 +393,7 @@ paths:
               example:
                 {"userId": "123456789012345678", "inventory": [{"name": "Аптечка", "amount": 2}]}
         '400':
-          description: 'Невірні або відсутні параметри; сума не є додатним цілим числом.'
-        '404':
-          description: 'Бізнес, мафію, гравця або товар не знайдено.'
+          description: 'Невірні або відсутні параметри.'
         '429':
           description: 'Перевищено ліміт запитів.'
         '500':
@@ -440,9 +440,9 @@ paths:
               example:
                 {"success": true, "userId": "123456789012345678"}
         '400':
-          description: 'Невірні або відсутні параметри; сума не є додатним цілим числом.'
-        '404':
-          description: 'Бізнес, мафію, гравця або товар не знайдено.'
+          description: 'Невірні або відсутні параметри, або сума не є додатним цілим (`INVALID_AMOUNT`, `AMOUNT_TOO_SMALL`).'
+        '409':
+          description: 'Недостатньо коштів або активів (`INSUFFICIENT_FUNDS`, `NOT_ENOUGH_ASSETS`).'
         '429':
           description: 'Перевищено ліміт запитів.'
         '500':
@@ -510,11 +510,9 @@ paths:
               example:
                 {"page": 1, "total": 1, "businesses": [{"id": "B7K2Q9XZ", "name": "Кафе «Арбат»", "bank": 120000}]}
         '400':
-          description: 'Невірні або відсутні параметри; сума не є додатним цілим числом.'
+          description: 'Невірні або відсутні параметри.'
         '404':
           description: 'Бізнес, мафію, гравця або товар не знайдено.'
-        '409':
-          description: 'Недостатньо коштів або конфлікт стану.'
         '429':
           description: 'Перевищено ліміт запитів.'
         '500':
@@ -590,11 +588,11 @@ paths:
               example:
                 {"success": true, "businessId": "B7K2Q9XZ", "added": 5000, "newBalance": 125000}
         '400':
-          description: 'Невірні або відсутні параметри; сума не є додатним цілим числом.'
+          description: 'Невірні або відсутні параметри, або сума не є додатним цілим (`INVALID_AMOUNT`, `AMOUNT_TOO_SMALL`).'
         '404':
           description: 'Бізнес, мафію, гравця або товар не знайдено.'
         '409':
-          description: 'Недостатньо коштів або конфлікт стану.'
+          description: 'Недостатньо коштів або активів (`INSUFFICIENT_FUNDS`, `NOT_ENOUGH_ASSETS`).'
         '429':
           description: 'Перевищено ліміт запитів.'
         '500':
@@ -659,11 +657,9 @@ paths:
               example:
                 {"page": 1, "total": 1, "mafias": [{"id": "M3X8P1", "name": "Солнцевские", "bank": 54000}]}
         '400':
-          description: 'Невірні або відсутні параметри; сума не є додатним цілим числом.'
+          description: 'Невірні або відсутні параметри.'
         '404':
           description: 'Бізнес, мафію, гравця або товар не знайдено.'
-        '409':
-          description: 'Недостатньо коштів або конфлікт стану.'
         '429':
           description: 'Перевищено ліміт запитів.'
         '500':
@@ -721,11 +717,11 @@ paths:
               example:
                 {"success": true, "mafiaId": "M3X8P1", "added": 1000, "newBalance": 55000}
         '400':
-          description: 'Невірні або відсутні параметри; сума не є додатним цілим числом.'
+          description: 'Невірні або відсутні параметри, або сума не є додатним цілим (`INVALID_AMOUNT`, `AMOUNT_TOO_SMALL`).'
         '404':
           description: 'Бізнес, мафію, гравця або товар не знайдено.'
         '409':
-          description: 'Недостатньо коштів або конфлікт стану.'
+          description: 'Недостатньо коштів або активів (`INSUFFICIENT_FUNDS`, `NOT_ENOUGH_ASSETS`).'
         '429':
           description: 'Перевищено ліміт запитів.'
         '500':
@@ -774,9 +770,7 @@ paths:
               example:
                 {"balance": {"bank": 2500000}}
         '400':
-          description: 'Невірні або відсутні параметри; сума не є додатним цілим числом.'
-        '409':
-          description: 'Недостатньо коштів або конфлікт стану.'
+          description: 'Невірні або відсутні параметри.'
         '429':
           description: 'Перевищено ліміт запитів.'
         '500':
@@ -825,9 +819,9 @@ paths:
               example:
                 {"success": true, "added": 10000, "newBalance": 2510000}
         '400':
-          description: 'Невірні або відсутні параметри; сума не є додатним цілим числом.'
+          description: 'Невірні або відсутні параметри, або сума не є додатним цілим (`INVALID_AMOUNT`, `AMOUNT_TOO_SMALL`).'
         '409':
-          description: 'Недостатньо коштів або конфлікт стану.'
+          description: 'Недостатньо коштів або активів (`INSUFFICIENT_FUNDS`, `NOT_ENOUGH_ASSETS`).'
         '429':
           description: 'Перевищено ліміт запитів.'
         '500':
@@ -870,7 +864,7 @@ paths:
               example:
                 {"count": 1, "items": [{"name": "Аптечка", "price_buy": 250, "price_sell": 100}]}
         '400':
-          description: 'Невірні або відсутні параметри; сума не є додатним цілим числом.'
+          description: 'Невірні або відсутні параметри.'
         '404':
           description: 'Бізнес, мафію, гравця або товар не знайдено.'
         '429':
@@ -881,7 +875,7 @@ paths:
       tags:
       - Економіка
       summary: 'Економіка: дії з магазином'
-      description: 'Дії: `addItem` (`item`), `removeItem` (`itemName`), `buy` (`userId`, `itemName`), `sellToStore` (`userId`, `itemName`). Помилка 404 — товар не знайдено; 400 — товар не можна продати. Параметри дії передаються в query; для POST — у JSON-тілі.'
+      description: 'Дії: `addItem` (`item`), `removeItem` (`itemName`), `buy` (`userId`, `itemName`), `sellToStore` (`userId`, `itemName`). Помилка 404 — товар не знайдено; 400 — невірна сума; 409 — недостатньо коштів. Параметри дії передаються в query; для POST — у JSON-тілі.'
       security:
       - BearerAuth: []
       parameters:
@@ -917,9 +911,11 @@ paths:
               example:
                 {"success": true, "userId": "123456789012345678", "itemName": "Аптечка"}
         '400':
-          description: 'Невірні або відсутні параметри; сума не є додатним цілим числом.'
+          description: 'Невірні або відсутні параметри, або сума не є додатним цілим (`INVALID_AMOUNT`, `AMOUNT_TOO_SMALL`).'
         '404':
           description: 'Бізнес, мафію, гравця або товар не знайдено.'
+        '409':
+          description: 'Недостатньо коштів або активів (`INSUFFICIENT_FUNDS`, `NOT_ENOUGH_ASSETS`).'
         '429':
           description: 'Перевищено ліміт запитів.'
         '500':
@@ -967,7 +963,7 @@ paths:
               example:
                 {"page": 1, "total": 0, "ads": []}
         '400':
-          description: 'Невірні або відсутні параметри; сума не є додатним цілим числом.'
+          description: 'Невірні або відсутні параметри.'
         '429':
           description: 'Перевищено ліміт запитів.'
         '500':
@@ -1014,7 +1010,9 @@ paths:
               example:
                 {"success": true}
         '400':
-          description: 'Невірні або відсутні параметри; сума не є додатним цілим числом.'
+          description: 'Невірні або відсутні параметри, або сума не є додатним цілим (`INVALID_AMOUNT`, `AMOUNT_TOO_SMALL`).'
+        '409':
+          description: 'Недостатньо коштів або активів (`INSUFFICIENT_FUNDS`, `NOT_ENOUGH_ASSETS`).'
         '429':
           description: 'Перевищено ліміт запитів.'
         '500':

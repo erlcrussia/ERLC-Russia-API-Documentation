@@ -7,7 +7,7 @@ icon: "clock-rotate-left"
 ## Novembre 2026
 
 * **Realtime**: aggiunto l'evento `response.tool_call` (`name`, `status: running`). La fine della chiamata arriva in `response.done` con `end_session: true`; `end_voice_session` non viene pubblicato. Un turno vocale con ricerca dura fino a ~40 secondi, il limite del server è di 5 minuti, non ci sono keepalive e la scadenza client deve essere di almeno 120 secondi.
-* **Economia**: documentato il parametro `action` per tutti i moduli CivOps, i parametri di richiesta e gli errori `400`/`404`/`409`. Gli importi nelle operazioni su attività, mafie e bilancio devono essere interi positivi; i fondi insufficienti restituiscono `409`.
+* **Economia**: documentato il parametro `action` per tutti i moduli CivOps, i parametri di richiesta e gli errori `400`/`404`/`409`. Gli importi in tutti i moduli economia devono essere interi positivi: `400` (`INVALID_AMOUNT`, `AMOUNT_TOO_SMALL`), fondi o asset insufficienti restituiscono `409` (`INSUFFICIENT_FUNDS`, `NOT_ENOUGH_ASSETS`).
 * **Team**: eliminazione logica con ripristino entro 30 giorni e metodi di servizio.
 * **File personali**: i `user-assets` privati vengono serviti con URL firmati; la sessione del proprietario viene verificata a ogni lettura.
 * **CDN**: rimozione dei metadati delle immagini al caricamento, analisi degli accessi edge e aggiornamento dello stato dei domini personalizzati.

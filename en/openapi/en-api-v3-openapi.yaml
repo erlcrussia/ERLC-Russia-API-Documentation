@@ -281,7 +281,7 @@ paths:
               example:
                 {"userId": "123456789012345678", "cash": 15000, "bank": 82000, "rank": 14}
         '400':
-          description: 'Missing or invalid parameters; the amount is not a positive integer.'
+          description: 'Missing or invalid parameters.'
         '429':
           description: 'Rate limit exceeded.'
         '500':
@@ -290,7 +290,7 @@ paths:
       tags:
       - Economy
       summary: 'Economy: money operations'
-      description: 'Money operations. `amount` is a positive integer; operations do not run when funds are insufficient. Actions: `transfer` (`fromUserId`, `toUserId`, `amount`), `deposit` and `withdraw` (`userId`, `amount`), `add` and `remove` (`userId`, `amount`, `type`: `cash` or `bank`), `reset` (`userId`), `resetCooldown` (`userId`, optional `command`). Action parameters go in the query string; for POST, in the JSON body.'
+      description: 'Money operations. `amount` is a positive integer; insufficient funds return 409. Actions: `transfer` (`fromUserId`, `toUserId`, `amount`), `deposit` and `withdraw` (`userId`, `amount`), `add` and `remove` (`userId`, `amount`, `type`: `cash` or `bank`), `reset` (`userId`), `resetCooldown` (`userId`, optional `command`). Action parameters go in the query string; for POST, in the JSON body.'
       security:
       - BearerAuth: []
       parameters:
@@ -336,7 +336,9 @@ paths:
               example:
                 {"success": true, "userId": "123456789012345678", "amount": 5000, "newBalance": 87000}
         '400':
-          description: 'Missing or invalid parameters; the amount is not a positive integer.'
+          description: 'Missing or invalid parameters, or the amount is not a positive integer (`INVALID_AMOUNT`, `AMOUNT_TOO_SMALL`).'
+        '409':
+          description: 'Insufficient funds or assets (`INSUFFICIENT_FUNDS`, `NOT_ENOUGH_ASSETS`).'
         '429':
           description: 'Rate limit exceeded.'
         '500':
@@ -391,9 +393,7 @@ paths:
               example:
                 {"userId": "123456789012345678", "inventory": [{"name": "Аптечка", "amount": 2}]}
         '400':
-          description: 'Missing or invalid parameters; the amount is not a positive integer.'
-        '404':
-          description: 'Business, mafia, player or item not found.'
+          description: 'Missing or invalid parameters.'
         '429':
           description: 'Rate limit exceeded.'
         '500':
@@ -440,9 +440,9 @@ paths:
               example:
                 {"success": true, "userId": "123456789012345678"}
         '400':
-          description: 'Missing or invalid parameters; the amount is not a positive integer.'
-        '404':
-          description: 'Business, mafia, player or item not found.'
+          description: 'Missing or invalid parameters, or the amount is not a positive integer (`INVALID_AMOUNT`, `AMOUNT_TOO_SMALL`).'
+        '409':
+          description: 'Insufficient funds or assets (`INSUFFICIENT_FUNDS`, `NOT_ENOUGH_ASSETS`).'
         '429':
           description: 'Rate limit exceeded.'
         '500':
@@ -510,11 +510,9 @@ paths:
               example:
                 {"page": 1, "total": 1, "businesses": [{"id": "B7K2Q9XZ", "name": "Кафе «Арбат»", "bank": 120000}]}
         '400':
-          description: 'Missing or invalid parameters; the amount is not a positive integer.'
+          description: 'Missing or invalid parameters.'
         '404':
           description: 'Business, mafia, player or item not found.'
-        '409':
-          description: 'Insufficient funds or a state conflict.'
         '429':
           description: 'Rate limit exceeded.'
         '500':
@@ -590,11 +588,11 @@ paths:
               example:
                 {"success": true, "businessId": "B7K2Q9XZ", "added": 5000, "newBalance": 125000}
         '400':
-          description: 'Missing or invalid parameters; the amount is not a positive integer.'
+          description: 'Missing or invalid parameters, or the amount is not a positive integer (`INVALID_AMOUNT`, `AMOUNT_TOO_SMALL`).'
         '404':
           description: 'Business, mafia, player or item not found.'
         '409':
-          description: 'Insufficient funds or a state conflict.'
+          description: 'Insufficient funds or assets (`INSUFFICIENT_FUNDS`, `NOT_ENOUGH_ASSETS`).'
         '429':
           description: 'Rate limit exceeded.'
         '500':
@@ -659,11 +657,9 @@ paths:
               example:
                 {"page": 1, "total": 1, "mafias": [{"id": "M3X8P1", "name": "Солнцевские", "bank": 54000}]}
         '400':
-          description: 'Missing or invalid parameters; the amount is not a positive integer.'
+          description: 'Missing or invalid parameters.'
         '404':
           description: 'Business, mafia, player or item not found.'
-        '409':
-          description: 'Insufficient funds or a state conflict.'
         '429':
           description: 'Rate limit exceeded.'
         '500':
@@ -721,11 +717,11 @@ paths:
               example:
                 {"success": true, "mafiaId": "M3X8P1", "added": 1000, "newBalance": 55000}
         '400':
-          description: 'Missing or invalid parameters; the amount is not a positive integer.'
+          description: 'Missing or invalid parameters, or the amount is not a positive integer (`INVALID_AMOUNT`, `AMOUNT_TOO_SMALL`).'
         '404':
           description: 'Business, mafia, player or item not found.'
         '409':
-          description: 'Insufficient funds or a state conflict.'
+          description: 'Insufficient funds or assets (`INSUFFICIENT_FUNDS`, `NOT_ENOUGH_ASSETS`).'
         '429':
           description: 'Rate limit exceeded.'
         '500':
@@ -774,9 +770,7 @@ paths:
               example:
                 {"balance": {"bank": 2500000}}
         '400':
-          description: 'Missing or invalid parameters; the amount is not a positive integer.'
-        '409':
-          description: 'Insufficient funds or a state conflict.'
+          description: 'Missing or invalid parameters.'
         '429':
           description: 'Rate limit exceeded.'
         '500':
@@ -825,9 +819,9 @@ paths:
               example:
                 {"success": true, "added": 10000, "newBalance": 2510000}
         '400':
-          description: 'Missing or invalid parameters; the amount is not a positive integer.'
+          description: 'Missing or invalid parameters, or the amount is not a positive integer (`INVALID_AMOUNT`, `AMOUNT_TOO_SMALL`).'
         '409':
-          description: 'Insufficient funds or a state conflict.'
+          description: 'Insufficient funds or assets (`INSUFFICIENT_FUNDS`, `NOT_ENOUGH_ASSETS`).'
         '429':
           description: 'Rate limit exceeded.'
         '500':
@@ -870,7 +864,7 @@ paths:
               example:
                 {"count": 1, "items": [{"name": "Аптечка", "price_buy": 250, "price_sell": 100}]}
         '400':
-          description: 'Missing or invalid parameters; the amount is not a positive integer.'
+          description: 'Missing or invalid parameters.'
         '404':
           description: 'Business, mafia, player or item not found.'
         '429':
@@ -881,7 +875,7 @@ paths:
       tags:
       - Economy
       summary: 'Economy: store actions'
-      description: 'Actions: `addItem` (`item`), `removeItem` (`itemName`), `buy` (`userId`, `itemName`), `sellToStore` (`userId`, `itemName`). 404 means the item is missing; 400 means the item cannot be sold. Action parameters go in the query string; for POST, in the JSON body.'
+      description: 'Actions: `addItem` (`item`), `removeItem` (`itemName`), `buy` (`userId`, `itemName`), `sellToStore` (`userId`, `itemName`). 404 means the item is missing; 400 means an invalid amount; 409 means insufficient funds. Action parameters go in the query string; for POST, in the JSON body.'
       security:
       - BearerAuth: []
       parameters:
@@ -917,9 +911,11 @@ paths:
               example:
                 {"success": true, "userId": "123456789012345678", "itemName": "Аптечка"}
         '400':
-          description: 'Missing or invalid parameters; the amount is not a positive integer.'
+          description: 'Missing or invalid parameters, or the amount is not a positive integer (`INVALID_AMOUNT`, `AMOUNT_TOO_SMALL`).'
         '404':
           description: 'Business, mafia, player or item not found.'
+        '409':
+          description: 'Insufficient funds or assets (`INSUFFICIENT_FUNDS`, `NOT_ENOUGH_ASSETS`).'
         '429':
           description: 'Rate limit exceeded.'
         '500':
@@ -967,7 +963,7 @@ paths:
               example:
                 {"page": 1, "total": 0, "ads": []}
         '400':
-          description: 'Missing or invalid parameters; the amount is not a positive integer.'
+          description: 'Missing or invalid parameters.'
         '429':
           description: 'Rate limit exceeded.'
         '500':
@@ -1014,7 +1010,9 @@ paths:
               example:
                 {"success": true}
         '400':
-          description: 'Missing or invalid parameters; the amount is not a positive integer.'
+          description: 'Missing or invalid parameters, or the amount is not a positive integer (`INVALID_AMOUNT`, `AMOUNT_TOO_SMALL`).'
+        '409':
+          description: 'Insufficient funds or assets (`INSUFFICIENT_FUNDS`, `NOT_ENOUGH_ASSETS`).'
         '429':
           description: 'Rate limit exceeded.'
         '500':
