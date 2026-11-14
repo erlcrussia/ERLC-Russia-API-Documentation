@@ -22,10 +22,9 @@ All errors are returned in JSON format with `code` and `message` fields.
   <Accordion title="Authentication and Token Errors">
     | Code | Description | Meaning |
     | :---: | :--- | :--- |
-    | `5006` | Invalid Master Key | Invalid master key. Check the `erlcrussia-api-master-key` header |
     | `5007` | Missing Token | Authorization token is missing. Add the `Authorization: Bearer <token>` or `erlcrussia-api-key: <token>` header |
     | `5008` | Invalid Token | The token is invalid, disabled or deleted |
-    | `5033` | Unauthorized | No valid session or key for this route |
+    | `5033` | Unauthorized | No valid key for this route |
     | `5009` | Forbidden | Access to this endpoint or action is forbidden for your token |
     | `5010` | Api Version Forbidden | The key is not allowed to use this API version |
     | `5011` | Query Param Forbidden | Access to the specified query parameters is forbidden by key permissions |
@@ -87,7 +86,7 @@ All errors are returned in JSON format with `code` and `message` fields.
     | `5102` | Token Required | Add the `token` field to the `auth` message |
     | `5107` | Not Authenticated | Send an `auth` message before any other actions |
     | `5108` | Invalid Token | Check your WebSocket token |
-    | `5109` | Connection Blocked | Contact administrator |
+    | `5109` | Connection Blocked | Contact support |
     | `5117` | Authentication Failed | Internal error. Try again later |
     | `5127` | Connected | Informational code, no action required |
     | `5128` | Auth Success | Informational code, no action required |
@@ -114,14 +113,14 @@ All errors are returned in JSON format with `code` and `message` fields.
   <Accordion title="Economy API Errors">
     | Code | Description | Meaning |
     | :---: | :--- | :--- |
-    | `6000` | Unknown Error Occurred | Check logs, contact administrator |
+    | `6000` | Unknown Error Occurred | Check logs, contact support |
     | `6001` | Database Error Occurred. Please Try Again Later. | Retry request after a few seconds |
     | `6002` | Invalid Amount Specified. | Check amount format (must be a positive number) |
     | `6003` | Invalid Or Missing Parameters. | Check required parameters in request |
     | `6004` | Requested Resource Not Found. | Check resource ID |
     | `6005` | Internal Server Error Occurred. | Retry request later |
     | `6006` | Discord Operation Failed. | Check bot permissions in Discord |
-    | `6007` | Data Serialization Error. | Contact administrator |
+    | `6007` | Data Serialization Error. | Contact support |
     | `6008` | Guild Not Found | Check `guildId` in parameters |
     | `6009` | Discord Channel Not Found | Check `channelId` in request |
     | `6010` | Business Not Found | Check `businessId` or `businessName` |

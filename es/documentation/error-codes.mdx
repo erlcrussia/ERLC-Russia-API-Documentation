@@ -22,10 +22,9 @@ Todos los errores se devuelven en formato JSON con los campos `code` y `message`
   <Accordion title="Errores de autenticación y tokens">
     | Código | Descripción | Significado |
     | :---: | :--- | :--- |
-    | `5006` | Invalid Master Key | Clave maestra no válida. Verifique el encabezado `erlcrussia-api-master-key` |
     | `5007` | Missing Token | Falta el token de autorización. Agregue el encabezado `Authorization: Bearer <token>` o `erlcrussia-api-key: <token>` |
     | `5008` | Invalid Token | El token no es válido, está desactivado o se eliminó |
-    | `5033` | Unauthorized | No hay sesión ni clave válidas para esta ruta |
+    | `5033` | Unauthorized | No hay una clave válida para esta ruta |
     | `5009` | Forbidden | Acceso no autorizado a este endpoint o acción |
     | `5010` | Api Version Forbidden | La clave no puede usar esta versión de la API |
     | `5011` | Query Param Forbidden | Acceso a los parámetros de consulta prohibido por los permisos de la clave |
@@ -87,7 +86,7 @@ Todos los errores se devuelven en formato JSON con los campos `code` y `message`
     | `5102` | Token Required | Agregue el campo `token` al mensaje `auth` |
     | `5107` | Not Authenticated | Envíe el mensaje `auth` antes de otras acciones |
     | `5108` | Invalid Token | Verifique su token de WebSocket |
-    | `5109` | Connection Blocked | Póngase en contacto con el administrador |
+    | `5109` | Connection Blocked | Póngase en contacto con soporte |
     | `5117` | Authentication Failed | Error interno. Inténtelo más tarde |
     | `5127` | Connected | Código informativo, no requiere acción |
     | `5128` | Auth Success | Código informativo, no requiere acción |
@@ -114,14 +113,14 @@ Todos los errores se devuelven en formato JSON con los campos `code` y `message`
   <Accordion title="Errores de API de economía">
     | Código | Descripción | Significado |
     | :---: | :--- | :--- |
-    | `6000` | Unknown Error Occurred | Revise los logs, contacte al administrador |
+    | `6000` | Unknown Error Occurred | Revise los logs, contacte a soporte |
     | `6001` | Database Error Occurred. Please Try Again Later. | Reintente en unos segundos |
     | `6002` | Invalid Amount Specified. | Formato de monto inválido (debe ser número positivo) |
     | `6003` | Invalid Or Missing Parameters. | Parámetros obligatorios ausentes o inválidos |
     | `6004` | Requested Resource Not Found. | Compruebe el ID del recurso |
     | `6005` | Internal Server Error Occurred. | Reintente más tarde |
     | `6006` | Discord Operation Failed. | Compruebe los permisos del bot en Discord |
-    | `6007` | Data Serialization Error. | Contacte al administrador |
+    | `6007` | Data Serialization Error. | Contacte a soporte |
     | `6008` | Guild Not Found | Verifique `guildId` |
     | `6009` | Discord Channel Not Found | Verifique `channelId` |
     | `6010` | Business Not Found | Verifique `businessId` o `businessName` |

@@ -45,7 +45,7 @@ tags:
   - name: Applications
     description: Эндпоинты для управления заявками.
   - name: LOA
-    description: Эндпоинты для управления отпусками (Leave of Absence).
+    description: Эндпоинты для управления отпусками.
   - name: Infractions
     description: Эндпоинты для управления нарушениями.
   - name: Logging
@@ -557,7 +557,7 @@ paths:
     post:
       tags:
         - LOA
-      summary: Запрос на отпуск (LOA).
+      summary: Запрос на отпуск.
       description: Отправляет запрос на отпуск в канал персонала.
       operationId: sendLoa
       security:
@@ -1097,7 +1097,7 @@ paths:
     post:
       tags:
         - Logging
-      summary: Последние предупреждения (DEPRECATED).
+      summary: Последние предупреждения. Маршрут устарел.
       description: УСТАРЕВШИЙ ЭНДПОИНТ.
       operationId: getLastWarnings
       security:
