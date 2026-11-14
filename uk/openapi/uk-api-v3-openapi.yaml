@@ -238,36 +238,76 @@ paths:
       tags:
       - Економіка
       summary: 'Економіка: гроші гравців'
-      description: Баланс гравця, топ за грошима, місце в топі й кулдауни команд.
+      description: 'Профіль гравця та довідники. Дії: `balance` (потрібен `userId`), `leaderboard` (`limit`), `rank` (`userId`), `holdings` (`userId`), `stocks`, `cooldowns` (`userId`). Параметри дії передаються в query; для POST — у JSON-тілі.'
       security:
       - BearerAuth: []
+      parameters:
+      - name: action
+        in: query
+        required: true
+        description: 'Дія API економіки. Передається в query-параметрі `action`.'
+        schema:
+          type: string
+          enum:
+          - balance
+          - leaderboard
+          - rank
+          - holdings
+          - stocks
+          - cooldowns
+      - name: userId
+        in: query
+        required: false
+        description: 'Discord ID гравця.'
+        schema:
+          type: string
+      - name: limit
+        in: query
+        required: false
+        description: 'Розмір сторінки.'
+        schema:
+          type: integer
+      - name: fresh
+        in: query
+        required: false
+        description: 'Не використовувати кеш відповіді (3 секунди). Те саме, що заголовок `X-Cache-Refresh: 1`.'
+        schema:
+          type: boolean
       responses:
         '200':
-          description: Дані економіки.
+          description: 'OK'
           content:
             application/json:
               example:
-                userId: '123456789012345678'
-                cash: 15000
-                bank: 82000
-                rank: 14
-              schema:
-                type: object
-                properties:
-                  userId:
-                    type: string
-                  cash:
-                    type: integer
-                  bank:
-                    type: integer
-                  rank:
-                    type: integer
+                {"userId": "123456789012345678", "cash": 15000, "bank": 82000, "rank": 14}
+        '400':
+          description: 'Невірні або відсутні параметри; сума не є додатним цілим числом.'
+        '429':
+          description: 'Перевищено ліміт запитів.'
+        '500':
+          description: 'Помилка сервісу економіки або бази даних.'
     post:
       tags:
       - Економіка
       summary: 'Економіка: операції з грошима'
+      description: 'Грошові операції. `amount` — додатне ціле; за нестачі коштів операція не виконується. Дії: `transfer` (`fromUserId`, `toUserId`, `amount`), `deposit` і `withdraw` (`userId`, `amount`), `add` і `remove` (`userId`, `amount`, `type`: `cash` або `bank`), `reset` (`userId`), `resetCooldown` (`userId`, необов''язковий `command`). Параметри дії передаються в query; для POST — у JSON-тілі.'
       security:
       - BearerAuth: []
+      parameters:
+      - name: action
+        in: query
+        required: true
+        description: 'Дія API економіки. Передається в query-параметрі `action`.'
+        schema:
+          type: string
+          enum:
+          - transfer
+          - deposit
+          - withdraw
+          - add
+          - remove
+          - reset
+          - resetCooldown
       requestBody:
         required: true
         content:
@@ -279,94 +319,103 @@ paths:
                   type: string
                 toUserId:
                   type: string
+                userId:
+                  type: string
                 amount:
                   type: integer
-            example:
-              fromUserId: '123456789012345678'
-              toUserId: '234567890123456789'
-              amount: 500
+                  description: 'Сума в E-Coins — додатне ціле число.'
+                type:
+                  type: string
+                command:
+                  type: string
       responses:
         '200':
-          description: Успішне оновлення.
+          description: 'OK'
           content:
             application/json:
               example:
-                success: true
-                fromUserId: '123456789012345678'
-                toUserId: '234567890123456789'
-                amount: 500
-                newBalance:
-                  cash: 14500
-                  bank: 82000
-              schema:
-                type: object
-                properties:
-                  success:
-                    type: boolean
-                  fromUserId:
-                    type: string
-                  toUserId:
-                    type: string
-                  amount:
-                    type: integer
-                  newBalance:
-                    type: object
-                    properties:
-                      cash:
-                        type: integer
-                      bank:
-                        type: integer
-      description: Перекази, банк, нарахування, списання, скидання балансу й кулдаунів.
+                {"success": true, "userId": "123456789012345678", "amount": 5000, "newBalance": 87000}
+        '400':
+          description: 'Невірні або відсутні параметри; сума не є додатним цілим числом.'
+        '429':
+          description: 'Перевищено ліміт запитів.'
+        '500':
+          description: 'Помилка сервісу економіки або бази даних.'
   /civops/users:
     get:
       tags:
       - Економіка
       summary: 'Економіка: гравець'
+      description: 'Інвентар та історія операцій. Дії: `inventory` (`userId`), `transactions` (`userId`, `page`, `limit`). Параметри дії передаються в query; для POST — у JSON-тілі.'
       security:
       - BearerAuth: []
       parameters:
-      - name: id
+      - name: action
         in: query
+        required: true
+        description: 'Дія API економіки. Передається в query-параметрі `action`.'
         schema:
           type: string
-      - name: discord_id
+          enum:
+          - inventory
+          - transactions
+      - name: userId
         in: query
+        required: false
+        description: 'Discord ID гравця.'
         schema:
           type: string
+      - name: page
+        in: query
+        required: false
+        description: 'Номер сторінки (з 1).'
+        schema:
+          type: integer
+      - name: limit
+        in: query
+        required: false
+        description: 'Розмір сторінки.'
+        schema:
+          type: integer
+      - name: fresh
+        in: query
+        required: false
+        description: 'Не використовувати кеш відповіді (3 секунди). Те саме, що заголовок `X-Cache-Refresh: 1`.'
+        schema:
+          type: boolean
       responses:
         '200':
-          description: Дані профілю гравця.
+          description: 'OK'
           content:
             application/json:
               example:
-                userId: '123456789012345678'
-                inventory:
-                - name: Аптечка
-                  amount: 2
-                  description: Восстанавливает здоровье
-              schema:
-                type: object
-                properties:
-                  userId:
-                    type: string
-                  inventory:
-                    type: array
-                    items:
-                      type: object
-                      properties:
-                        name:
-                          type: string
-                        amount:
-                          type: integer
-                        description:
-                          type: string
-      description: Інвентар гравця й історія його операцій.
+                {"userId": "123456789012345678", "inventory": [{"name": "Аптечка", "amount": 2}]}
+        '400':
+          description: 'Невірні або відсутні параметри; сума не є додатним цілим числом.'
+        '404':
+          description: 'Бізнес, мафію, гравця або товар не знайдено.'
+        '429':
+          description: 'Перевищено ліміт запитів.'
+        '500':
+          description: 'Помилка сервісу економіки або бази даних.'
     post:
       tags:
       - Економіка
       summary: 'Економіка: інвентар гравця'
+      description: 'Керування інвентарем. Дії: `addItem` (`userId`, `item` з полями `name`, `amount`), `removeItem` (`userId`, `itemName`, `amount`), `clearInventory` (`userId`). Параметри дії передаються в query; для POST — у JSON-тілі.'
       security:
       - BearerAuth: []
+      parameters:
+      - name: action
+        in: query
+        required: true
+        description: 'Дія API економіки. Передається в query-параметрі `action`.'
+        schema:
+          type: string
+          enum:
+          - addItem
+          - removeItem
+          - clearInventory
       requestBody:
         required: true
         content:
@@ -378,100 +427,129 @@ paths:
                   type: string
                 item:
                   type: object
-                  properties:
-                    name:
-                      type: string
-                    amount:
-                      type: integer
-            example:
-              userId: '123456789012345678'
-              item:
-                name: Аптечка
-                amount: 1
+                itemName:
+                  type: string
+                amount:
+                  type: integer
+                  description: 'Сума в E-Coins — додатне ціле число.'
       responses:
         '200':
-          description: Профіль оновлено.
+          description: 'OK'
           content:
             application/json:
               example:
-                success: true
-                userId: '123456789012345678'
-                item: Аптечка
-                amount: 1
-              schema:
-                type: object
-                properties:
-                  success:
-                    type: boolean
-                  userId:
-                    type: string
-                  item:
-                    type: string
-                  amount:
-                    type: integer
-      description: Додавання й видалення предметів, очищення інвентаря.
+                {"success": true, "userId": "123456789012345678"}
+        '400':
+          description: 'Невірні або відсутні параметри; сума не є додатним цілим числом.'
+        '404':
+          description: 'Бізнес, мафію, гравця або товар не знайдено.'
+        '429':
+          description: 'Перевищено ліміт запитів.'
+        '500':
+          description: 'Помилка сервісу економіки або бази даних.'
   /civops/businesses:
     get:
       tags:
       - Економіка
       summary: 'Економіка: бізнеси'
+      description: 'Дії: `list` (`page`, `limit`), `info` (`businessId` або `businessName`), `balance`, `employees`, `store` (`businessName`), `transfers`, `logs` (`businessId`, `page`, `limit`), `rating`, `pending`. Параметри дії передаються в query; для POST — у JSON-тілі.'
       security:
       - BearerAuth: []
+      parameters:
+      - name: action
+        in: query
+        required: true
+        description: 'Дія API економіки. Передається в query-параметрі `action`.'
+        schema:
+          type: string
+          enum:
+          - list
+          - info
+          - balance
+          - employees
+          - store
+          - transfers
+          - logs
+          - rating
+          - pending
+      - name: businessId
+        in: query
+        required: false
+        description: 'ID бізнесу.'
+        schema:
+          type: string
+      - name: businessName
+        in: query
+        required: false
+        description: 'Назва бізнесу.'
+        schema:
+          type: string
+      - name: page
+        in: query
+        required: false
+        description: 'Номер сторінки (з 1).'
+        schema:
+          type: integer
+      - name: limit
+        in: query
+        required: false
+        description: 'Розмір сторінки.'
+        schema:
+          type: integer
+      - name: fresh
+        in: query
+        required: false
+        description: 'Не використовувати кеш відповіді (3 секунди). Те саме, що заголовок `X-Cache-Refresh: 1`.'
+        schema:
+          type: boolean
       responses:
         '200':
-          description: Перелік зареєстрованих підприємств.
+          description: 'OK'
           content:
             application/json:
               example:
-                page: 1
-                total: 1
-                businesses:
-                - id: B7K2Q9XZ
-                  name: Кафе «Арбат»
-                  form: ООО
-                  status: active
-                  owner_id: '123456789012345678'
-                  owner_name: player
-                  address: ул. Арбат, 10
-                  bank: 120000
-                  created_at: 1792083600
-              schema:
-                type: object
-                properties:
-                  page:
-                    type: integer
-                  total:
-                    type: integer
-                  businesses:
-                    type: array
-                    items:
-                      type: object
-                      properties:
-                        id:
-                          type: string
-                        name:
-                          type: string
-                        form:
-                          type: string
-                        status:
-                          type: string
-                        owner_id:
-                          type: string
-                        owner_name:
-                          type: string
-                        address:
-                          type: string
-                        bank:
-                          type: integer
-                        created_at:
-                          type: integer
-      description: 'Бізнеси: список, картка, баланс, працівники, товари, перекази, рейтинг і заявки.'
+                {"page": 1, "total": 1, "businesses": [{"id": "B7K2Q9XZ", "name": "Кафе «Арбат»", "bank": 120000}]}
+        '400':
+          description: 'Невірні або відсутні параметри; сума не є додатним цілим числом.'
+        '404':
+          description: 'Бізнес, мафію, гравця або товар не знайдено.'
+        '409':
+          description: 'Недостатньо коштів або конфлікт стану.'
+        '429':
+          description: 'Перевищено ліміт запитів.'
+        '500':
+          description: 'Помилка сервісу економіки або бази даних.'
     post:
       tags:
       - Економіка
       summary: 'Економіка: дії з бізнесами'
+      description: 'Грошові дії потребують `amount` — додатного цілого. `addMoney` повертає 404 для невідомого бізнесу; `removeMoney` і `withdraw` — 409 за нестачі коштів. Дії: `request`, `approve`, `create`, `update`, `delete`, `addMoney`/`removeMoney`/`withdraw` (`businessId`, `amount`), `transfer`, `addEmployee`/`removeEmployee`, `addProduct`/`removeProduct`/`buyProduct`, `returnMoney`, `cancelRequest`. Параметри дії передаються в query; для POST — у JSON-тілі.'
       security:
       - BearerAuth: []
+      parameters:
+      - name: action
+        in: query
+        required: true
+        description: 'Дія API економіки. Передається в query-параметрі `action`.'
+        schema:
+          type: string
+          enum:
+          - request
+          - approve
+          - create
+          - update
+          - delete
+          - addMoney
+          - removeMoney
+          - withdraw
+          - transfer
+          - addEmployee
+          - removeEmployee
+          - addProduct
+          - removeProduct
+          - buyProduct
+          - returnMoney
+          - cancelRequest
       requestBody:
         required: true
         content:
@@ -481,89 +559,138 @@ paths:
               properties:
                 businessId:
                   type: string
+                businessName:
+                  type: string
+                businessData:
+                  type: object
                 amount:
                   type: integer
-            example:
-              businessId: B7K2Q9XZ
-              amount: 5000
+                  description: 'Сума в E-Coins — додатне ціле число.'
+                type:
+                  type: string
+                targetUserId:
+                  type: string
+                userId:
+                  type: string
+                guildId:
+                  type: string
+                item:
+                  type: object
+                itemName:
+                  type: string
+                transactionId:
+                  type: string
+                requestId:
+                  type: string
       responses:
         '200':
-          description: Операцію виконано.
+          description: 'OK'
           content:
             application/json:
               example:
-                success: true
-                businessId: B7K2Q9XZ
-                added: 5000
-                newBalance: 125000
-              schema:
-                type: object
-                properties:
-                  success:
-                    type: boolean
-                  businessId:
-                    type: string
-                  added:
-                    type: integer
-                  newBalance:
-                    type: integer
-      description: Заявки, створення й видалення бізнесів, гроші, працівники й товари.
+                {"success": true, "businessId": "B7K2Q9XZ", "added": 5000, "newBalance": 125000}
+        '400':
+          description: 'Невірні або відсутні параметри; сума не є додатним цілим числом.'
+        '404':
+          description: 'Бізнес, мафію, гравця або товар не знайдено.'
+        '409':
+          description: 'Недостатньо коштів або конфлікт стану.'
+        '429':
+          description: 'Перевищено ліміт запитів.'
+        '500':
+          description: 'Помилка сервісу економіки або бази даних.'
   /civops/mafias:
     get:
       tags:
       - Економіка
       summary: 'Економіка: мафії'
+      description: 'Дії: `list` (`page`, `limit`), `info` (`mafiaId` або `mafiaName`), `balance`, `members`, `transfers`, `logs` (`mafiaId`, `page`, `limit`). Параметри дії передаються в query; для POST — у JSON-тілі.'
       security:
       - BearerAuth: []
+      parameters:
+      - name: action
+        in: query
+        required: true
+        description: 'Дія API економіки. Передається в query-параметрі `action`.'
+        schema:
+          type: string
+          enum:
+          - list
+          - info
+          - balance
+          - members
+          - transfers
+          - logs
+      - name: mafiaId
+        in: query
+        required: false
+        description: 'ID мафії.'
+        schema:
+          type: string
+      - name: mafiaName
+        in: query
+        required: false
+        description: 'Назва мафії.'
+        schema:
+          type: string
+      - name: page
+        in: query
+        required: false
+        description: 'Номер сторінки (з 1).'
+        schema:
+          type: integer
+      - name: limit
+        in: query
+        required: false
+        description: 'Розмір сторінки.'
+        schema:
+          type: integer
+      - name: fresh
+        in: query
+        required: false
+        description: 'Не використовувати кеш відповіді (3 секунди). Те саме, що заголовок `X-Cache-Refresh: 1`.'
+        schema:
+          type: boolean
       responses:
         '200':
-          description: Список мафій та угруповань.
+          description: 'OK'
           content:
             application/json:
               example:
-                page: 1
-                total: 1
-                mafias:
-                - id: M3X8P1
-                  name: Солнцевские
-                  leader_id: '123456789012345678'
-                  leader_name: player
-                  color: '#8B0000'
-                  bank: 54000
-                  created_at: 1792083600
-              schema:
-                type: object
-                properties:
-                  page:
-                    type: integer
-                  total:
-                    type: integer
-                  mafias:
-                    type: array
-                    items:
-                      type: object
-                      properties:
-                        id:
-                          type: string
-                        name:
-                          type: string
-                        leader_id:
-                          type: string
-                        leader_name:
-                          type: string
-                        color:
-                          type: string
-                        bank:
-                          type: integer
-                        created_at:
-                          type: integer
-      description: 'Мафії: список, картка, баланс, учасники, перекази й логи.'
+                {"page": 1, "total": 1, "mafias": [{"id": "M3X8P1", "name": "Солнцевские", "bank": 54000}]}
+        '400':
+          description: 'Невірні або відсутні параметри; сума не є додатним цілим числом.'
+        '404':
+          description: 'Бізнес, мафію, гравця або товар не знайдено.'
+        '409':
+          description: 'Недостатньо коштів або конфлікт стану.'
+        '429':
+          description: 'Перевищено ліміт запитів.'
+        '500':
+          description: 'Помилка сервісу економіки або бази даних.'
     post:
       tags:
       - Економіка
       summary: 'Економіка: дії з мафіями'
+      description: 'Грошові дії потребують `amount` — додатного цілого. `addMoney` повертає 404 для невідомої мафії; `removeMoney` і `withdraw` — 409 за нестачі коштів. Дії: `create`, `delete`, `addMoney`/`removeMoney`/`withdraw` (`mafiaId`, `amount`), `transfer`, `addMember`, `removeMember`. Параметри дії передаються в query; для POST — у JSON-тілі.'
       security:
       - BearerAuth: []
+      parameters:
+      - name: action
+        in: query
+        required: true
+        description: 'Дія API економіки. Передається в query-параметрі `action`.'
+        schema:
+          type: string
+          enum:
+          - create
+          - delete
+          - addMoney
+          - removeMoney
+          - withdraw
+          - transfer
+          - addMember
+          - removeMember
       requestBody:
         required: true
         content:
@@ -573,63 +700,105 @@ paths:
               properties:
                 mafiaId:
                   type: string
+                mafiaName:
+                  type: string
                 amount:
                   type: integer
-            example:
-              mafiaId: M3X8P1
-              amount: 1000
+                  description: 'Сума в E-Coins — додатне ціле число.'
+                targetUserId:
+                  type: string
+                userId:
+                  type: string
+                username:
+                  type: string
+                reason:
+                  type: string
       responses:
         '200':
-          description: Статус операції.
+          description: 'OK'
           content:
             application/json:
               example:
-                success: true
-                mafiaId: M3X8P1
-                added: 1000
-                newBalance: 55000
-              schema:
-                type: object
-                properties:
-                  success:
-                    type: boolean
-                  mafiaId:
-                    type: string
-                  added:
-                    type: integer
-                  newBalance:
-                    type: integer
-      description: Створення й видалення мафій, гроші, перекази й учасники.
+                {"success": true, "mafiaId": "M3X8P1", "added": 1000, "newBalance": 55000}
+        '400':
+          description: 'Невірні або відсутні параметри; сума не є додатним цілим числом.'
+        '404':
+          description: 'Бізнес, мафію, гравця або товар не знайдено.'
+        '409':
+          description: 'Недостатньо коштів або конфлікт стану.'
+        '429':
+          description: 'Перевищено ліміт запитів.'
+        '500':
+          description: 'Помилка сервісу економіки або бази даних.'
   /civops/government:
     get:
       tags:
       - Економіка
       summary: 'Економіка: бюджет'
+      description: 'Дії: `balance` — баланс казни, `transfers` (`page`, `limit`) — історія переказів. Параметри дії передаються в query; для POST — у JSON-тілі.'
       security:
       - BearerAuth: []
+      parameters:
+      - name: action
+        in: query
+        required: true
+        description: 'Дія API економіки. Передається в query-параметрі `action`.'
+        schema:
+          type: string
+          enum:
+          - balance
+          - transfers
+      - name: page
+        in: query
+        required: false
+        description: 'Номер сторінки (з 1).'
+        schema:
+          type: integer
+      - name: limit
+        in: query
+        required: false
+        description: 'Розмір сторінки.'
+        schema:
+          type: integer
+      - name: fresh
+        in: query
+        required: false
+        description: 'Не використовувати кеш відповіді (3 секунди). Те саме, що заголовок `X-Cache-Refresh: 1`.'
+        schema:
+          type: boolean
       responses:
         '200':
-          description: Стан держбюджету та департаментів.
+          description: 'OK'
           content:
             application/json:
               example:
-                balance:
-                  bank: 2500000
-              schema:
-                type: object
-                properties:
-                  balance:
-                    type: object
-                    properties:
-                      bank:
-                        type: integer
-      description: Баланс бюджету й перекази уряду.
+                {"balance": {"bank": 2500000}}
+        '400':
+          description: 'Невірні або відсутні параметри; сума не є додатним цілим числом.'
+        '409':
+          description: 'Недостатньо коштів або конфлікт стану.'
+        '429':
+          description: 'Перевищено ліміт запитів.'
+        '500':
+          description: 'Помилка сервісу економіки або бази даних.'
     post:
       tags:
       - Економіка
       summary: 'Економіка: дії з бюджетом'
+      description: '`amount` — додатне ціле. `removeMoney` повертає 409 за нестачі коштів. `withdraw` потребує `amount`, `toType` (`user`, `business`, `mafia`), `toId`, `authorId` та необов''язковий `reason`. Дії: `addMoney`, `removeMoney`, `withdraw`. Параметри дії передаються в query; для POST — у JSON-тілі.'
       security:
       - BearerAuth: []
+      parameters:
+      - name: action
+        in: query
+        required: true
+        description: 'Дія API економіки. Передається в query-параметрі `action`.'
+        schema:
+          type: string
+          enum:
+          - addMoney
+          - removeMoney
+          - withdraw
       requestBody:
         required: true
         content:
@@ -639,85 +808,94 @@ paths:
               properties:
                 amount:
                   type: integer
-            example:
-              amount: 10000
+                  description: 'Сума в E-Coins — додатне ціле число.'
+                toType:
+                  type: string
+                toId:
+                  type: string
+                authorId:
+                  type: string
+                reason:
+                  type: string
       responses:
         '200':
-          description: Параметри оновлено.
+          description: 'OK'
           content:
             application/json:
               example:
-                success: true
-                added: 10000
-                newBalance: 2510000
-              schema:
-                type: object
-                properties:
-                  success:
-                    type: boolean
-                  added:
-                    type: integer
-                  newBalance:
-                    type: integer
-      description: Поповнення й списання бюджету, перекази гравцю, бізнесу чи мафії.
+                {"success": true, "added": 10000, "newBalance": 2510000}
+        '400':
+          description: 'Невірні або відсутні параметри; сума не є додатним цілим числом.'
+        '409':
+          description: 'Недостатньо коштів або конфлікт стану.'
+        '429':
+          description: 'Перевищено ліміт запитів.'
+        '500':
+          description: 'Помилка сервісу економіки або бази даних.'
   /civops/store:
     get:
       tags:
       - Економіка
       summary: 'Економіка: магазин'
+      description: 'Дії: `list` — каталог товарів, `info` (`itemName`) — картка товару. Параметри дії передаються в query; для POST — у JSON-тілі.'
       security:
       - BearerAuth: []
+      parameters:
+      - name: action
+        in: query
+        required: true
+        description: 'Дія API економіки. Передається в query-параметрі `action`.'
+        schema:
+          type: string
+          enum:
+          - list
+          - info
+      - name: itemName
+        in: query
+        required: false
+        description: 'Назва товару.'
+        schema:
+          type: string
+      - name: fresh
+        in: query
+        required: false
+        description: 'Не використовувати кеш відповіді (3 секунди). Те саме, що заголовок `X-Cache-Refresh: 1`.'
+        schema:
+          type: boolean
       responses:
         '200':
-          description: Каталог товарів магазину.
+          description: 'OK'
           content:
             application/json:
               example:
-                count: 1
-                items:
-                - name: Аптечка
-                  description: Восстанавливает здоровье
-                  price_buy: 250
-                  price_sell: 100
-                  quantity: null
-                  can_use: true
-                  can_sell: true
-                  createdAt: 1792083600
-              schema:
-                type: object
-                properties:
-                  count:
-                    type: integer
-                  items:
-                    type: array
-                    items:
-                      type: object
-                      properties:
-                        name:
-                          type: string
-                        description:
-                          type: string
-                        price_buy:
-                          type: integer
-                        price_sell:
-                          type: integer
-                        quantity:
-                          type:
-                          - string
-                          - 'null'
-                        can_use:
-                          type: boolean
-                        can_sell:
-                          type: boolean
-                        createdAt:
-                          type: integer
-      description: Товари ігрового магазину.
+                {"count": 1, "items": [{"name": "Аптечка", "price_buy": 250, "price_sell": 100}]}
+        '400':
+          description: 'Невірні або відсутні параметри; сума не є додатним цілим числом.'
+        '404':
+          description: 'Бізнес, мафію, гравця або товар не знайдено.'
+        '429':
+          description: 'Перевищено ліміт запитів.'
+        '500':
+          description: 'Помилка сервісу економіки або бази даних.'
     post:
       tags:
       - Економіка
       summary: 'Економіка: дії з магазином'
+      description: 'Дії: `addItem` (`item`), `removeItem` (`itemName`), `buy` (`userId`, `itemName`), `sellToStore` (`userId`, `itemName`). Помилка 404 — товар не знайдено; 400 — товар не можна продати. Параметри дії передаються в query; для POST — у JSON-тілі.'
       security:
       - BearerAuth: []
+      parameters:
+      - name: action
+        in: query
+        required: true
+        description: 'Дія API економіки. Передається в query-параметрі `action`.'
+        schema:
+          type: string
+          enum:
+          - addItem
+          - removeItem
+          - buy
+          - sellToStore
       requestBody:
         required: true
         content:
@@ -725,91 +903,91 @@ paths:
             schema:
               type: object
               properties:
-                userId:
-                  type: string
+                item:
+                  type: object
                 itemName:
                   type: string
-                quantity:
-                  type: integer
-            example:
-              userId: '123456789012345678'
-              itemName: Аптечка
-              quantity: 2
+                userId:
+                  type: string
       responses:
         '200':
-          description: Результат транзакції.
+          description: 'OK'
           content:
             application/json:
               example:
-                success: true
-                userId: '123456789012345678'
-                item: Аптечка
-                quantity: 2
-                totalPrice: 500
-              schema:
-                type: object
-                properties:
-                  success:
-                    type: boolean
-                  userId:
-                    type: string
-                  item:
-                    type: string
-                  quantity:
-                    type: integer
-                  totalPrice:
-                    type: integer
-      description: Додавання й видалення товарів, купівля та продаж магазину.
+                {"success": true, "userId": "123456789012345678", "itemName": "Аптечка"}
+        '400':
+          description: 'Невірні або відсутні параметри; сума не є додатним цілим числом.'
+        '404':
+          description: 'Бізнес, мафію, гравця або товар не знайдено.'
+        '429':
+          description: 'Перевищено ліміт запитів.'
+        '500':
+          description: 'Помилка сервісу економіки або бази даних.'
   /civops/ads:
     get:
       tags:
       - Економіка
-      summary: 'Економіка: оголошення'
+      summary: 'Економіка: реклама бізнесів'
+      description: 'Дія: `list` (`page`, `limit`) — рекламні заявки бізнесів. Параметри дії передаються в query; для POST — у JSON-тілі.'
       security:
       - BearerAuth: []
+      parameters:
+      - name: action
+        in: query
+        required: true
+        description: 'Дія API економіки. Передається в query-параметрі `action`.'
+        schema:
+          type: string
+          enum:
+          - list
+      - name: page
+        in: query
+        required: false
+        description: 'Номер сторінки (з 1).'
+        schema:
+          type: integer
+      - name: limit
+        in: query
+        required: false
+        description: 'Розмір сторінки.'
+        schema:
+          type: integer
+      - name: fresh
+        in: query
+        required: false
+        description: 'Не використовувати кеш відповіді (3 секунди). Те саме, що заголовок `X-Cache-Refresh: 1`.'
+        schema:
+          type: boolean
       responses:
         '200':
-          description: Активні рекламні кампанії.
+          description: 'OK'
           content:
             application/json:
               example:
-                count: 1
-                ads:
-                - id: 5
-                  user_id: '123456789012345678'
-                  username: player
-                  business_name: Кафе «Арбат»
-                  address: ул. Арбат, 10
-                  created_at: 1792083600
-              schema:
-                type: object
-                properties:
-                  count:
-                    type: integer
-                  ads:
-                    type: array
-                    items:
-                      type: object
-                      properties:
-                        id:
-                          type: integer
-                        user_id:
-                          type: string
-                        username:
-                          type: string
-                        business_name:
-                          type: string
-                        address:
-                          type: string
-                        created_at:
-                          type: integer
-      description: Заявки на ігрову рекламу (`action=list`).
+                {"page": 1, "total": 0, "ads": []}
+        '400':
+          description: 'Невірні або відсутні параметри; сума не є додатним цілим числом.'
+        '429':
+          description: 'Перевищено ліміт запитів.'
+        '500':
+          description: 'Помилка сервісу економіки або бази даних.'
     post:
       tags:
       - Економіка
-      summary: 'Економіка: подання оголошення'
+      summary: 'Економіка: дії з рекламою'
+      description: 'Дія: `create` — заявка на рекламу бізнесу. Параметри дії передаються в query; для POST — у JSON-тілі.'
       security:
       - BearerAuth: []
+      parameters:
+      - name: action
+        in: query
+        required: true
+        description: 'Дія API економіки. Передається в query-параметрі `action`.'
+        schema:
+          type: string
+          enum:
+          - create
       requestBody:
         required: true
         content:
@@ -817,126 +995,92 @@ paths:
             schema:
               type: object
               properties:
-                userId:
-                  type: string
-                username:
+                businessId:
                   type: string
                 businessName:
                   type: string
-                address:
+                title:
                   type: string
-            example:
-              userId: '123456789012345678'
-              username: player
-              businessName: Кафе «Арбат»
-              address: ул. Арбат, 10
+                description:
+                  type: string
+                amount:
+                  type: integer
+                  description: 'Сума в E-Coins — додатне ціле число.'
       responses:
         '200':
-          description: Оголошення розміщено.
+          description: 'OK'
           content:
             application/json:
               example:
-                success: true
-                userId: '123456789012345678'
-                businessName: Кафе «Арбат»
-                address: ул. Арбат, 10
-                adSent: true
-              schema:
-                type: object
-                properties:
-                  success:
-                    type: boolean
-                  userId:
-                    type: string
-                  businessName:
-                    type: string
-                  address:
-                    type: string
-                  adSent:
-                    type: boolean
-      description: Створює заявку на ігрову рекламу (`action=create`).
+                {"success": true}
+        '400':
+          description: 'Невірні або відсутні параметри; сума не є додатним цілим числом.'
+        '429':
+          description: 'Перевищено ліміт запитів.'
+        '500':
+          description: 'Помилка сервісу економіки або бази даних.'
   /civops/system:
     get:
       tags:
       - Економіка
-      summary: 'Економіка: зведення'
+      summary: 'Економіка: стан сервісу'
+      description: 'Лише читання. Дії: `stats`, `uptime`, `dbStatus`. Параметри дії передаються в query; для POST — у JSON-тілі.'
       security:
       - BearerAuth: []
+      parameters:
+      - name: action
+        in: query
+        required: true
+        description: 'Дія API економіки. Передається в query-параметрі `action`.'
+        schema:
+          type: string
+          enum:
+          - stats
+          - uptime
+          - dbStatus
+      - name: fresh
+        in: query
+        required: false
+        description: 'Не використовувати кеш відповіді (3 секунди). Те саме, що заголовок `X-Cache-Refresh: 1`.'
+        schema:
+          type: boolean
       responses:
         '200':
-          description: Версія та конфігурація економіки.
+          description: 'OK'
           content:
             application/json:
               example:
-                users: 5120
-                businesses: 34
-                mafias: 6
-                governmentBalance: 2500000
-                uptime: 86400.5
-                memory:
-                  rss: 152043520
-                  heapTotal: 98304000
-                  heapUsed: 71303168
-                  external: 2097152
-                timestamp: '2026-10-21T12:00:00.000Z'
-              schema:
-                type: object
-                properties:
-                  users:
-                    type: integer
-                  businesses:
-                    type: integer
-                  mafias:
-                    type: integer
-                  governmentBalance:
-                    type: integer
-                  uptime:
-                    type: number
-                  memory:
-                    type: object
-                    properties:
-                      rss:
-                        type: integer
-                      heapTotal:
-                        type: integer
-                      heapUsed:
-                        type: integer
-                      external:
-                        type: integer
-                  timestamp:
-                    type: string
-                    format: date-time
-      description: Загальна статистика економіки й час роботи сервісу.
+                {"status": "ok"}
+        '429':
+          description: 'Перевищено ліміт запитів.'
+        '500':
+          description: 'Помилка сервісу економіки або бази даних.'
   /civops/health:
     get:
       tags:
       - Економіка
-      summary: 'Економіка: стан'
+      summary: 'Економіка: перевірка доступності'
+      description: 'Перевірка доступності сервісу економіки. Доступна будь-якому ключу з правом читання економіки. Параметри дії передаються в query; для POST — у JSON-тілі.'
       security:
       - BearerAuth: []
+      parameters:
+      - name: fresh
+        in: query
+        required: false
+        description: 'Не використовувати кеш відповіді (3 секунди). Те саме, що заголовок `X-Cache-Refresh: 1`.'
+        schema:
+          type: boolean
       responses:
         '200':
-          description: Сервіс економіки є активним.
+          description: 'OK'
           content:
             application/json:
               example:
-                status: ok
-                service: Economy API
-                timestamp: '2026-10-21T12:00:00.000Z'
-                uptime: 86400.5
-              schema:
-                type: object
-                properties:
-                  status:
-                    type: string
-                  service:
-                    type: string
-                  timestamp:
-                    type: string
-                    format: date-time
-                  uptime:
-                    type: number
-      description: Чи працює модуль економіки. Ключ не потрібен.
+                {"status": "ok", "service": "Economy API"}
+        '429':
+          description: 'Перевищено ліміт запитів.'
+        '500':
+          description: 'Помилка сервісу економіки або бази даних.'
   /stats:
     get:
       tags:
@@ -8510,13 +8654,329 @@ paths:
                 createdAt: '2026-10-15T19:00:00Z'
                 expiresAt: null
         '401':
-          description: Потрібна чинна сесія власника. Строк перевіряється під час кожного читання незалежно від очищення. Браузерний синтез без аудіофайлу не архівується.
+          description: 'Потрібна дійсна сесія власника файлу.'
         '404':
-          description: Потрібна чинна сесія власника. Строк перевіряється під час кожного читання незалежно від очищення. Браузерний синтез без аудіофайлу не архівується.
+          description: 'Файл не знайдено або він недоступний цьому користувачу.'
         '429':
-          description: Потрібна чинна сесія власника. Строк перевіряється під час кожного читання незалежно від очищення. Браузерний синтез без аудіофайлу не архівується.
+          description: 'Перевищено ліміт запитів авторизації.'
         '503':
-          description: Потрібна чинна сесія власника. Строк перевіряється під час кожного читання незалежно від очищення. Браузерний синтез без аудіофайлу не архівується.
+          description: 'Сервіс CDN тимчасово недоступний.'
+  /ads/analytics:
+    get:
+      tags:
+      - Рекламные кампании V3
+      summary: 'Реклама: аналітика'
+      description: 'Агрегована статистика показів і кліків власника сесії. `period` — `24h`, `7d` (типово) або `30d`; `campaignId` звужує вибірку до однієї кампанії.'
+      security:
+      - CookieAuth: []
+      parameters:
+      - name: period
+        in: query
+        required: false
+        description: 'Період аналітики.'
+        schema:
+          type: string
+          enum:
+          - 24h
+          - 7d
+          - 30d
+      - name: campaignId
+        in: query
+        required: false
+        description: 'ID кампанії.'
+        schema:
+          type: string
+      responses:
+        '200':
+          description: 'Impressions and clicks analytics.'
+          content:
+            application/json:
+              example:
+                {"from":"2026-11-07T00:00:00Z","to":"2026-11-14T00:00:00Z","interval":"day","totals":{"impressions":1200,"clicks":34},"series":[],"campaigns":[],"placements":[]}
+        '400':
+          description: 'Невірні або відсутні параметри.'
+        '401':
+          description: 'Потрібна дійсна сесія користувача.'
+        '429':
+          description: 'Забагато спроб підтвердження; повторіть через 5 хвилин.'
+  /ads/channel-products:
+    get:
+      tags:
+      - Рекламные кампании V3
+      summary: 'Реклама: розміщення в Discord'
+      description: 'Каталог рекламних розміщень у Discord, доступних для оплати. Ціни й канали налаштовує адміністратор; відповідь не кешується.'
+      responses:
+        '200':
+          description: 'Placement catalog.'
+          content:
+            application/json:
+              example:
+                {"products":{}}
+        '503':
+          description: 'Сервіс розміщення або каталог тимчасово недоступні.'
+  /ads/channel-orders/{code}:
+    get:
+      tags:
+      - Рекламные кампании V3
+      summary: 'Реклама: стан замовлення'
+      description: 'Стан замовлення на розміщення в Discord: `pending`, `paid`, `sent`, `failed` або `expired`.'
+      security:
+      - CookieAuth: []
+      parameters:
+      - name: code
+        in: path
+        required: true
+        description: 'Код замовлення.'
+        schema:
+          type: string
+      responses:
+        '200':
+          description: 'Order state.'
+          content:
+            application/json:
+              example:
+                {"state":"pending"}
+        '401':
+          description: 'Потрібна дійсна сесія користувача.'
+        '404':
+          description: 'Замовлення, покупку або промокод не знайдено.'
+  /ads/channel-orders/{code}/redeem:
+    post:
+      tags:
+      - Рекламные кампании V3
+      summary: 'Реклама: підтвердити оплату'
+      description: 'Підтвердження оплати кодом FunPay. Код замовлення і код оплати мають збігатися; після успішної перевірки публікація одразу надсилається в Discord.'
+      security:
+      - CookieAuth: []
+      parameters:
+      - name: code
+        in: path
+        required: true
+        description: 'Код замовлення.'
+        schema:
+          type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - paidCode
+              properties:
+                paidCode:
+                  type: string
+                  description: 'Код оплати FunPay.'
+            example:
+              paidCode: FP-123456
+      responses:
+        '200':
+          description: 'Payment confirmed and the publication sent.'
+          content:
+            application/json:
+              example:
+                {"success":true}
+        '400':
+          description: 'Невірні або відсутні параметри.'
+        '401':
+          description: 'Потрібна дійсна сесія користувача.'
+        '409':
+          description: 'Замовлення вже використане, не оплачене або код оплати не збігається.'
+        '429':
+          description: 'Забагато спроб підтвердження; повторіть через 5 хвилин.'
+        '503':
+          description: 'Сервіс розміщення або каталог тимчасово недоступні.'
+  /ads/campaigns/{id}/channel-order:
+    post:
+      tags:
+      - Рекламные кампании V3
+      summary: 'Реклама: замовлення розміщення'
+      description: 'Створює замовлення на Discord-розміщення для схваленої кампанії та вибраного продукту. Повертає код замовлення і посилання на оплату FunPay.'
+      security:
+      - CookieAuth: []
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: 'ID кампанії.'
+        schema:
+          type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - productId
+              properties:
+                productId:
+                  type: string
+                  description: 'ID продукту розміщення.'
+            example:
+              productId: top-24h
+      responses:
+        '201':
+          description: 'Order created.'
+          content:
+            application/json:
+              example:
+                {"code":"AD-7K2Q","productId":"top-24h","productName":"Top 24h","funpayUrl":"https://funpay.com/lots/offer?id=000","price":199,"quantity":1}
+        '400':
+          description: 'Невірні або відсутні параметри.'
+        '401':
+          description: 'Потрібна дійсна сесія користувача.'
+        '503':
+          description: 'Сервіс розміщення або каталог тимчасово недоступні.'
+  /subscriptions/purchases:
+    get:
+      tags:
+      - API Підписок
+      summary: 'Підписки: історія покупок'
+      description: 'Історія покупок поточного користувача. Ключ із правом `subscription.read` або майстер-ключ мають передати `discordId`; сесія бачить лише власні покупки.'
+      security:
+      - CookieAuth: []
+      - BearerAuth: []
+      parameters:
+      - name: discordId
+        in: query
+        required: false
+        description: 'Discord ID покупця.'
+        schema:
+          type: string
+      - name: page
+        in: query
+        required: false
+        description: 'Номер сторінки (з 1).'
+        schema:
+          type: integer
+      - name: limit
+        in: query
+        required: false
+        description: 'Розмір сторінки (1–100, типово 20).'
+        schema:
+          type: integer
+      - name: type
+        in: query
+        required: false
+        description: 'Тип покупки: `subscription`, `benefit`, `booster` або `coins`.'
+        schema:
+          type: string
+      - name: status
+        in: query
+        required: false
+        description: 'Статус: `pending`, `completed`, `refunded` або `failed`.'
+        schema:
+          type: string
+      - name: from
+        in: query
+        required: false
+        description: 'Початок періоду, `YYYY-MM-DD`.'
+        schema:
+          type: string
+      - name: to
+        in: query
+        required: false
+        description: 'Кінець періоду включно, `YYYY-MM-DD`.'
+        schema:
+          type: string
+      - name: search
+        in: query
+        required: false
+        description: 'Пошук за назвою або ID товару (до 64 символів).'
+        schema:
+          type: string
+      responses:
+        '200':
+          description: 'Paginated purchase list.'
+          content:
+            application/json:
+              example:
+                {"success":true,"purchases":[],"pagination":{"page":1,"limit":20,"total":0,"totalPages":0,"hasMore":false}}
+        '400':
+          description: 'Невірні або відсутні параметри.'
+        '401':
+          description: 'Потрібна дійсна сесія користувача.'
+        '403':
+          description: 'Недостатньо прав або запитано чужого користувача.'
+  /subscriptions/purchases/{id}:
+    get:
+      tags:
+      - API Підписок
+      summary: 'Підписки: покупка'
+      description: 'Одна покупка поточного користувача за ID.'
+      security:
+      - CookieAuth: []
+      - BearerAuth: []
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: 'Purchase ID.'
+        schema:
+          type: string
+      responses:
+        '200':
+          description: 'Purchase.'
+          content:
+            application/json:
+              example:
+                {"success":true,"purchase":{}}
+        '401':
+          description: 'Потрібна дійсна сесія користувача.'
+        '404':
+          description: 'Замовлення, покупку або промокод не знайдено.'
+  /subscriptions/promo/validate:
+    post:
+      tags:
+      - API Підписок
+      summary: 'Підписки: перевірка промокоду'
+      description: 'Попередня перевірка промокоду. Код не резервується: перевірка повторюється під час оплати. `discordId` можна не передавати за наявності сесії; чужий ID доступний лише майстер-ключу.'
+      security:
+      - CookieAuth: []
+      - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - code
+              - productId
+              properties:
+                code:
+                  type: string
+                  description: 'Промокод.'
+                productId:
+                  type: string
+                  description: 'ID продукту розміщення.'
+                discordId:
+                  type: string
+                  description: 'Discord ID покупця.'
+                duration:
+                  type: string
+                  description: 'Тривалість підписки, типово `1month`.'
+            example:
+              code: SAVE10
+              productId: kreml
+              duration: 1month
+      responses:
+        '200':
+          description: 'Discount quote.'
+          content:
+            application/json:
+              example:
+                {"success":true,"quote":{"code":"SAVE10","percent":10,"productId":"kreml","duration":"1month","originalCoins":400,"discountCoins":40,"finalCoins":360}}
+        '400':
+          description: 'Невірні або відсутні параметри.'
+        '401':
+          description: 'Потрібна дійсна сесія користувача.'
+        '403':
+          description: 'Недостатньо прав або запитано чужого користувача.'
+        '404':
+          description: 'Замовлення, покупку або промокод не знайдено.'
+
 components:
   securitySchemes:
     AIManagementKeyHeader:

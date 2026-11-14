@@ -10,7 +10,8 @@
           "icon": "rocket",
           "pages": [
             "uk/introduction",
-            "uk/api-clients"
+            "uk/api-clients",
+            "uk/changelog"
           ]
         },
         {
@@ -146,7 +147,10 @@
                     "uk/reference/v3/subscriptions/get-store",
                     "uk/reference/v3/subscriptions/get-user-subscriptions",
                     "uk/reference/v3/subscriptions/purchase-with-coins",
-                    "uk/reference/v3/subscriptions/get-user-limits"
+                    "uk/reference/v3/subscriptions/get-user-limits",
+                    "uk/reference/v3/subscriptions/get-subscriptions-purchases",
+                    "uk/reference/v3/subscriptions/get-subscriptions-purchases-id",
+                    "uk/reference/v3/subscriptions/post-subscriptions-promo-validate"
                   ]
                 },
                 {
@@ -287,7 +291,12 @@
                     "uk/reference/v3/ads/post-ads-campaigns-id-buy",
                     "uk/reference/v3/ads/post-ads-campaigns-id-toggle",
                     "uk/reference/v3/ads/get-ads-packages",
-                    "uk/reference/v3/ads/get-ads-serve"
+                    "uk/reference/v3/ads/get-ads-serve",
+                    "uk/reference/v3/ads/get-ads-analytics",
+                    "uk/reference/v3/ads/get-ads-channel-products",
+                    "uk/reference/v3/ads/get-ads-channel-orders-code",
+                    "uk/reference/v3/ads/post-ads-channel-orders-code-redeem",
+                    "uk/reference/v3/ads/post-ads-campaigns-id-channel-order"
                   ]
                 },
                 {

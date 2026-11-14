@@ -231,36 +231,76 @@ paths:
       tags:
       - Экономика
       summary: 'Экономика: деньги игроков'
-      description: Баланс игрока, топ по деньгам, место в топе и кулдауны команд.
+      description: 'Профиль игрока и справочники. Действия: `balance` (нужен `userId`), `leaderboard` (`limit`), `rank` (`userId`), `holdings` (`userId`), `stocks`, `cooldowns` (`userId`). Параметры действия передаются в query; для POST — в JSON-теле.'
       security:
       - BearerAuth: []
+      parameters:
+      - name: action
+        in: query
+        required: true
+        description: 'Действие API экономики. Передаётся в query-параметре `action`.'
+        schema:
+          type: string
+          enum:
+          - balance
+          - leaderboard
+          - rank
+          - holdings
+          - stocks
+          - cooldowns
+      - name: userId
+        in: query
+        required: false
+        description: 'Discord ID игрока.'
+        schema:
+          type: string
+      - name: limit
+        in: query
+        required: false
+        description: 'Размер страницы.'
+        schema:
+          type: integer
+      - name: fresh
+        in: query
+        required: false
+        description: 'Не использовать кэш ответа (3 секунды). Эквивалентно заголовку `X-Cache-Refresh: 1`.'
+        schema:
+          type: boolean
       responses:
         '200':
-          description: Данные экономики.
+          description: 'OK'
           content:
             application/json:
               example:
-                userId: '123456789012345678'
-                cash: 15000
-                bank: 82000
-                rank: 14
-              schema:
-                type: object
-                properties:
-                  userId:
-                    type: string
-                  cash:
-                    type: integer
-                  bank:
-                    type: integer
-                  rank:
-                    type: integer
+                {"userId": "123456789012345678", "cash": 15000, "bank": 82000, "rank": 14}
+        '400':
+          description: 'Неверные или отсутствующие параметры; сумма не является положительным целым числом.'
+        '429':
+          description: 'Превышен лимит запросов.'
+        '500':
+          description: 'Ошибка сервиса экономики или базы данных.'
     post:
       tags:
       - Экономика
       summary: 'Экономика: операции с деньгами'
+      description: 'Денежные операции. `amount` — положительное целое; при нехватке средств операция не выполняется. Действия: `transfer` (`fromUserId`, `toUserId`, `amount`), `deposit` и `withdraw` (`userId`, `amount`), `add` и `remove` (`userId`, `amount`, `type`: `cash` или `bank`), `reset` (`userId`), `resetCooldown` (`userId`, необязательный `command`). Параметры действия передаются в query; для POST — в JSON-теле.'
       security:
       - BearerAuth: []
+      parameters:
+      - name: action
+        in: query
+        required: true
+        description: 'Действие API экономики. Передаётся в query-параметре `action`.'
+        schema:
+          type: string
+          enum:
+          - transfer
+          - deposit
+          - withdraw
+          - add
+          - remove
+          - reset
+          - resetCooldown
       requestBody:
         required: true
         content:
@@ -272,94 +312,103 @@ paths:
                   type: string
                 toUserId:
                   type: string
+                userId:
+                  type: string
                 amount:
                   type: integer
-            example:
-              fromUserId: '123456789012345678'
-              toUserId: '234567890123456789'
-              amount: 500
+                  description: 'Сумма в E-Coins — положительное целое число.'
+                type:
+                  type: string
+                command:
+                  type: string
       responses:
         '200':
-          description: Успешное обновление.
+          description: 'OK'
           content:
             application/json:
               example:
-                success: true
-                fromUserId: '123456789012345678'
-                toUserId: '234567890123456789'
-                amount: 500
-                newBalance:
-                  cash: 14500
-                  bank: 82000
-              schema:
-                type: object
-                properties:
-                  success:
-                    type: boolean
-                  fromUserId:
-                    type: string
-                  toUserId:
-                    type: string
-                  amount:
-                    type: integer
-                  newBalance:
-                    type: object
-                    properties:
-                      cash:
-                        type: integer
-                      bank:
-                        type: integer
-      description: Переводы, банк, начисление, списание, сброс баланса и кулдаунов.
+                {"success": true, "userId": "123456789012345678", "amount": 5000, "newBalance": 87000}
+        '400':
+          description: 'Неверные или отсутствующие параметры; сумма не является положительным целым числом.'
+        '429':
+          description: 'Превышен лимит запросов.'
+        '500':
+          description: 'Ошибка сервиса экономики или базы данных.'
   /civops/users:
     get:
       tags:
       - Экономика
       summary: 'Экономика: игрок'
+      description: 'Инвентарь и история операций. Действия: `inventory` (`userId`), `transactions` (`userId`, `page`, `limit`). Параметры действия передаются в query; для POST — в JSON-теле.'
       security:
       - BearerAuth: []
       parameters:
-      - name: id
+      - name: action
         in: query
+        required: true
+        description: 'Действие API экономики. Передаётся в query-параметре `action`.'
         schema:
           type: string
-      - name: discord_id
+          enum:
+          - inventory
+          - transactions
+      - name: userId
         in: query
+        required: false
+        description: 'Discord ID игрока.'
         schema:
           type: string
+      - name: page
+        in: query
+        required: false
+        description: 'Номер страницы (с 1).'
+        schema:
+          type: integer
+      - name: limit
+        in: query
+        required: false
+        description: 'Размер страницы.'
+        schema:
+          type: integer
+      - name: fresh
+        in: query
+        required: false
+        description: 'Не использовать кэш ответа (3 секунды). Эквивалентно заголовку `X-Cache-Refresh: 1`.'
+        schema:
+          type: boolean
       responses:
         '200':
-          description: Данные профиля игрока.
+          description: 'OK'
           content:
             application/json:
               example:
-                userId: '123456789012345678'
-                inventory:
-                - name: Аптечка
-                  amount: 2
-                  description: Восстанавливает здоровье
-              schema:
-                type: object
-                properties:
-                  userId:
-                    type: string
-                  inventory:
-                    type: array
-                    items:
-                      type: object
-                      properties:
-                        name:
-                          type: string
-                        amount:
-                          type: integer
-                        description:
-                          type: string
-      description: Инвентарь игрока и история его операций.
+                {"userId": "123456789012345678", "inventory": [{"name": "Аптечка", "amount": 2}]}
+        '400':
+          description: 'Неверные или отсутствующие параметры; сумма не является положительным целым числом.'
+        '404':
+          description: 'Бизнес, мафия, игрок или товар не найден.'
+        '429':
+          description: 'Превышен лимит запросов.'
+        '500':
+          description: 'Ошибка сервиса экономики или базы данных.'
     post:
       tags:
       - Экономика
       summary: 'Экономика: инвентарь игрока'
+      description: 'Управление инвентарём. Действия: `addItem` (`userId`, `item` с полями `name`, `amount`), `removeItem` (`userId`, `itemName`, `amount`), `clearInventory` (`userId`). Параметры действия передаются в query; для POST — в JSON-теле.'
       security:
       - BearerAuth: []
+      parameters:
+      - name: action
+        in: query
+        required: true
+        description: 'Действие API экономики. Передаётся в query-параметре `action`.'
+        schema:
+          type: string
+          enum:
+          - addItem
+          - removeItem
+          - clearInventory
       requestBody:
         required: true
         content:
@@ -371,100 +420,129 @@ paths:
                   type: string
                 item:
                   type: object
-                  properties:
-                    name:
-                      type: string
-                    amount:
-                      type: integer
-            example:
-              userId: '123456789012345678'
-              item:
-                name: Аптечка
-                amount: 1
+                itemName:
+                  type: string
+                amount:
+                  type: integer
+                  description: 'Сумма в E-Coins — положительное целое число.'
       responses:
         '200':
-          description: Профиль обновлен.
+          description: 'OK'
           content:
             application/json:
               example:
-                success: true
-                userId: '123456789012345678'
-                item: Аптечка
-                amount: 1
-              schema:
-                type: object
-                properties:
-                  success:
-                    type: boolean
-                  userId:
-                    type: string
-                  item:
-                    type: string
-                  amount:
-                    type: integer
-      description: Добавление и удаление предметов, очистка инвентаря.
+                {"success": true, "userId": "123456789012345678"}
+        '400':
+          description: 'Неверные или отсутствующие параметры; сумма не является положительным целым числом.'
+        '404':
+          description: 'Бизнес, мафия, игрок или товар не найден.'
+        '429':
+          description: 'Превышен лимит запросов.'
+        '500':
+          description: 'Ошибка сервиса экономики или базы данных.'
   /civops/businesses:
     get:
       tags:
       - Экономика
       summary: 'Экономика: бизнесы'
+      description: 'Действия: `list` (`page`, `limit`), `info` (`businessId` или `businessName`), `balance`, `employees`, `store` (`businessName`), `transfers`, `logs` (`businessId`, `page`, `limit`), `rating`, `pending`. Параметры действия передаются в query; для POST — в JSON-теле.'
       security:
       - BearerAuth: []
+      parameters:
+      - name: action
+        in: query
+        required: true
+        description: 'Действие API экономики. Передаётся в query-параметре `action`.'
+        schema:
+          type: string
+          enum:
+          - list
+          - info
+          - balance
+          - employees
+          - store
+          - transfers
+          - logs
+          - rating
+          - pending
+      - name: businessId
+        in: query
+        required: false
+        description: 'ID бизнеса.'
+        schema:
+          type: string
+      - name: businessName
+        in: query
+        required: false
+        description: 'Название бизнеса.'
+        schema:
+          type: string
+      - name: page
+        in: query
+        required: false
+        description: 'Номер страницы (с 1).'
+        schema:
+          type: integer
+      - name: limit
+        in: query
+        required: false
+        description: 'Размер страницы.'
+        schema:
+          type: integer
+      - name: fresh
+        in: query
+        required: false
+        description: 'Не использовать кэш ответа (3 секунды). Эквивалентно заголовку `X-Cache-Refresh: 1`.'
+        schema:
+          type: boolean
       responses:
         '200':
-          description: Список зарегистрированных предприятий.
+          description: 'OK'
           content:
             application/json:
               example:
-                page: 1
-                total: 1
-                businesses:
-                - id: B7K2Q9XZ
-                  name: Кафе «Арбат»
-                  form: ООО
-                  status: active
-                  owner_id: '123456789012345678'
-                  owner_name: player
-                  address: ул. Арбат, 10
-                  bank: 120000
-                  created_at: 1792083600
-              schema:
-                type: object
-                properties:
-                  page:
-                    type: integer
-                  total:
-                    type: integer
-                  businesses:
-                    type: array
-                    items:
-                      type: object
-                      properties:
-                        id:
-                          type: string
-                        name:
-                          type: string
-                        form:
-                          type: string
-                        status:
-                          type: string
-                        owner_id:
-                          type: string
-                        owner_name:
-                          type: string
-                        address:
-                          type: string
-                        bank:
-                          type: integer
-                        created_at:
-                          type: integer
-      description: 'Бизнесы: список, карточка, баланс, сотрудники, товары, переводы, рейтинг и заявки.'
+                {"page": 1, "total": 1, "businesses": [{"id": "B7K2Q9XZ", "name": "Кафе «Арбат»", "bank": 120000}]}
+        '400':
+          description: 'Неверные или отсутствующие параметры; сумма не является положительным целым числом.'
+        '404':
+          description: 'Бизнес, мафия, игрок или товар не найден.'
+        '409':
+          description: 'Недостаточно средств или конфликт состояния.'
+        '429':
+          description: 'Превышен лимит запросов.'
+        '500':
+          description: 'Ошибка сервиса экономики или базы данных.'
     post:
       tags:
       - Экономика
       summary: 'Экономика: действия с бизнесами'
+      description: 'Денежные действия требуют `amount` — положительное целое. `addMoney` возвращает 404 для неизвестного бизнеса; `removeMoney` и `withdraw` — 409 при нехватке средств. Действия: `request`, `approve`, `create`, `update`, `delete`, `addMoney`/`removeMoney`/`withdraw` (`businessId`, `amount`), `transfer`, `addEmployee`/`removeEmployee`, `addProduct`/`removeProduct`/`buyProduct`, `returnMoney`, `cancelRequest`. Параметры действия передаются в query; для POST — в JSON-теле.'
       security:
       - BearerAuth: []
+      parameters:
+      - name: action
+        in: query
+        required: true
+        description: 'Действие API экономики. Передаётся в query-параметре `action`.'
+        schema:
+          type: string
+          enum:
+          - request
+          - approve
+          - create
+          - update
+          - delete
+          - addMoney
+          - removeMoney
+          - withdraw
+          - transfer
+          - addEmployee
+          - removeEmployee
+          - addProduct
+          - removeProduct
+          - buyProduct
+          - returnMoney
+          - cancelRequest
       requestBody:
         required: true
         content:
@@ -474,89 +552,138 @@ paths:
               properties:
                 businessId:
                   type: string
+                businessName:
+                  type: string
+                businessData:
+                  type: object
                 amount:
                   type: integer
-            example:
-              businessId: B7K2Q9XZ
-              amount: 5000
+                  description: 'Сумма в E-Coins — положительное целое число.'
+                type:
+                  type: string
+                targetUserId:
+                  type: string
+                userId:
+                  type: string
+                guildId:
+                  type: string
+                item:
+                  type: object
+                itemName:
+                  type: string
+                transactionId:
+                  type: string
+                requestId:
+                  type: string
       responses:
         '200':
-          description: Операция выполнена.
+          description: 'OK'
           content:
             application/json:
               example:
-                success: true
-                businessId: B7K2Q9XZ
-                added: 5000
-                newBalance: 125000
-              schema:
-                type: object
-                properties:
-                  success:
-                    type: boolean
-                  businessId:
-                    type: string
-                  added:
-                    type: integer
-                  newBalance:
-                    type: integer
-      description: Заявки, создание и удаление бизнесов, деньги, сотрудники и товары.
+                {"success": true, "businessId": "B7K2Q9XZ", "added": 5000, "newBalance": 125000}
+        '400':
+          description: 'Неверные или отсутствующие параметры; сумма не является положительным целым числом.'
+        '404':
+          description: 'Бизнес, мафия, игрок или товар не найден.'
+        '409':
+          description: 'Недостаточно средств или конфликт состояния.'
+        '429':
+          description: 'Превышен лимит запросов.'
+        '500':
+          description: 'Ошибка сервиса экономики или базы данных.'
   /civops/mafias:
     get:
       tags:
       - Экономика
       summary: 'Экономика: мафии'
+      description: 'Действия: `list` (`page`, `limit`), `info` (`mafiaId` или `mafiaName`), `balance`, `members`, `transfers`, `logs` (`mafiaId`, `page`, `limit`). Параметры действия передаются в query; для POST — в JSON-теле.'
       security:
       - BearerAuth: []
+      parameters:
+      - name: action
+        in: query
+        required: true
+        description: 'Действие API экономики. Передаётся в query-параметре `action`.'
+        schema:
+          type: string
+          enum:
+          - list
+          - info
+          - balance
+          - members
+          - transfers
+          - logs
+      - name: mafiaId
+        in: query
+        required: false
+        description: 'ID мафии.'
+        schema:
+          type: string
+      - name: mafiaName
+        in: query
+        required: false
+        description: 'Название мафии.'
+        schema:
+          type: string
+      - name: page
+        in: query
+        required: false
+        description: 'Номер страницы (с 1).'
+        schema:
+          type: integer
+      - name: limit
+        in: query
+        required: false
+        description: 'Размер страницы.'
+        schema:
+          type: integer
+      - name: fresh
+        in: query
+        required: false
+        description: 'Не использовать кэш ответа (3 секунды). Эквивалентно заголовку `X-Cache-Refresh: 1`.'
+        schema:
+          type: boolean
       responses:
         '200':
-          description: Список мафий и группировок.
+          description: 'OK'
           content:
             application/json:
               example:
-                page: 1
-                total: 1
-                mafias:
-                - id: M3X8P1
-                  name: Солнцевские
-                  leader_id: '123456789012345678'
-                  leader_name: player
-                  color: '#8B0000'
-                  bank: 54000
-                  created_at: 1792083600
-              schema:
-                type: object
-                properties:
-                  page:
-                    type: integer
-                  total:
-                    type: integer
-                  mafias:
-                    type: array
-                    items:
-                      type: object
-                      properties:
-                        id:
-                          type: string
-                        name:
-                          type: string
-                        leader_id:
-                          type: string
-                        leader_name:
-                          type: string
-                        color:
-                          type: string
-                        bank:
-                          type: integer
-                        created_at:
-                          type: integer
-      description: 'Мафии: список, карточка, баланс, участники, переводы и логи.'
+                {"page": 1, "total": 1, "mafias": [{"id": "M3X8P1", "name": "Солнцевские", "bank": 54000}]}
+        '400':
+          description: 'Неверные или отсутствующие параметры; сумма не является положительным целым числом.'
+        '404':
+          description: 'Бизнес, мафия, игрок или товар не найден.'
+        '409':
+          description: 'Недостаточно средств или конфликт состояния.'
+        '429':
+          description: 'Превышен лимит запросов.'
+        '500':
+          description: 'Ошибка сервиса экономики или базы данных.'
     post:
       tags:
       - Экономика
       summary: 'Экономика: действия с мафиями'
+      description: 'Денежные действия требуют `amount` — положительное целое. `addMoney` возвращает 404 для неизвестной мафии; `removeMoney` и `withdraw` — 409 при нехватке средств. Действия: `create`, `delete`, `addMoney`/`removeMoney`/`withdraw` (`mafiaId`, `amount`), `transfer`, `addMember`, `removeMember`. Параметры действия передаются в query; для POST — в JSON-теле.'
       security:
       - BearerAuth: []
+      parameters:
+      - name: action
+        in: query
+        required: true
+        description: 'Действие API экономики. Передаётся в query-параметре `action`.'
+        schema:
+          type: string
+          enum:
+          - create
+          - delete
+          - addMoney
+          - removeMoney
+          - withdraw
+          - transfer
+          - addMember
+          - removeMember
       requestBody:
         required: true
         content:
@@ -566,63 +693,105 @@ paths:
               properties:
                 mafiaId:
                   type: string
+                mafiaName:
+                  type: string
                 amount:
                   type: integer
-            example:
-              mafiaId: M3X8P1
-              amount: 1000
+                  description: 'Сумма в E-Coins — положительное целое число.'
+                targetUserId:
+                  type: string
+                userId:
+                  type: string
+                username:
+                  type: string
+                reason:
+                  type: string
       responses:
         '200':
-          description: Статус операции.
+          description: 'OK'
           content:
             application/json:
               example:
-                success: true
-                mafiaId: M3X8P1
-                added: 1000
-                newBalance: 55000
-              schema:
-                type: object
-                properties:
-                  success:
-                    type: boolean
-                  mafiaId:
-                    type: string
-                  added:
-                    type: integer
-                  newBalance:
-                    type: integer
-      description: Создание и удаление мафий, деньги, переводы и участники.
+                {"success": true, "mafiaId": "M3X8P1", "added": 1000, "newBalance": 55000}
+        '400':
+          description: 'Неверные или отсутствующие параметры; сумма не является положительным целым числом.'
+        '404':
+          description: 'Бизнес, мафия, игрок или товар не найден.'
+        '409':
+          description: 'Недостаточно средств или конфликт состояния.'
+        '429':
+          description: 'Превышен лимит запросов.'
+        '500':
+          description: 'Ошибка сервиса экономики или базы данных.'
   /civops/government:
     get:
       tags:
       - Экономика
       summary: 'Экономика: бюджет'
+      description: 'Действия: `balance` — баланс казны, `transfers` (`page`, `limit`) — история переводов. Параметры действия передаются в query; для POST — в JSON-теле.'
       security:
       - BearerAuth: []
+      parameters:
+      - name: action
+        in: query
+        required: true
+        description: 'Действие API экономики. Передаётся в query-параметре `action`.'
+        schema:
+          type: string
+          enum:
+          - balance
+          - transfers
+      - name: page
+        in: query
+        required: false
+        description: 'Номер страницы (с 1).'
+        schema:
+          type: integer
+      - name: limit
+        in: query
+        required: false
+        description: 'Размер страницы.'
+        schema:
+          type: integer
+      - name: fresh
+        in: query
+        required: false
+        description: 'Не использовать кэш ответа (3 секунды). Эквивалентно заголовку `X-Cache-Refresh: 1`.'
+        schema:
+          type: boolean
       responses:
         '200':
-          description: Состояние госбюджета и департаментов.
+          description: 'OK'
           content:
             application/json:
               example:
-                balance:
-                  bank: 2500000
-              schema:
-                type: object
-                properties:
-                  balance:
-                    type: object
-                    properties:
-                      bank:
-                        type: integer
-      description: Баланс бюджета и переводы правительства.
+                {"balance": {"bank": 2500000}}
+        '400':
+          description: 'Неверные или отсутствующие параметры; сумма не является положительным целым числом.'
+        '409':
+          description: 'Недостаточно средств или конфликт состояния.'
+        '429':
+          description: 'Превышен лимит запросов.'
+        '500':
+          description: 'Ошибка сервиса экономики или базы данных.'
     post:
       tags:
       - Экономика
       summary: 'Экономика: действия с бюджетом'
+      description: '`amount` — положительное целое. `removeMoney` возвращает 409 при нехватке средств. `withdraw` требует `amount`, `toType` (`user`, `business`, `mafia`), `toId`, `authorId` и необязательный `reason`. Действия: `addMoney`, `removeMoney`, `withdraw`. Параметры действия передаются в query; для POST — в JSON-теле.'
       security:
       - BearerAuth: []
+      parameters:
+      - name: action
+        in: query
+        required: true
+        description: 'Действие API экономики. Передаётся в query-параметре `action`.'
+        schema:
+          type: string
+          enum:
+          - addMoney
+          - removeMoney
+          - withdraw
       requestBody:
         required: true
         content:
@@ -632,85 +801,94 @@ paths:
               properties:
                 amount:
                   type: integer
-            example:
-              amount: 10000
+                  description: 'Сумма в E-Coins — положительное целое число.'
+                toType:
+                  type: string
+                toId:
+                  type: string
+                authorId:
+                  type: string
+                reason:
+                  type: string
       responses:
         '200':
-          description: Параметры обновлены.
+          description: 'OK'
           content:
             application/json:
               example:
-                success: true
-                added: 10000
-                newBalance: 2510000
-              schema:
-                type: object
-                properties:
-                  success:
-                    type: boolean
-                  added:
-                    type: integer
-                  newBalance:
-                    type: integer
-      description: Пополнение и списание бюджета, переводы игроку, бизнесу или мафии.
+                {"success": true, "added": 10000, "newBalance": 2510000}
+        '400':
+          description: 'Неверные или отсутствующие параметры; сумма не является положительным целым числом.'
+        '409':
+          description: 'Недостаточно средств или конфликт состояния.'
+        '429':
+          description: 'Превышен лимит запросов.'
+        '500':
+          description: 'Ошибка сервиса экономики или базы данных.'
   /civops/store:
     get:
       tags:
       - Экономика
       summary: 'Экономика: магазин'
+      description: 'Действия: `list` — каталог товаров, `info` (`itemName`) — карточка товара. Параметры действия передаются в query; для POST — в JSON-теле.'
       security:
       - BearerAuth: []
+      parameters:
+      - name: action
+        in: query
+        required: true
+        description: 'Действие API экономики. Передаётся в query-параметре `action`.'
+        schema:
+          type: string
+          enum:
+          - list
+          - info
+      - name: itemName
+        in: query
+        required: false
+        description: 'Название товара.'
+        schema:
+          type: string
+      - name: fresh
+        in: query
+        required: false
+        description: 'Не использовать кэш ответа (3 секунды). Эквивалентно заголовку `X-Cache-Refresh: 1`.'
+        schema:
+          type: boolean
       responses:
         '200':
-          description: Каталог товаров магазина.
+          description: 'OK'
           content:
             application/json:
               example:
-                count: 1
-                items:
-                - name: Аптечка
-                  description: Восстанавливает здоровье
-                  price_buy: 250
-                  price_sell: 100
-                  quantity: null
-                  can_use: true
-                  can_sell: true
-                  createdAt: 1792083600
-              schema:
-                type: object
-                properties:
-                  count:
-                    type: integer
-                  items:
-                    type: array
-                    items:
-                      type: object
-                      properties:
-                        name:
-                          type: string
-                        description:
-                          type: string
-                        price_buy:
-                          type: integer
-                        price_sell:
-                          type: integer
-                        quantity:
-                          type:
-                          - string
-                          - 'null'
-                        can_use:
-                          type: boolean
-                        can_sell:
-                          type: boolean
-                        createdAt:
-                          type: integer
-      description: Товары игрового магазина.
+                {"count": 1, "items": [{"name": "Аптечка", "price_buy": 250, "price_sell": 100}]}
+        '400':
+          description: 'Неверные или отсутствующие параметры; сумма не является положительным целым числом.'
+        '404':
+          description: 'Бизнес, мафия, игрок или товар не найден.'
+        '429':
+          description: 'Превышен лимит запросов.'
+        '500':
+          description: 'Ошибка сервиса экономики или базы данных.'
     post:
       tags:
       - Экономика
       summary: 'Экономика: действия с магазином'
+      description: 'Действия: `addItem` (`item`), `removeItem` (`itemName`), `buy` (`userId`, `itemName`), `sellToStore` (`userId`, `itemName`). Ошибка 404 — товар не найден; 400 — товар нельзя продать. Параметры действия передаются в query; для POST — в JSON-теле.'
       security:
       - BearerAuth: []
+      parameters:
+      - name: action
+        in: query
+        required: true
+        description: 'Действие API экономики. Передаётся в query-параметре `action`.'
+        schema:
+          type: string
+          enum:
+          - addItem
+          - removeItem
+          - buy
+          - sellToStore
       requestBody:
         required: true
         content:
@@ -718,91 +896,91 @@ paths:
             schema:
               type: object
               properties:
-                userId:
-                  type: string
+                item:
+                  type: object
                 itemName:
                   type: string
-                quantity:
-                  type: integer
-            example:
-              userId: '123456789012345678'
-              itemName: Аптечка
-              quantity: 2
+                userId:
+                  type: string
       responses:
         '200':
-          description: Результат транзакции.
+          description: 'OK'
           content:
             application/json:
               example:
-                success: true
-                userId: '123456789012345678'
-                item: Аптечка
-                quantity: 2
-                totalPrice: 500
-              schema:
-                type: object
-                properties:
-                  success:
-                    type: boolean
-                  userId:
-                    type: string
-                  item:
-                    type: string
-                  quantity:
-                    type: integer
-                  totalPrice:
-                    type: integer
-      description: Добавление и удаление товаров, покупка и продажа магазину.
+                {"success": true, "userId": "123456789012345678", "itemName": "Аптечка"}
+        '400':
+          description: 'Неверные или отсутствующие параметры; сумма не является положительным целым числом.'
+        '404':
+          description: 'Бизнес, мафия, игрок или товар не найден.'
+        '429':
+          description: 'Превышен лимит запросов.'
+        '500':
+          description: 'Ошибка сервиса экономики или базы данных.'
   /civops/ads:
     get:
       tags:
       - Экономика
-      summary: 'Экономика: объявления'
+      summary: 'Экономика: реклама бизнесов'
+      description: 'Действие: `list` (`page`, `limit`) — рекламные заявки бизнесов. Параметры действия передаются в query; для POST — в JSON-теле.'
       security:
       - BearerAuth: []
+      parameters:
+      - name: action
+        in: query
+        required: true
+        description: 'Действие API экономики. Передаётся в query-параметре `action`.'
+        schema:
+          type: string
+          enum:
+          - list
+      - name: page
+        in: query
+        required: false
+        description: 'Номер страницы (с 1).'
+        schema:
+          type: integer
+      - name: limit
+        in: query
+        required: false
+        description: 'Размер страницы.'
+        schema:
+          type: integer
+      - name: fresh
+        in: query
+        required: false
+        description: 'Не использовать кэш ответа (3 секунды). Эквивалентно заголовку `X-Cache-Refresh: 1`.'
+        schema:
+          type: boolean
       responses:
         '200':
-          description: Активные рекламные кампании.
+          description: 'OK'
           content:
             application/json:
               example:
-                count: 1
-                ads:
-                - id: 5
-                  user_id: '123456789012345678'
-                  username: player
-                  business_name: Кафе «Арбат»
-                  address: ул. Арбат, 10
-                  created_at: 1792083600
-              schema:
-                type: object
-                properties:
-                  count:
-                    type: integer
-                  ads:
-                    type: array
-                    items:
-                      type: object
-                      properties:
-                        id:
-                          type: integer
-                        user_id:
-                          type: string
-                        username:
-                          type: string
-                        business_name:
-                          type: string
-                        address:
-                          type: string
-                        created_at:
-                          type: integer
-      description: Заявки на игровую рекламу (`action=list`).
+                {"page": 1, "total": 0, "ads": []}
+        '400':
+          description: 'Неверные или отсутствующие параметры; сумма не является положительным целым числом.'
+        '429':
+          description: 'Превышен лимит запросов.'
+        '500':
+          description: 'Ошибка сервиса экономики или базы данных.'
     post:
       tags:
       - Экономика
-      summary: 'Экономика: подача объявления'
+      summary: 'Экономика: действия с рекламой'
+      description: 'Действие: `create` — заявка на рекламу бизнеса. Параметры действия передаются в query; для POST — в JSON-теле.'
       security:
       - BearerAuth: []
+      parameters:
+      - name: action
+        in: query
+        required: true
+        description: 'Действие API экономики. Передаётся в query-параметре `action`.'
+        schema:
+          type: string
+          enum:
+          - create
       requestBody:
         required: true
         content:
@@ -810,126 +988,92 @@ paths:
             schema:
               type: object
               properties:
-                userId:
-                  type: string
-                username:
+                businessId:
                   type: string
                 businessName:
                   type: string
-                address:
+                title:
                   type: string
-            example:
-              userId: '123456789012345678'
-              username: player
-              businessName: Кафе «Арбат»
-              address: ул. Арбат, 10
+                description:
+                  type: string
+                amount:
+                  type: integer
+                  description: 'Сумма в E-Coins — положительное целое число.'
       responses:
         '200':
-          description: Объявление размещено.
+          description: 'OK'
           content:
             application/json:
               example:
-                success: true
-                userId: '123456789012345678'
-                businessName: Кафе «Арбат»
-                address: ул. Арбат, 10
-                adSent: true
-              schema:
-                type: object
-                properties:
-                  success:
-                    type: boolean
-                  userId:
-                    type: string
-                  businessName:
-                    type: string
-                  address:
-                    type: string
-                  adSent:
-                    type: boolean
-      description: Создаёт заявку на игровую рекламу (`action=create`).
+                {"success": true}
+        '400':
+          description: 'Неверные или отсутствующие параметры; сумма не является положительным целым числом.'
+        '429':
+          description: 'Превышен лимит запросов.'
+        '500':
+          description: 'Ошибка сервиса экономики или базы данных.'
   /civops/system:
     get:
       tags:
       - Экономика
-      summary: 'Экономика: сводка'
+      summary: 'Экономика: состояние сервиса'
+      description: 'Только чтение. Действия: `stats`, `uptime`, `dbStatus`. Параметры действия передаются в query; для POST — в JSON-теле.'
       security:
       - BearerAuth: []
+      parameters:
+      - name: action
+        in: query
+        required: true
+        description: 'Действие API экономики. Передаётся в query-параметре `action`.'
+        schema:
+          type: string
+          enum:
+          - stats
+          - uptime
+          - dbStatus
+      - name: fresh
+        in: query
+        required: false
+        description: 'Не использовать кэш ответа (3 секунды). Эквивалентно заголовку `X-Cache-Refresh: 1`.'
+        schema:
+          type: boolean
       responses:
         '200':
-          description: Версия и конфигурация экономики.
+          description: 'OK'
           content:
             application/json:
               example:
-                users: 5120
-                businesses: 34
-                mafias: 6
-                governmentBalance: 2500000
-                uptime: 86400.5
-                memory:
-                  rss: 152043520
-                  heapTotal: 98304000
-                  heapUsed: 71303168
-                  external: 2097152
-                timestamp: '2026-10-21T12:00:00.000Z'
-              schema:
-                type: object
-                properties:
-                  users:
-                    type: integer
-                  businesses:
-                    type: integer
-                  mafias:
-                    type: integer
-                  governmentBalance:
-                    type: integer
-                  uptime:
-                    type: number
-                  memory:
-                    type: object
-                    properties:
-                      rss:
-                        type: integer
-                      heapTotal:
-                        type: integer
-                      heapUsed:
-                        type: integer
-                      external:
-                        type: integer
-                  timestamp:
-                    type: string
-                    format: date-time
-      description: Общая статистика экономики и время работы сервиса.
+                {"status": "ok"}
+        '429':
+          description: 'Превышен лимит запросов.'
+        '500':
+          description: 'Ошибка сервиса экономики или базы данных.'
   /civops/health:
     get:
       tags:
       - Экономика
-      summary: 'Экономика: состояние'
+      summary: 'Экономика: проверка доступности'
+      description: 'Проверка доступности сервиса экономики. Доступна любому ключу с правом чтения экономики. Параметры действия передаются в query; для POST — в JSON-теле.'
       security:
       - BearerAuth: []
+      parameters:
+      - name: fresh
+        in: query
+        required: false
+        description: 'Не использовать кэш ответа (3 секунды). Эквивалентно заголовку `X-Cache-Refresh: 1`.'
+        schema:
+          type: boolean
       responses:
         '200':
-          description: Сервис экономики активен.
+          description: 'OK'
           content:
             application/json:
               example:
-                status: ok
-                service: Economy API
-                timestamp: '2026-10-21T12:00:00.000Z'
-                uptime: 86400.5
-              schema:
-                type: object
-                properties:
-                  status:
-                    type: string
-                  service:
-                    type: string
-                  timestamp:
-                    type: string
-                    format: date-time
-                  uptime:
-                    type: number
-      description: Работает ли модуль экономики. Ключ не нужен.
+                {"status": "ok", "service": "Economy API"}
+        '429':
+          description: 'Превышен лимит запросов.'
+        '500':
+          description: 'Ошибка сервиса экономики или базы данных.'
   /stats:
     get:
       tags:
@@ -8496,13 +8640,329 @@ paths:
                 createdAt: '2026-10-15T19:00:00Z'
                 expiresAt: null
         '401':
-          description: Сессия владельца обязательна. Истечение проверяется при каждом чтении, независимо от фоновой очистки. Браузерный синтез без аудиофайла не архивируется.
+          description: 'Требуется действующая сессия владельца файла.'
         '404':
-          description: Сессия владельца обязательна. Истечение проверяется при каждом чтении, независимо от фоновой очистки. Браузерный синтез без аудиофайла не архивируется.
+          description: 'Файл не найден или недоступен этому пользователю.'
         '429':
-          description: Сессия владельца обязательна. Истечение проверяется при каждом чтении, независимо от фоновой очистки. Браузерный синтез без аудиофайла не архивируется.
+          description: 'Превышен лимит запросов авторизации.'
         '503':
-          description: Сессия владельца обязательна. Истечение проверяется при каждом чтении, независимо от фоновой очистки. Браузерный синтез без аудиофайла не архивируется.
+          description: 'Сервис CDN временно недоступен.'
+  /ads/analytics:
+    get:
+      tags:
+      - Рекламные кампании V3
+      summary: 'Реклама: аналитика'
+      description: 'Агрегированная статистика показов и кликов владельца сессии. Период `24h`, `7d` (по умолчанию) или `30d`; `campaignId` сужает выборку до одной кампании.'
+      security:
+      - CookieAuth: []
+      parameters:
+      - name: period
+        in: query
+        required: false
+        description: 'Период аналитики.'
+        schema:
+          type: string
+          enum:
+          - 24h
+          - 7d
+          - 30d
+      - name: campaignId
+        in: query
+        required: false
+        description: 'ID кампании.'
+        schema:
+          type: string
+      responses:
+        '200':
+          description: 'Аналитика показов и кликов.'
+          content:
+            application/json:
+              example:
+                {"from":"2026-11-07T00:00:00Z","to":"2026-11-14T00:00:00Z","interval":"day","totals":{"impressions":1200,"clicks":34},"series":[],"campaigns":[],"placements":[]}
+        '400':
+          description: 'Неверные или отсутствующие параметры.'
+        '401':
+          description: 'Требуется действующая сессия пользователя.'
+        '429':
+          description: 'Слишком много попыток подтверждения; повторите через 5 минут.'
+  /ads/channel-products:
+    get:
+      tags:
+      - Рекламные кампании V3
+      summary: 'Реклама: размещения в Discord'
+      description: 'Каталог рекламных размещений в Discord, доступных для оплаты. Цены и каналы настраиваются администратором; ответ не кэшируется.'
+      responses:
+        '200':
+          description: 'Каталог размещений.'
+          content:
+            application/json:
+              example:
+                {"products":{}}
+        '503':
+          description: 'Сервис размещения или каталог временно недоступны.'
+  /ads/channel-orders/{code}:
+    get:
+      tags:
+      - Рекламные кампании V3
+      summary: 'Реклама: состояние заказа'
+      description: 'Состояние заказа на размещение в Discord: `pending`, `paid`, `sent`, `failed` или `expired`.'
+      security:
+      - CookieAuth: []
+      parameters:
+      - name: code
+        in: path
+        required: true
+        description: 'Код заказа.'
+        schema:
+          type: string
+      responses:
+        '200':
+          description: 'Состояние заказа.'
+          content:
+            application/json:
+              example:
+                {"state":"pending"}
+        '401':
+          description: 'Требуется действующая сессия пользователя.'
+        '404':
+          description: 'Заказ, покупка или промокод не найден.'
+  /ads/channel-orders/{code}/redeem:
+    post:
+      tags:
+      - Рекламные кампании V3
+      summary: 'Реклама: подтвердить оплату'
+      description: 'Подтверждение оплаты заказа кодом FunPay. Код заказа и код оплаты должны совпадать; после успешной проверки публикация сразу отправляется в Discord.'
+      security:
+      - CookieAuth: []
+      parameters:
+      - name: code
+        in: path
+        required: true
+        description: 'Код заказа.'
+        schema:
+          type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - paidCode
+              properties:
+                paidCode:
+                  type: string
+                  description: 'Код оплаты FunPay.'
+            example:
+              paidCode: FP-123456
+      responses:
+        '200':
+          description: 'Оплата подтверждена, публикация отправлена.'
+          content:
+            application/json:
+              example:
+                {"success":true}
+        '400':
+          description: 'Неверные или отсутствующие параметры.'
+        '401':
+          description: 'Требуется действующая сессия пользователя.'
+        '409':
+          description: 'Заказ уже использован, не оплачен или не совпадает с кодом оплаты.'
+        '429':
+          description: 'Слишком много попыток подтверждения; повторите через 5 минут.'
+        '503':
+          description: 'Сервис размещения или каталог временно недоступны.'
+  /ads/campaigns/{id}/channel-order:
+    post:
+      tags:
+      - Рекламные кампании V3
+      summary: 'Реклама: заказ размещения'
+      description: 'Создаёт заказ на Discord-размещение для одобренной кампании и выбранного продукта. Возвращает код заказа и ссылку на оплату FunPay.'
+      security:
+      - CookieAuth: []
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: 'ID кампании.'
+        schema:
+          type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - productId
+              properties:
+                productId:
+                  type: string
+                  description: 'ID продукта размещения.'
+            example:
+              productId: top-24h
+      responses:
+        '201':
+          description: 'Заказ создан.'
+          content:
+            application/json:
+              example:
+                {"code":"AD-7K2Q","productId":"top-24h","productName":"Top 24h","funpayUrl":"https://funpay.com/lots/offer?id=000","price":199,"quantity":1}
+        '400':
+          description: 'Неверные или отсутствующие параметры.'
+        '401':
+          description: 'Требуется действующая сессия пользователя.'
+        '503':
+          description: 'Сервис размещения или каталог временно недоступны.'
+  /subscriptions/purchases:
+    get:
+      tags:
+      - API Подписок
+      summary: 'Подписки: история покупок'
+      description: 'История покупок текущего пользователя. Ключ с правом `subscription.read` или мастер-ключ обязаны передать `discordId`; сессия видит только свои покупки.'
+      security:
+      - CookieAuth: []
+      - BearerAuth: []
+      parameters:
+      - name: discordId
+        in: query
+        required: false
+        description: 'Discord ID покупателя.'
+        schema:
+          type: string
+      - name: page
+        in: query
+        required: false
+        description: 'Номер страницы (с 1).'
+        schema:
+          type: integer
+      - name: limit
+        in: query
+        required: false
+        description: 'Размер страницы (1–100, по умолчанию 20).'
+        schema:
+          type: integer
+      - name: type
+        in: query
+        required: false
+        description: 'Тип покупки: `subscription`, `benefit`, `booster` или `coins`.'
+        schema:
+          type: string
+      - name: status
+        in: query
+        required: false
+        description: 'Статус: `pending`, `completed`, `refunded` или `failed`.'
+        schema:
+          type: string
+      - name: from
+        in: query
+        required: false
+        description: 'Начало периода, `YYYY-MM-DD`.'
+        schema:
+          type: string
+      - name: to
+        in: query
+        required: false
+        description: 'Конец периода включительно, `YYYY-MM-DD`.'
+        schema:
+          type: string
+      - name: search
+        in: query
+        required: false
+        description: 'Поиск по названию или ID товара (до 64 символов).'
+        schema:
+          type: string
+      responses:
+        '200':
+          description: 'Список покупок с пагинацией.'
+          content:
+            application/json:
+              example:
+                {"success":true,"purchases":[],"pagination":{"page":1,"limit":20,"total":0,"totalPages":0,"hasMore":false}}
+        '400':
+          description: 'Неверные или отсутствующие параметры.'
+        '401':
+          description: 'Требуется действующая сессия пользователя.'
+        '403':
+          description: 'Недостаточно прав или запрошен чужой пользователь.'
+  /subscriptions/purchases/{id}:
+    get:
+      tags:
+      - API Подписок
+      summary: 'Подписки: покупка'
+      description: 'Одна покупка текущего пользователя по её ID.'
+      security:
+      - CookieAuth: []
+      - BearerAuth: []
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: 'ID покупки.'
+        schema:
+          type: string
+      responses:
+        '200':
+          description: 'Покупка.'
+          content:
+            application/json:
+              example:
+                {"success":true,"purchase":{}}
+        '401':
+          description: 'Требуется действующая сессия пользователя.'
+        '404':
+          description: 'Заказ, покупка или промокод не найден.'
+  /subscriptions/promo/validate:
+    post:
+      tags:
+      - API Подписок
+      summary: 'Подписки: проверка промокода'
+      description: 'Предварительная проверка промокода. Код не резервируется: повторная проверка выполняется при оплате. `discordId` можно не передавать при наличии сессии; чужой ID доступен только мастер-ключу.'
+      security:
+      - CookieAuth: []
+      - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - code
+              - productId
+              properties:
+                code:
+                  type: string
+                  description: 'Промокод.'
+                productId:
+                  type: string
+                  description: 'ID продукта размещения.'
+                discordId:
+                  type: string
+                  description: 'Discord ID покупателя.'
+                duration:
+                  type: string
+                  description: 'Длительность подписки, по умолчанию `1month`.'
+            example:
+              code: SAVE10
+              productId: kreml
+              duration: 1month
+      responses:
+        '200':
+          description: 'Расчёт скидки.'
+          content:
+            application/json:
+              example:
+                {"success":true,"quote":{"code":"SAVE10","percent":10,"productId":"kreml","duration":"1month","originalCoins":400,"discountCoins":40,"finalCoins":360}}
+        '400':
+          description: 'Неверные или отсутствующие параметры.'
+        '401':
+          description: 'Требуется действующая сессия пользователя.'
+        '403':
+          description: 'Недостаточно прав или запрошен чужой пользователь.'
+        '404':
+          description: 'Заказ, покупка или промокод не найден.'
+
 components:
   securitySchemes:
     AIManagementKeyHeader:

@@ -54,3 +54,15 @@ El servidor envía `response.created`, luego `response.output_audio_transcript.d
 * `event_id` es opcional (hasta 128 caracteres). Si se envía, un evento repetido con el mismo `event_id` se ignora.
 * Solo una respuesta a la vez. El texto va de 1 a 12 000 caracteres; la voz, de 100 ms a 120 segundos.
 * Tras 100 intercambios o 4096 eventos, abre una conexión nueva.
+
+## Herramientas y tiempos de espera
+
+Cuando el modelo inicia una herramienta (por ejemplo, `web_search`), el servidor envía:
+
+```json
+{"type":"response.tool_call","response_id":"resp_…","name":"web_search","status":"running"}
+```
+
+El evento solo marca el inicio de la llamada: no hay evento de finalización, y `response.output_audio_transcript.delta` y `response.output_audio.delta` siguen llegando después. `end_voice_session` no se publica a propósito; el cliente sabe que la llamada termina por `response.done` con `end_session: true`.
+
+Un turno de voz con búsqueda puede durar hasta ~40 segundos. El servidor limita un turno a cinco minutos; no hay eventos keepalive. Define un plazo de cliente de al menos 120 segundos y no cierres la conexión antes, o la respuesta se cortará.

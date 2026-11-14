@@ -236,38 +236,78 @@ paths:
   /civops/economy:
     get:
       tags:
-      - Economics
+      - Economy
       summary: 'Economy: player money'
-      description: Player balance, the money leaderboard, rank and command cooldowns.
+      description: 'Player profile and reference data. Actions: `balance` (requires `userId`), `leaderboard` (`limit`), `rank` (`userId`), `holdings` (`userId`), `stocks`, `cooldowns` (`userId`). Action parameters go in the query string; for POST, in the JSON body.'
       security:
       - BearerAuth: []
+      parameters:
+      - name: action
+        in: query
+        required: true
+        description: 'Economy API action, passed in the `action` query parameter.'
+        schema:
+          type: string
+          enum:
+          - balance
+          - leaderboard
+          - rank
+          - holdings
+          - stocks
+          - cooldowns
+      - name: userId
+        in: query
+        required: false
+        description: 'Discord ID of the player.'
+        schema:
+          type: string
+      - name: limit
+        in: query
+        required: false
+        description: 'Page size.'
+        schema:
+          type: integer
+      - name: fresh
+        in: query
+        required: false
+        description: 'Bypass the 3-second response cache. Same as the `X-Cache-Refresh: 1` header.'
+        schema:
+          type: boolean
       responses:
         '200':
-          description: Economic data.
+          description: 'OK'
           content:
             application/json:
               example:
-                userId: '123456789012345678'
-                cash: 15000
-                bank: 82000
-                rank: 14
-              schema:
-                type: object
-                properties:
-                  userId:
-                    type: string
-                  cash:
-                    type: integer
-                  bank:
-                    type: integer
-                  rank:
-                    type: integer
+                {"userId": "123456789012345678", "cash": 15000, "bank": 82000, "rank": 14}
+        '400':
+          description: 'Missing or invalid parameters; the amount is not a positive integer.'
+        '429':
+          description: 'Rate limit exceeded.'
+        '500':
+          description: 'Economy service or database error.'
     post:
       tags:
-      - Economics
+      - Economy
       summary: 'Economy: money operations'
+      description: 'Money operations. `amount` is a positive integer; operations do not run when funds are insufficient. Actions: `transfer` (`fromUserId`, `toUserId`, `amount`), `deposit` and `withdraw` (`userId`, `amount`), `add` and `remove` (`userId`, `amount`, `type`: `cash` or `bank`), `reset` (`userId`), `resetCooldown` (`userId`, optional `command`). Action parameters go in the query string; for POST, in the JSON body.'
       security:
       - BearerAuth: []
+      parameters:
+      - name: action
+        in: query
+        required: true
+        description: 'Economy API action, passed in the `action` query parameter.'
+        schema:
+          type: string
+          enum:
+          - transfer
+          - deposit
+          - withdraw
+          - add
+          - remove
+          - reset
+          - resetCooldown
       requestBody:
         required: true
         content:
@@ -279,94 +319,103 @@ paths:
                   type: string
                 toUserId:
                   type: string
+                userId:
+                  type: string
                 amount:
                   type: integer
-            example:
-              fromUserId: '123456789012345678'
-              toUserId: '234567890123456789'
-              amount: 500
+                  description: 'Amount in E-Coins, a positive integer.'
+                type:
+                  type: string
+                command:
+                  type: string
       responses:
         '200':
-          description: Successful update.
+          description: 'OK'
           content:
             application/json:
               example:
-                success: true
-                fromUserId: '123456789012345678'
-                toUserId: '234567890123456789'
-                amount: 500
-                newBalance:
-                  cash: 14500
-                  bank: 82000
-              schema:
-                type: object
-                properties:
-                  success:
-                    type: boolean
-                  fromUserId:
-                    type: string
-                  toUserId:
-                    type: string
-                  amount:
-                    type: integer
-                  newBalance:
-                    type: object
-                    properties:
-                      cash:
-                        type: integer
-                      bank:
-                        type: integer
-      description: Transfers, bank, adding, removing, resetting balance and cooldowns.
+                {"success": true, "userId": "123456789012345678", "amount": 5000, "newBalance": 87000}
+        '400':
+          description: 'Missing or invalid parameters; the amount is not a positive integer.'
+        '429':
+          description: 'Rate limit exceeded.'
+        '500':
+          description: 'Economy service or database error.'
   /civops/users:
     get:
       tags:
-      - Economics
+      - Economy
       summary: 'Economy: player'
+      description: 'Inventory and transaction history. Actions: `inventory` (`userId`), `transactions` (`userId`, `page`, `limit`). Action parameters go in the query string; for POST, in the JSON body.'
       security:
       - BearerAuth: []
       parameters:
-      - name: id
+      - name: action
         in: query
+        required: true
+        description: 'Economy API action, passed in the `action` query parameter.'
         schema:
           type: string
-      - name: discord_id
+          enum:
+          - inventory
+          - transactions
+      - name: userId
         in: query
+        required: false
+        description: 'Discord ID of the player.'
         schema:
           type: string
+      - name: page
+        in: query
+        required: false
+        description: 'Page number, starting at 1.'
+        schema:
+          type: integer
+      - name: limit
+        in: query
+        required: false
+        description: 'Page size.'
+        schema:
+          type: integer
+      - name: fresh
+        in: query
+        required: false
+        description: 'Bypass the 3-second response cache. Same as the `X-Cache-Refresh: 1` header.'
+        schema:
+          type: boolean
       responses:
         '200':
-          description: Player profile data.
+          description: 'OK'
           content:
             application/json:
               example:
-                userId: '123456789012345678'
-                inventory:
-                - name: Аптечка
-                  amount: 2
-                  description: Восстанавливает здоровье
-              schema:
-                type: object
-                properties:
-                  userId:
-                    type: string
-                  inventory:
-                    type: array
-                    items:
-                      type: object
-                      properties:
-                        name:
-                          type: string
-                        amount:
-                          type: integer
-                        description:
-                          type: string
-      description: A player inventory and transaction history.
+                {"userId": "123456789012345678", "inventory": [{"name": "Аптечка", "amount": 2}]}
+        '400':
+          description: 'Missing or invalid parameters; the amount is not a positive integer.'
+        '404':
+          description: 'Business, mafia, player or item not found.'
+        '429':
+          description: 'Rate limit exceeded.'
+        '500':
+          description: 'Economy service or database error.'
     post:
       tags:
-      - Economics
+      - Economy
       summary: 'Economy: player inventory'
+      description: 'Inventory management. Actions: `addItem` (`userId`, `item` with `name` and `amount`), `removeItem` (`userId`, `itemName`, `amount`), `clearInventory` (`userId`). Action parameters go in the query string; for POST, in the JSON body.'
       security:
       - BearerAuth: []
+      parameters:
+      - name: action
+        in: query
+        required: true
+        description: 'Economy API action, passed in the `action` query parameter.'
+        schema:
+          type: string
+          enum:
+          - addItem
+          - removeItem
+          - clearInventory
       requestBody:
         required: true
         content:
@@ -378,100 +427,129 @@ paths:
                   type: string
                 item:
                   type: object
-                  properties:
-                    name:
-                      type: string
-                    amount:
-                      type: integer
-            example:
-              userId: '123456789012345678'
-              item:
-                name: Аптечка
-                amount: 1
+                itemName:
+                  type: string
+                amount:
+                  type: integer
+                  description: 'Amount in E-Coins, a positive integer.'
       responses:
         '200':
-          description: Profile updated.
+          description: 'OK'
           content:
             application/json:
               example:
-                success: true
-                userId: '123456789012345678'
-                item: Аптечка
-                amount: 1
-              schema:
-                type: object
-                properties:
-                  success:
-                    type: boolean
-                  userId:
-                    type: string
-                  item:
-                    type: string
-                  amount:
-                    type: integer
-      description: Adding and removing items, clearing the inventory.
+                {"success": true, "userId": "123456789012345678"}
+        '400':
+          description: 'Missing or invalid parameters; the amount is not a positive integer.'
+        '404':
+          description: 'Business, mafia, player or item not found.'
+        '429':
+          description: 'Rate limit exceeded.'
+        '500':
+          description: 'Economy service or database error.'
   /civops/businesses:
     get:
       tags:
-      - Economics
+      - Economy
       summary: 'Economy: businesses'
+      description: 'Actions: `list` (`page`, `limit`), `info` (`businessId` or `businessName`), `balance`, `employees`, `store` (`businessName`), `transfers`, `logs` (`businessId`, `page`, `limit`), `rating`, `pending`. Action parameters go in the query string; for POST, in the JSON body.'
       security:
       - BearerAuth: []
+      parameters:
+      - name: action
+        in: query
+        required: true
+        description: 'Economy API action, passed in the `action` query parameter.'
+        schema:
+          type: string
+          enum:
+          - list
+          - info
+          - balance
+          - employees
+          - store
+          - transfers
+          - logs
+          - rating
+          - pending
+      - name: businessId
+        in: query
+        required: false
+        description: 'Business ID.'
+        schema:
+          type: string
+      - name: businessName
+        in: query
+        required: false
+        description: 'Business name.'
+        schema:
+          type: string
+      - name: page
+        in: query
+        required: false
+        description: 'Page number, starting at 1.'
+        schema:
+          type: integer
+      - name: limit
+        in: query
+        required: false
+        description: 'Page size.'
+        schema:
+          type: integer
+      - name: fresh
+        in: query
+        required: false
+        description: 'Bypass the 3-second response cache. Same as the `X-Cache-Refresh: 1` header.'
+        schema:
+          type: boolean
       responses:
         '200':
-          description: List of registered enterprises.
+          description: 'OK'
           content:
             application/json:
               example:
-                page: 1
-                total: 1
-                businesses:
-                - id: B7K2Q9XZ
-                  name: Кафе «Арбат»
-                  form: ООО
-                  status: active
-                  owner_id: '123456789012345678'
-                  owner_name: player
-                  address: ул. Арбат, 10
-                  bank: 120000
-                  created_at: 1792083600
-              schema:
-                type: object
-                properties:
-                  page:
-                    type: integer
-                  total:
-                    type: integer
-                  businesses:
-                    type: array
-                    items:
-                      type: object
-                      properties:
-                        id:
-                          type: string
-                        name:
-                          type: string
-                        form:
-                          type: string
-                        status:
-                          type: string
-                        owner_id:
-                          type: string
-                        owner_name:
-                          type: string
-                        address:
-                          type: string
-                        bank:
-                          type: integer
-                        created_at:
-                          type: integer
-      description: 'Businesses: list, details, balance, employees, items, transfers, rating and requests.'
+                {"page": 1, "total": 1, "businesses": [{"id": "B7K2Q9XZ", "name": "Кафе «Арбат»", "bank": 120000}]}
+        '400':
+          description: 'Missing or invalid parameters; the amount is not a positive integer.'
+        '404':
+          description: 'Business, mafia, player or item not found.'
+        '409':
+          description: 'Insufficient funds or a state conflict.'
+        '429':
+          description: 'Rate limit exceeded.'
+        '500':
+          description: 'Economy service or database error.'
     post:
       tags:
-      - Economics
+      - Economy
       summary: 'Economy: business actions'
+      description: 'Money actions require a positive integer `amount`. `addMoney` returns 404 for an unknown business; `removeMoney` and `withdraw` return 409 when funds are insufficient. Actions: `request`, `approve`, `create`, `update`, `delete`, `addMoney`/`removeMoney`/`withdraw` (`businessId`, `amount`), `transfer`, `addEmployee`/`removeEmployee`, `addProduct`/`removeProduct`/`buyProduct`, `returnMoney`, `cancelRequest`. Action parameters go in the query string; for POST, in the JSON body.'
       security:
       - BearerAuth: []
+      parameters:
+      - name: action
+        in: query
+        required: true
+        description: 'Economy API action, passed in the `action` query parameter.'
+        schema:
+          type: string
+          enum:
+          - request
+          - approve
+          - create
+          - update
+          - delete
+          - addMoney
+          - removeMoney
+          - withdraw
+          - transfer
+          - addEmployee
+          - removeEmployee
+          - addProduct
+          - removeProduct
+          - buyProduct
+          - returnMoney
+          - cancelRequest
       requestBody:
         required: true
         content:
@@ -481,89 +559,138 @@ paths:
               properties:
                 businessId:
                   type: string
+                businessName:
+                  type: string
+                businessData:
+                  type: object
                 amount:
                   type: integer
-            example:
-              businessId: B7K2Q9XZ
-              amount: 5000
+                  description: 'Amount in E-Coins, a positive integer.'
+                type:
+                  type: string
+                targetUserId:
+                  type: string
+                userId:
+                  type: string
+                guildId:
+                  type: string
+                item:
+                  type: object
+                itemName:
+                  type: string
+                transactionId:
+                  type: string
+                requestId:
+                  type: string
       responses:
         '200':
-          description: The operation is completed.
+          description: 'OK'
           content:
             application/json:
               example:
-                success: true
-                businessId: B7K2Q9XZ
-                added: 5000
-                newBalance: 125000
-              schema:
-                type: object
-                properties:
-                  success:
-                    type: boolean
-                  businessId:
-                    type: string
-                  added:
-                    type: integer
-                  newBalance:
-                    type: integer
-      description: Requests, creating and deleting businesses, money, employees and items.
+                {"success": true, "businessId": "B7K2Q9XZ", "added": 5000, "newBalance": 125000}
+        '400':
+          description: 'Missing or invalid parameters; the amount is not a positive integer.'
+        '404':
+          description: 'Business, mafia, player or item not found.'
+        '409':
+          description: 'Insufficient funds or a state conflict.'
+        '429':
+          description: 'Rate limit exceeded.'
+        '500':
+          description: 'Economy service or database error.'
   /civops/mafias:
     get:
       tags:
-      - Economics
+      - Economy
       summary: 'Economy: mafias'
+      description: 'Actions: `list` (`page`, `limit`), `info` (`mafiaId` or `mafiaName`), `balance`, `members`, `transfers`, `logs` (`mafiaId`, `page`, `limit`). Action parameters go in the query string; for POST, in the JSON body.'
       security:
       - BearerAuth: []
+      parameters:
+      - name: action
+        in: query
+        required: true
+        description: 'Economy API action, passed in the `action` query parameter.'
+        schema:
+          type: string
+          enum:
+          - list
+          - info
+          - balance
+          - members
+          - transfers
+          - logs
+      - name: mafiaId
+        in: query
+        required: false
+        description: 'Mafia ID.'
+        schema:
+          type: string
+      - name: mafiaName
+        in: query
+        required: false
+        description: 'Mafia name.'
+        schema:
+          type: string
+      - name: page
+        in: query
+        required: false
+        description: 'Page number, starting at 1.'
+        schema:
+          type: integer
+      - name: limit
+        in: query
+        required: false
+        description: 'Page size.'
+        schema:
+          type: integer
+      - name: fresh
+        in: query
+        required: false
+        description: 'Bypass the 3-second response cache. Same as the `X-Cache-Refresh: 1` header.'
+        schema:
+          type: boolean
       responses:
         '200':
-          description: List of mafias and groups.
+          description: 'OK'
           content:
             application/json:
               example:
-                page: 1
-                total: 1
-                mafias:
-                - id: M3X8P1
-                  name: Солнцевские
-                  leader_id: '123456789012345678'
-                  leader_name: player
-                  color: '#8B0000'
-                  bank: 54000
-                  created_at: 1792083600
-              schema:
-                type: object
-                properties:
-                  page:
-                    type: integer
-                  total:
-                    type: integer
-                  mafias:
-                    type: array
-                    items:
-                      type: object
-                      properties:
-                        id:
-                          type: string
-                        name:
-                          type: string
-                        leader_id:
-                          type: string
-                        leader_name:
-                          type: string
-                        color:
-                          type: string
-                        bank:
-                          type: integer
-                        created_at:
-                          type: integer
-      description: 'Mafias: list, details, balance, members, transfers and logs.'
+                {"page": 1, "total": 1, "mafias": [{"id": "M3X8P1", "name": "Солнцевские", "bank": 54000}]}
+        '400':
+          description: 'Missing or invalid parameters; the amount is not a positive integer.'
+        '404':
+          description: 'Business, mafia, player or item not found.'
+        '409':
+          description: 'Insufficient funds or a state conflict.'
+        '429':
+          description: 'Rate limit exceeded.'
+        '500':
+          description: 'Economy service or database error.'
     post:
       tags:
-      - Economics
+      - Economy
       summary: 'Economy: mafia actions'
+      description: 'Money actions require a positive integer `amount`. `addMoney` returns 404 for an unknown mafia; `removeMoney` and `withdraw` return 409 when funds are insufficient. Actions: `create`, `delete`, `addMoney`/`removeMoney`/`withdraw` (`mafiaId`, `amount`), `transfer`, `addMember`, `removeMember`. Action parameters go in the query string; for POST, in the JSON body.'
       security:
       - BearerAuth: []
+      parameters:
+      - name: action
+        in: query
+        required: true
+        description: 'Economy API action, passed in the `action` query parameter.'
+        schema:
+          type: string
+          enum:
+          - create
+          - delete
+          - addMoney
+          - removeMoney
+          - withdraw
+          - transfer
+          - addMember
+          - removeMember
       requestBody:
         required: true
         content:
@@ -573,370 +700,387 @@ paths:
               properties:
                 mafiaId:
                   type: string
+                mafiaName:
+                  type: string
                 amount:
                   type: integer
-            example:
-              mafiaId: M3X8P1
-              amount: 1000
-      responses:
-        '200':
-          description: Operation status.
-          content:
-            application/json:
-              example:
-                success: true
-                mafiaId: M3X8P1
-                added: 1000
-                newBalance: 55000
-              schema:
-                type: object
-                properties:
-                  success:
-                    type: boolean
-                  mafiaId:
-                    type: string
-                  added:
-                    type: integer
-                  newBalance:
-                    type: integer
-      description: Creating and deleting mafias, money, transfers and members.
-  /civops/government:
-    get:
-      tags:
-      - Economics
-      summary: 'Economy: budget'
-      security:
-      - BearerAuth: []
-      responses:
-        '200':
-          description: State of the state budget and departments.
-          content:
-            application/json:
-              example:
-                balance:
-                  bank: 2500000
-              schema:
-                type: object
-                properties:
-                  balance:
-                    type: object
-                    properties:
-                      bank:
-                        type: integer
-      description: Government budget balance and transfers.
-    post:
-      tags:
-      - Economics
-      summary: 'Economy: budget actions'
-      security:
-      - BearerAuth: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                amount:
-                  type: integer
-            example:
-              amount: 10000
-      responses:
-        '200':
-          description: Settings have been updated.
-          content:
-            application/json:
-              example:
-                success: true
-                added: 10000
-                newBalance: 2510000
-              schema:
-                type: object
-                properties:
-                  success:
-                    type: boolean
-                  added:
-                    type: integer
-                  newBalance:
-                    type: integer
-      description: Adding to and taking from the budget, transfers to a player, business or mafia.
-  /civops/store:
-    get:
-      tags:
-      - Economics
-      summary: 'Economy: store'
-      security:
-      - BearerAuth: []
-      responses:
-        '200':
-          description: Catalog of store goods.
-          content:
-            application/json:
-              example:
-                count: 1
-                items:
-                - name: Аптечка
-                  description: Восстанавливает здоровье
-                  price_buy: 250
-                  price_sell: 100
-                  quantity: null
-                  can_use: true
-                  can_sell: true
-                  createdAt: 1792083600
-              schema:
-                type: object
-                properties:
-                  count:
-                    type: integer
-                  items:
-                    type: array
-                    items:
-                      type: object
-                      properties:
-                        name:
-                          type: string
-                        description:
-                          type: string
-                        price_buy:
-                          type: integer
-                        price_sell:
-                          type: integer
-                        quantity:
-                          type:
-                          - string
-                          - 'null'
-                        can_use:
-                          type: boolean
-                        can_sell:
-                          type: boolean
-                        createdAt:
-                          type: integer
-      description: Items of the in-game store.
-    post:
-      tags:
-      - Economics
-      summary: 'Economy: store actions'
-      security:
-      - BearerAuth: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                userId:
+                  description: 'Amount in E-Coins, a positive integer.'
+                targetUserId:
                   type: string
-                itemName:
-                  type: string
-                quantity:
-                  type: integer
-            example:
-              userId: '123456789012345678'
-              itemName: Аптечка
-              quantity: 2
-      responses:
-        '200':
-          description: The result of the transaction.
-          content:
-            application/json:
-              example:
-                success: true
-                userId: '123456789012345678'
-                item: Аптечка
-                quantity: 2
-                totalPrice: 500
-              schema:
-                type: object
-                properties:
-                  success:
-                    type: boolean
-                  userId:
-                    type: string
-                  item:
-                    type: string
-                  quantity:
-                    type: integer
-                  totalPrice:
-                    type: integer
-      description: Adding and removing items, buying from and selling to the store.
-  /civops/ads:
-    get:
-      tags:
-      - Economics
-      summary: 'Economy: ads'
-      security:
-      - BearerAuth: []
-      responses:
-        '200':
-          description: Active advertising campaigns.
-          content:
-            application/json:
-              example:
-                count: 1
-                ads:
-                - id: 5
-                  user_id: '123456789012345678'
-                  username: player
-                  business_name: Кафе «Арбат»
-                  address: ул. Арбат, 10
-                  created_at: 1792083600
-              schema:
-                type: object
-                properties:
-                  count:
-                    type: integer
-                  ads:
-                    type: array
-                    items:
-                      type: object
-                      properties:
-                        id:
-                          type: integer
-                        user_id:
-                          type: string
-                        username:
-                          type: string
-                        business_name:
-                          type: string
-                        address:
-                          type: string
-                        created_at:
-                          type: integer
-      description: In-game ad requests (`action=list`).
-    post:
-      tags:
-      - Economics
-      summary: 'Economy: submit an ad'
-      security:
-      - BearerAuth: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
                 userId:
                   type: string
                 username:
                   type: string
-                businessName:
+                reason:
                   type: string
-                address:
-                  type: string
-            example:
-              userId: '123456789012345678'
-              username: player
-              businessName: Кафе «Арбат»
-              address: ул. Арбат, 10
       responses:
         '200':
-          description: The advertisement has been posted.
+          description: 'OK'
           content:
             application/json:
               example:
-                success: true
-                userId: '123456789012345678'
-                businessName: Кафе «Арбат»
-                address: ул. Арбат, 10
-                adSent: true
-              schema:
-                type: object
-                properties:
-                  success:
-                    type: boolean
-                  userId:
-                    type: string
-                  businessName:
-                    type: string
-                  address:
-                    type: string
-                  adSent:
-                    type: boolean
-      description: Creates an in-game ad request (`action=create`).
+                {"success": true, "mafiaId": "M3X8P1", "added": 1000, "newBalance": 55000}
+        '400':
+          description: 'Missing or invalid parameters; the amount is not a positive integer.'
+        '404':
+          description: 'Business, mafia, player or item not found.'
+        '409':
+          description: 'Insufficient funds or a state conflict.'
+        '429':
+          description: 'Rate limit exceeded.'
+        '500':
+          description: 'Economy service or database error.'
+  /civops/government:
+    get:
+      tags:
+      - Economy
+      summary: 'Economy: government budget'
+      description: 'Actions: `balance` for the treasury, `transfers` (`page`, `limit`) for the transfer history. Action parameters go in the query string; for POST, in the JSON body.'
+      security:
+      - BearerAuth: []
+      parameters:
+      - name: action
+        in: query
+        required: true
+        description: 'Economy API action, passed in the `action` query parameter.'
+        schema:
+          type: string
+          enum:
+          - balance
+          - transfers
+      - name: page
+        in: query
+        required: false
+        description: 'Page number, starting at 1.'
+        schema:
+          type: integer
+      - name: limit
+        in: query
+        required: false
+        description: 'Page size.'
+        schema:
+          type: integer
+      - name: fresh
+        in: query
+        required: false
+        description: 'Bypass the 3-second response cache. Same as the `X-Cache-Refresh: 1` header.'
+        schema:
+          type: boolean
+      responses:
+        '200':
+          description: 'OK'
+          content:
+            application/json:
+              example:
+                {"balance": {"bank": 2500000}}
+        '400':
+          description: 'Missing or invalid parameters; the amount is not a positive integer.'
+        '409':
+          description: 'Insufficient funds or a state conflict.'
+        '429':
+          description: 'Rate limit exceeded.'
+        '500':
+          description: 'Economy service or database error.'
+    post:
+      tags:
+      - Economy
+      summary: 'Economy: budget actions'
+      description: '`amount` is a positive integer. `removeMoney` returns 409 when funds are insufficient. `withdraw` requires `amount`, `toType` (`user`, `business`, `mafia`), `toId`, `authorId` and an optional `reason`. Actions: `addMoney`, `removeMoney`, `withdraw`. Action parameters go in the query string; for POST, in the JSON body.'
+      security:
+      - BearerAuth: []
+      parameters:
+      - name: action
+        in: query
+        required: true
+        description: 'Economy API action, passed in the `action` query parameter.'
+        schema:
+          type: string
+          enum:
+          - addMoney
+          - removeMoney
+          - withdraw
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                amount:
+                  type: integer
+                  description: 'Amount in E-Coins, a positive integer.'
+                toType:
+                  type: string
+                toId:
+                  type: string
+                authorId:
+                  type: string
+                reason:
+                  type: string
+      responses:
+        '200':
+          description: 'OK'
+          content:
+            application/json:
+              example:
+                {"success": true, "added": 10000, "newBalance": 2510000}
+        '400':
+          description: 'Missing or invalid parameters; the amount is not a positive integer.'
+        '409':
+          description: 'Insufficient funds or a state conflict.'
+        '429':
+          description: 'Rate limit exceeded.'
+        '500':
+          description: 'Economy service or database error.'
+  /civops/store:
+    get:
+      tags:
+      - Economy
+      summary: 'Economy: store'
+      description: 'Actions: `list` for the catalog, `info` (`itemName`) for one item. Action parameters go in the query string; for POST, in the JSON body.'
+      security:
+      - BearerAuth: []
+      parameters:
+      - name: action
+        in: query
+        required: true
+        description: 'Economy API action, passed in the `action` query parameter.'
+        schema:
+          type: string
+          enum:
+          - list
+          - info
+      - name: itemName
+        in: query
+        required: false
+        description: 'Item name.'
+        schema:
+          type: string
+      - name: fresh
+        in: query
+        required: false
+        description: 'Bypass the 3-second response cache. Same as the `X-Cache-Refresh: 1` header.'
+        schema:
+          type: boolean
+      responses:
+        '200':
+          description: 'OK'
+          content:
+            application/json:
+              example:
+                {"count": 1, "items": [{"name": "Аптечка", "price_buy": 250, "price_sell": 100}]}
+        '400':
+          description: 'Missing or invalid parameters; the amount is not a positive integer.'
+        '404':
+          description: 'Business, mafia, player or item not found.'
+        '429':
+          description: 'Rate limit exceeded.'
+        '500':
+          description: 'Economy service or database error.'
+    post:
+      tags:
+      - Economy
+      summary: 'Economy: store actions'
+      description: 'Actions: `addItem` (`item`), `removeItem` (`itemName`), `buy` (`userId`, `itemName`), `sellToStore` (`userId`, `itemName`). 404 means the item is missing; 400 means the item cannot be sold. Action parameters go in the query string; for POST, in the JSON body.'
+      security:
+      - BearerAuth: []
+      parameters:
+      - name: action
+        in: query
+        required: true
+        description: 'Economy API action, passed in the `action` query parameter.'
+        schema:
+          type: string
+          enum:
+          - addItem
+          - removeItem
+          - buy
+          - sellToStore
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                item:
+                  type: object
+                itemName:
+                  type: string
+                userId:
+                  type: string
+      responses:
+        '200':
+          description: 'OK'
+          content:
+            application/json:
+              example:
+                {"success": true, "userId": "123456789012345678", "itemName": "Аптечка"}
+        '400':
+          description: 'Missing or invalid parameters; the amount is not a positive integer.'
+        '404':
+          description: 'Business, mafia, player or item not found.'
+        '429':
+          description: 'Rate limit exceeded.'
+        '500':
+          description: 'Economy service or database error.'
+  /civops/ads:
+    get:
+      tags:
+      - Economy
+      summary: 'Economy: business ads'
+      description: 'Action: `list` (`page`, `limit`) for business ad requests. Action parameters go in the query string; for POST, in the JSON body.'
+      security:
+      - BearerAuth: []
+      parameters:
+      - name: action
+        in: query
+        required: true
+        description: 'Economy API action, passed in the `action` query parameter.'
+        schema:
+          type: string
+          enum:
+          - list
+      - name: page
+        in: query
+        required: false
+        description: 'Page number, starting at 1.'
+        schema:
+          type: integer
+      - name: limit
+        in: query
+        required: false
+        description: 'Page size.'
+        schema:
+          type: integer
+      - name: fresh
+        in: query
+        required: false
+        description: 'Bypass the 3-second response cache. Same as the `X-Cache-Refresh: 1` header.'
+        schema:
+          type: boolean
+      responses:
+        '200':
+          description: 'OK'
+          content:
+            application/json:
+              example:
+                {"page": 1, "total": 0, "ads": []}
+        '400':
+          description: 'Missing or invalid parameters; the amount is not a positive integer.'
+        '429':
+          description: 'Rate limit exceeded.'
+        '500':
+          description: 'Economy service or database error.'
+    post:
+      tags:
+      - Economy
+      summary: 'Economy: ad actions'
+      description: 'Action: `create` submits a business ad request. Action parameters go in the query string; for POST, in the JSON body.'
+      security:
+      - BearerAuth: []
+      parameters:
+      - name: action
+        in: query
+        required: true
+        description: 'Economy API action, passed in the `action` query parameter.'
+        schema:
+          type: string
+          enum:
+          - create
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                businessId:
+                  type: string
+                businessName:
+                  type: string
+                title:
+                  type: string
+                description:
+                  type: string
+                amount:
+                  type: integer
+                  description: 'Amount in E-Coins, a positive integer.'
+      responses:
+        '200':
+          description: 'OK'
+          content:
+            application/json:
+              example:
+                {"success": true}
+        '400':
+          description: 'Missing or invalid parameters; the amount is not a positive integer.'
+        '429':
+          description: 'Rate limit exceeded.'
+        '500':
+          description: 'Economy service or database error.'
   /civops/system:
     get:
       tags:
-      - Economics
-      summary: 'Economy: summary'
+      - Economy
+      summary: 'Economy: service status'
+      description: 'Read-only. Actions: `stats`, `uptime`, `dbStatus`. Action parameters go in the query string; for POST, in the JSON body.'
       security:
       - BearerAuth: []
+      parameters:
+      - name: action
+        in: query
+        required: true
+        description: 'Economy API action, passed in the `action` query parameter.'
+        schema:
+          type: string
+          enum:
+          - stats
+          - uptime
+          - dbStatus
+      - name: fresh
+        in: query
+        required: false
+        description: 'Bypass the 3-second response cache. Same as the `X-Cache-Refresh: 1` header.'
+        schema:
+          type: boolean
       responses:
         '200':
-          description: Economy version and configuration.
+          description: 'OK'
           content:
             application/json:
               example:
-                users: 5120
-                businesses: 34
-                mafias: 6
-                governmentBalance: 2500000
-                uptime: 86400.5
-                memory:
-                  rss: 152043520
-                  heapTotal: 98304000
-                  heapUsed: 71303168
-                  external: 2097152
-                timestamp: '2026-10-21T12:00:00.000Z'
-              schema:
-                type: object
-                properties:
-                  users:
-                    type: integer
-                  businesses:
-                    type: integer
-                  mafias:
-                    type: integer
-                  governmentBalance:
-                    type: integer
-                  uptime:
-                    type: number
-                  memory:
-                    type: object
-                    properties:
-                      rss:
-                        type: integer
-                      heapTotal:
-                        type: integer
-                      heapUsed:
-                        type: integer
-                      external:
-                        type: integer
-                  timestamp:
-                    type: string
-                    format: date-time
-      description: Overall economy statistics and service uptime.
+                {"status": "ok"}
+        '429':
+          description: 'Rate limit exceeded.'
+        '500':
+          description: 'Economy service or database error.'
   /civops/health:
     get:
       tags:
-      - Economics
-      summary: 'Economy: health'
+      - Economy
+      summary: 'Economy: health check'
+      description: 'Economy service health check. Available to any key with economy read access. Action parameters go in the query string; for POST, in the JSON body.'
       security:
       - BearerAuth: []
+      parameters:
+      - name: fresh
+        in: query
+        required: false
+        description: 'Bypass the 3-second response cache. Same as the `X-Cache-Refresh: 1` header.'
+        schema:
+          type: boolean
       responses:
         '200':
-          description: The economy service is active.
+          description: 'OK'
           content:
             application/json:
               example:
-                status: ok
-                service: Economy API
-                timestamp: '2026-10-21T12:00:00.000Z'
-                uptime: 86400.5
-              schema:
-                type: object
-                properties:
-                  status:
-                    type: string
-                  service:
-                    type: string
-                  timestamp:
-                    type: string
-                    format: date-time
-                  uptime:
-                    type: number
-      description: Whether the economy module is up. No key needed.
+                {"status": "ok", "service": "Economy API"}
+        '429':
+          description: 'Rate limit exceeded.'
+        '500':
+          description: 'Economy service or database error.'
   /stats:
     get:
       tags:
@@ -8510,13 +8654,329 @@ paths:
                 createdAt: '2026-10-15T19:00:00Z'
                 expiresAt: null
         '401':
-          description: An active owner session is required. Expiry is enforced on every read independently of cleanup. Browser-only synthesis without an audio file is not archived.
+          description: 'A valid owner session is required.'
         '404':
-          description: An active owner session is required. Expiry is enforced on every read independently of cleanup. Browser-only synthesis without an audio file is not archived.
+          description: 'The file does not exist or is not available to this user.'
         '429':
-          description: An active owner session is required. Expiry is enforced on every read independently of cleanup. Browser-only synthesis without an audio file is not archived.
+          description: 'The authorization rate limit was exceeded.'
         '503':
-          description: An active owner session is required. Expiry is enforced on every read independently of cleanup. Browser-only synthesis without an audio file is not archived.
+          description: 'The CDN service is temporarily unavailable.'
+  /ads/analytics:
+    get:
+      tags:
+      - Рекламные кампании V3
+      summary: 'Ads: analytics'
+      description: 'Aggregated impressions and clicks for the session owner. `period` is `24h`, `7d` (default) or `30d`; `campaignId` narrows the result to one campaign.'
+      security:
+      - CookieAuth: []
+      parameters:
+      - name: period
+        in: query
+        required: false
+        description: 'Analytics period.'
+        schema:
+          type: string
+          enum:
+          - 24h
+          - 7d
+          - 30d
+      - name: campaignId
+        in: query
+        required: false
+        description: 'Campaign ID.'
+        schema:
+          type: string
+      responses:
+        '200':
+          description: 'Impressions and clicks analytics.'
+          content:
+            application/json:
+              example:
+                {"from":"2026-11-07T00:00:00Z","to":"2026-11-14T00:00:00Z","interval":"day","totals":{"impressions":1200,"clicks":34},"series":[],"campaigns":[],"placements":[]}
+        '400':
+          description: 'Missing or invalid parameters.'
+        '401':
+          description: 'A valid user session is required.'
+        '429':
+          description: 'Too many confirmation attempts; retry in 5 minutes.'
+  /ads/channel-products:
+    get:
+      tags:
+      - Рекламные кампании V3
+      summary: 'Ads: Discord placements'
+      description: 'Discord ad placements available for purchase. Prices and channels are configured by an administrator; the response is not cached.'
+      responses:
+        '200':
+          description: 'Placement catalog.'
+          content:
+            application/json:
+              example:
+                {"products":{}}
+        '503':
+          description: 'The placement service or catalog is temporarily unavailable.'
+  /ads/channel-orders/{code}:
+    get:
+      tags:
+      - Рекламные кампании V3
+      summary: 'Ads: order state'
+      description: 'Discord placement order state: `pending`, `paid`, `sent`, `failed` or `expired`.'
+      security:
+      - CookieAuth: []
+      parameters:
+      - name: code
+        in: path
+        required: true
+        description: 'Order code.'
+        schema:
+          type: string
+      responses:
+        '200':
+          description: 'Order state.'
+          content:
+            application/json:
+              example:
+                {"state":"pending"}
+        '401':
+          description: 'A valid user session is required.'
+        '404':
+          description: 'Order, purchase or promo code not found.'
+  /ads/channel-orders/{code}/redeem:
+    post:
+      tags:
+      - Рекламные кампании V3
+      summary: 'Ads: confirm payment'
+      description: 'Confirms payment with a FunPay code. The order code and the paid code must match; after a successful check the publication is sent to Discord immediately.'
+      security:
+      - CookieAuth: []
+      parameters:
+      - name: code
+        in: path
+        required: true
+        description: 'Order code.'
+        schema:
+          type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - paidCode
+              properties:
+                paidCode:
+                  type: string
+                  description: 'FunPay payment code.'
+            example:
+              paidCode: FP-123456
+      responses:
+        '200':
+          description: 'Payment confirmed and the publication sent.'
+          content:
+            application/json:
+              example:
+                {"success":true}
+        '400':
+          description: 'Missing or invalid parameters.'
+        '401':
+          description: 'A valid user session is required.'
+        '409':
+          description: 'The order was already used, is unpaid, or the payment code does not match.'
+        '429':
+          description: 'Too many confirmation attempts; retry in 5 minutes.'
+        '503':
+          description: 'The placement service or catalog is temporarily unavailable.'
+  /ads/campaigns/{id}/channel-order:
+    post:
+      tags:
+      - Рекламные кампании V3
+      summary: 'Ads: placement order'
+      description: 'Creates a Discord placement order for an approved campaign and the selected product. Returns the order code and the FunPay checkout URL.'
+      security:
+      - CookieAuth: []
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: 'Campaign ID.'
+        schema:
+          type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - productId
+              properties:
+                productId:
+                  type: string
+                  description: 'Placement product ID.'
+            example:
+              productId: top-24h
+      responses:
+        '201':
+          description: 'Order created.'
+          content:
+            application/json:
+              example:
+                {"code":"AD-7K2Q","productId":"top-24h","productName":"Top 24h","funpayUrl":"https://funpay.com/lots/offer?id=000","price":199,"quantity":1}
+        '400':
+          description: 'Missing or invalid parameters.'
+        '401':
+          description: 'A valid user session is required.'
+        '503':
+          description: 'The placement service or catalog is temporarily unavailable.'
+  /subscriptions/purchases:
+    get:
+      tags:
+      - Subscriptions API
+      summary: 'Subscriptions: purchase history'
+      description: 'Purchase history of the current user. A key with `subscription.read` or the master key must pass `discordId`; a session only sees its own purchases.'
+      security:
+      - CookieAuth: []
+      - BearerAuth: []
+      parameters:
+      - name: discordId
+        in: query
+        required: false
+        description: 'Discord ID of the buyer.'
+        schema:
+          type: string
+      - name: page
+        in: query
+        required: false
+        description: 'Page number, starting at 1.'
+        schema:
+          type: integer
+      - name: limit
+        in: query
+        required: false
+        description: 'Page size (1–100, default 20).'
+        schema:
+          type: integer
+      - name: type
+        in: query
+        required: false
+        description: 'Purchase type: `subscription`, `benefit`, `booster` or `coins`.'
+        schema:
+          type: string
+      - name: status
+        in: query
+        required: false
+        description: 'Status: `pending`, `completed`, `refunded` or `failed`.'
+        schema:
+          type: string
+      - name: from
+        in: query
+        required: false
+        description: 'Start date, `YYYY-MM-DD`.'
+        schema:
+          type: string
+      - name: to
+        in: query
+        required: false
+        description: 'End date, inclusive, `YYYY-MM-DD`.'
+        schema:
+          type: string
+      - name: search
+        in: query
+        required: false
+        description: 'Search by item name or ID (up to 64 characters).'
+        schema:
+          type: string
+      responses:
+        '200':
+          description: 'Paginated purchase list.'
+          content:
+            application/json:
+              example:
+                {"success":true,"purchases":[],"pagination":{"page":1,"limit":20,"total":0,"totalPages":0,"hasMore":false}}
+        '400':
+          description: 'Missing or invalid parameters.'
+        '401':
+          description: 'A valid user session is required.'
+        '403':
+          description: 'Insufficient permissions or another user was requested.'
+  /subscriptions/purchases/{id}:
+    get:
+      tags:
+      - Subscriptions API
+      summary: 'Subscriptions: purchase'
+      description: 'One purchase of the current user by ID.'
+      security:
+      - CookieAuth: []
+      - BearerAuth: []
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: 'Purchase ID.'
+        schema:
+          type: string
+      responses:
+        '200':
+          description: 'Purchase.'
+          content:
+            application/json:
+              example:
+                {"success":true,"purchase":{}}
+        '401':
+          description: 'A valid user session is required.'
+        '404':
+          description: 'Order, purchase or promo code not found.'
+  /subscriptions/promo/validate:
+    post:
+      tags:
+      - Subscriptions API
+      summary: 'Subscriptions: promo code preview'
+      description: 'Previews a promo code. The code is not reserved; checks run again at payment. `discordId` may be omitted with a session; another user''s ID is available only to the master key.'
+      security:
+      - CookieAuth: []
+      - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - code
+              - productId
+              properties:
+                code:
+                  type: string
+                  description: 'Promo code.'
+                productId:
+                  type: string
+                  description: 'Placement product ID.'
+                discordId:
+                  type: string
+                  description: 'Discord ID of the buyer.'
+                duration:
+                  type: string
+                  description: 'Subscription duration, `1month` by default.'
+            example:
+              code: SAVE10
+              productId: kreml
+              duration: 1month
+      responses:
+        '200':
+          description: 'Discount quote.'
+          content:
+            application/json:
+              example:
+                {"success":true,"quote":{"code":"SAVE10","percent":10,"productId":"kreml","duration":"1month","originalCoins":400,"discountCoins":40,"finalCoins":360}}
+        '400':
+          description: 'Missing or invalid parameters.'
+        '401':
+          description: 'A valid user session is required.'
+        '403':
+          description: 'Insufficient permissions or another user was requested.'
+        '404':
+          description: 'Order, purchase or promo code not found.'
+
 components:
   securitySchemes:
     AIManagementKeyHeader:

@@ -1,0 +1,20 @@
+---
+title: "Changelog"
+description: "What changed in the API and the documentation."
+icon: "clock-rotate-left"
+---
+
+## November 2026
+
+* **Realtime**: added the `response.tool_call` event (`name`, `status: running`). Call completion arrives in `response.done` with `end_session: true`; `end_voice_session` is not published. A voice turn with search takes up to ~40 seconds, the server turn limit is 5 minutes, there are no keepalive events, and the client deadline should be at least 120 seconds.
+* **Economy**: documented the `action` parameter for every CivOps module, request parameters and `400`/`404`/`409` errors. Amounts in business, mafia and budget operations must be positive integers; insufficient funds return `409`.
+* **Teams**: soft delete with a 30-day restore window service methods.
+* **User assets**: private `user-assets` are served through signed URLs; the owner session is checked on every read.
+* **CDN**: image metadata stripping on upload, edge access analytics and custom domain status updates.
+* **Ads**: separate impression and click accounting, multi-slot campaigns and Discord placements paid with FunPay codes.
+* **Subscriptions**: purchase history, discount promo codes and a discount preview.
+
+## October 2026
+
+* **API V3**: unified `/v3/keys` keys, team binding for CDN and short links.
+* **Short links**: system domains moved to `erlc.click`, per-team analytics.

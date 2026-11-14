@@ -1,0 +1,20 @@
+---
+title: "Cronologia"
+description: "Cosa è cambiato nell'API e nella documentazione."
+icon: "clock-rotate-left"
+---
+
+## Novembre 2026
+
+* **Realtime**: aggiunto l'evento `response.tool_call` (`name`, `status: running`). La fine della chiamata arriva in `response.done` con `end_session: true`; `end_voice_session` non viene pubblicato. Un turno vocale con ricerca dura fino a ~40 secondi, il limite del server è di 5 minuti, non ci sono keepalive e la scadenza client deve essere di almeno 120 secondi.
+* **Economia**: documentato il parametro `action` per tutti i moduli CivOps, i parametri di richiesta e gli errori `400`/`404`/`409`. Gli importi nelle operazioni su attività, mafie e bilancio devono essere interi positivi; i fondi insufficienti restituiscono `409`.
+* **Team**: eliminazione logica con ripristino entro 30 giorni e metodi di servizio.
+* **File personali**: i `user-assets` privati vengono serviti con URL firmati; la sessione del proprietario viene verificata a ogni lettura.
+* **CDN**: rimozione dei metadati delle immagini al caricamento, analisi degli accessi edge e aggiornamento dello stato dei domini personalizzati.
+* **Pubblicità**: conteggio separato di impression e clic, campagne multi-slot e posizionamenti su Discord pagati con codici FunPay.
+* **Abbonamenti**: cronologia acquisti, codici promozionali sconto e anteprima dello sconto.
+
+## Ottobre 2026
+
+* **API V3**: chiavi unificate `/v3/keys`, associazione del team per CDN e link brevi.
+* **Link brevi**: domini di sistema migrati a `erlc.click`, analisi per team.

@@ -54,3 +54,15 @@ The server sends `response.created`, then `response.output_audio_transcript.delt
 * `event_id` is optional (up to 128 characters). When sent, a repeated event with the same `event_id` is ignored.
 * One response at a time. A text request is 1 to 12,000 characters; voice is 100 ms to 120 seconds.
 * After 100 exchanges or 4096 events, open a new connection.
+
+## Tools and timeouts
+
+When the model starts a tool (for example, `web_search`), the server sends:
+
+```json
+{"type":"response.tool_call","response_id":"resp_…","name":"web_search","status":"running"}
+```
+
+The event only marks the start of the call: there is no completion event, and `response.output_audio_transcript.delta` and `response.output_audio.delta` keep arriving afterwards. `end_voice_session` is intentionally not published; the client learns that the call is ending from `response.done` with `end_session: true`.
+
+A voice turn with a search can take up to ~40 seconds. The server caps one turn at five minutes; there are no keepalive events. Set a client deadline of at least 120 seconds and do not close the connection earlier, or the answer will be cut off.

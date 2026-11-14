@@ -235,38 +235,78 @@ paths:
   /civops/economy:
     get:
       tags:
-      - economía
+      - Economía
       summary: 'Economía: dinero de jugadores'
-      description: Saldo del jugador, ranking, posición y tiempos de espera de comandos.
+      description: 'Perfil del jugador y datos de referencia. Acciones: `balance` (requiere `userId`), `leaderboard` (`limit`), `rank` (`userId`), `holdings` (`userId`), `stocks`, `cooldowns` (`userId`). Los parámetros de la acción van en la query; para POST, en el cuerpo JSON.'
       security:
       - BearerAuth: []
+      parameters:
+      - name: action
+        in: query
+        required: true
+        description: 'Acción de la API de economía, se pasa en el parámetro `action` de la query.'
+        schema:
+          type: string
+          enum:
+          - balance
+          - leaderboard
+          - rank
+          - holdings
+          - stocks
+          - cooldowns
+      - name: userId
+        in: query
+        required: false
+        description: 'Discord ID del jugador.'
+        schema:
+          type: string
+      - name: limit
+        in: query
+        required: false
+        description: 'Tamaño de página.'
+        schema:
+          type: integer
+      - name: fresh
+        in: query
+        required: false
+        description: 'Omitir la caché de respuesta de 3 segundos. Equivale a la cabecera `X-Cache-Refresh: 1`.'
+        schema:
+          type: boolean
       responses:
         '200':
-          description: Datos económicos.
+          description: 'OK'
           content:
             application/json:
               example:
-                userId: '123456789012345678'
-                cash: 15000
-                bank: 82000
-                rank: 14
-              schema:
-                type: object
-                properties:
-                  userId:
-                    type: string
-                  cash:
-                    type: integer
-                  bank:
-                    type: integer
-                  rank:
-                    type: integer
+                {"userId": "123456789012345678", "cash": 15000, "bank": 82000, "rank": 14}
+        '400':
+          description: 'Parámetros ausentes o inválidos; el importe no es un entero positivo.'
+        '429':
+          description: 'Se superó el límite de peticiones.'
+        '500':
+          description: 'Error del servicio de economía o de la base de datos.'
     post:
       tags:
-      - economía
-      summary: 'Economía: operaciones'
+      - Economía
+      summary: 'Economía: operaciones con dinero'
+      description: 'Operaciones de dinero. `amount` es un entero positivo; la operación no se ejecuta si faltan fondos. Acciones: `transfer` (`fromUserId`, `toUserId`, `amount`), `deposit` y `withdraw` (`userId`, `amount`), `add` y `remove` (`userId`, `amount`, `type`: `cash` o `bank`), `reset` (`userId`), `resetCooldown` (`userId`, `command` opcional). Los parámetros de la acción van en la query; para POST, en el cuerpo JSON.'
       security:
       - BearerAuth: []
+      parameters:
+      - name: action
+        in: query
+        required: true
+        description: 'Acción de la API de economía, se pasa en el parámetro `action` de la query.'
+        schema:
+          type: string
+          enum:
+          - transfer
+          - deposit
+          - withdraw
+          - add
+          - remove
+          - reset
+          - resetCooldown
       requestBody:
         required: true
         content:
@@ -278,94 +318,103 @@ paths:
                   type: string
                 toUserId:
                   type: string
+                userId:
+                  type: string
                 amount:
                   type: integer
-            example:
-              fromUserId: '123456789012345678'
-              toUserId: '234567890123456789'
-              amount: 500
+                  description: 'Importe en E-Coins, un entero positivo.'
+                type:
+                  type: string
+                command:
+                  type: string
       responses:
         '200':
-          description: Actualización exitosa.
+          description: 'OK'
           content:
             application/json:
               example:
-                success: true
-                fromUserId: '123456789012345678'
-                toUserId: '234567890123456789'
-                amount: 500
-                newBalance:
-                  cash: 14500
-                  bank: 82000
-              schema:
-                type: object
-                properties:
-                  success:
-                    type: boolean
-                  fromUserId:
-                    type: string
-                  toUserId:
-                    type: string
-                  amount:
-                    type: integer
-                  newBalance:
-                    type: object
-                    properties:
-                      cash:
-                        type: integer
-                      bank:
-                        type: integer
-      description: Transferencias, banco, añadir, quitar, reiniciar saldo y tiempos de espera.
+                {"success": true, "userId": "123456789012345678", "amount": 5000, "newBalance": 87000}
+        '400':
+          description: 'Parámetros ausentes o inválidos; el importe no es un entero positivo.'
+        '429':
+          description: 'Se superó el límite de peticiones.'
+        '500':
+          description: 'Error del servicio de economía o de la base de datos.'
   /civops/users:
     get:
       tags:
-      - economía
+      - Economía
       summary: 'Economía: jugador'
+      description: 'Inventario e historial de operaciones. Acciones: `inventory` (`userId`), `transactions` (`userId`, `page`, `limit`). Los parámetros de la acción van en la query; para POST, en el cuerpo JSON.'
       security:
       - BearerAuth: []
       parameters:
-      - name: id
+      - name: action
         in: query
+        required: true
+        description: 'Acción de la API de economía, se pasa en el parámetro `action` de la query.'
         schema:
           type: string
-      - name: discord_id
+          enum:
+          - inventory
+          - transactions
+      - name: userId
         in: query
+        required: false
+        description: 'Discord ID del jugador.'
         schema:
           type: string
+      - name: page
+        in: query
+        required: false
+        description: 'Número de página, desde 1.'
+        schema:
+          type: integer
+      - name: limit
+        in: query
+        required: false
+        description: 'Tamaño de página.'
+        schema:
+          type: integer
+      - name: fresh
+        in: query
+        required: false
+        description: 'Omitir la caché de respuesta de 3 segundos. Equivale a la cabecera `X-Cache-Refresh: 1`.'
+        schema:
+          type: boolean
       responses:
         '200':
-          description: Datos del perfil del jugador.
+          description: 'OK'
           content:
             application/json:
               example:
-                userId: '123456789012345678'
-                inventory:
-                - name: Аптечка
-                  amount: 2
-                  description: Восстанавливает здоровье
-              schema:
-                type: object
-                properties:
-                  userId:
-                    type: string
-                  inventory:
-                    type: array
-                    items:
-                      type: object
-                      properties:
-                        name:
-                          type: string
-                        amount:
-                          type: integer
-                        description:
-                          type: string
-      description: Inventario e historial de operaciones del jugador.
+                {"userId": "123456789012345678", "inventory": [{"name": "Аптечка", "amount": 2}]}
+        '400':
+          description: 'Parámetros ausentes o inválidos; el importe no es un entero positivo.'
+        '404':
+          description: 'No se encontró el negocio, la mafia, el jugador o el artículo.'
+        '429':
+          description: 'Se superó el límite de peticiones.'
+        '500':
+          description: 'Error del servicio de economía o de la base de datos.'
     post:
       tags:
-      - economía
-      summary: 'Economía: inventario'
+      - Economía
+      summary: 'Economía: inventario del jugador'
+      description: 'Gestión del inventario. Acciones: `addItem` (`userId`, `item` con `name` y `amount`), `removeItem` (`userId`, `itemName`, `amount`), `clearInventory` (`userId`). Los parámetros de la acción van en la query; para POST, en el cuerpo JSON.'
       security:
       - BearerAuth: []
+      parameters:
+      - name: action
+        in: query
+        required: true
+        description: 'Acción de la API de economía, se pasa en el parámetro `action` de la query.'
+        schema:
+          type: string
+          enum:
+          - addItem
+          - removeItem
+          - clearInventory
       requestBody:
         required: true
         content:
@@ -377,100 +426,129 @@ paths:
                   type: string
                 item:
                   type: object
-                  properties:
-                    name:
-                      type: string
-                    amount:
-                      type: integer
-            example:
-              userId: '123456789012345678'
-              item:
-                name: Аптечка
-                amount: 1
+                itemName:
+                  type: string
+                amount:
+                  type: integer
+                  description: 'Importe en E-Coins, un entero positivo.'
       responses:
         '200':
-          description: Perfil actualizado.
+          description: 'OK'
           content:
             application/json:
               example:
-                success: true
-                userId: '123456789012345678'
-                item: Аптечка
-                amount: 1
-              schema:
-                type: object
-                properties:
-                  success:
-                    type: boolean
-                  userId:
-                    type: string
-                  item:
-                    type: string
-                  amount:
-                    type: integer
-      description: Añadir y quitar objetos, vaciar el inventario.
+                {"success": true, "userId": "123456789012345678"}
+        '400':
+          description: 'Parámetros ausentes o inválidos; el importe no es un entero positivo.'
+        '404':
+          description: 'No se encontró el negocio, la mafia, el jugador o el artículo.'
+        '429':
+          description: 'Se superó el límite de peticiones.'
+        '500':
+          description: 'Error del servicio de economía o de la base de datos.'
   /civops/businesses:
     get:
       tags:
-      - economía
+      - Economía
       summary: 'Economía: negocios'
+      description: 'Acciones: `list` (`page`, `limit`), `info` (`businessId` o `businessName`), `balance`, `employees`, `store` (`businessName`), `transfers`, `logs` (`businessId`, `page`, `limit`), `rating`, `pending`. Los parámetros de la acción van en la query; para POST, en el cuerpo JSON.'
       security:
       - BearerAuth: []
+      parameters:
+      - name: action
+        in: query
+        required: true
+        description: 'Acción de la API de economía, se pasa en el parámetro `action` de la query.'
+        schema:
+          type: string
+          enum:
+          - list
+          - info
+          - balance
+          - employees
+          - store
+          - transfers
+          - logs
+          - rating
+          - pending
+      - name: businessId
+        in: query
+        required: false
+        description: 'ID del negocio.'
+        schema:
+          type: string
+      - name: businessName
+        in: query
+        required: false
+        description: 'Nombre del negocio.'
+        schema:
+          type: string
+      - name: page
+        in: query
+        required: false
+        description: 'Número de página, desde 1.'
+        schema:
+          type: integer
+      - name: limit
+        in: query
+        required: false
+        description: 'Tamaño de página.'
+        schema:
+          type: integer
+      - name: fresh
+        in: query
+        required: false
+        description: 'Omitir la caché de respuesta de 3 segundos. Equivale a la cabecera `X-Cache-Refresh: 1`.'
+        schema:
+          type: boolean
       responses:
         '200':
-          description: Lista de empresas registradas.
+          description: 'OK'
           content:
             application/json:
               example:
-                page: 1
-                total: 1
-                businesses:
-                - id: B7K2Q9XZ
-                  name: Кафе «Арбат»
-                  form: ООО
-                  status: active
-                  owner_id: '123456789012345678'
-                  owner_name: player
-                  address: ул. Арбат, 10
-                  bank: 120000
-                  created_at: 1792083600
-              schema:
-                type: object
-                properties:
-                  page:
-                    type: integer
-                  total:
-                    type: integer
-                  businesses:
-                    type: array
-                    items:
-                      type: object
-                      properties:
-                        id:
-                          type: string
-                        name:
-                          type: string
-                        form:
-                          type: string
-                        status:
-                          type: string
-                        owner_id:
-                          type: string
-                        owner_name:
-                          type: string
-                        address:
-                          type: string
-                        bank:
-                          type: integer
-                        created_at:
-                          type: integer
-      description: 'Negocios: lista, ficha, saldo, empleados, productos, transferencias, ranking y solicitudes.'
+                {"page": 1, "total": 1, "businesses": [{"id": "B7K2Q9XZ", "name": "Кафе «Арбат»", "bank": 120000}]}
+        '400':
+          description: 'Parámetros ausentes o inválidos; el importe no es un entero positivo.'
+        '404':
+          description: 'No se encontró el negocio, la mafia, el jugador o el artículo.'
+        '409':
+          description: 'Fondos insuficientes o conflicto de estado.'
+        '429':
+          description: 'Se superó el límite de peticiones.'
+        '500':
+          description: 'Error del servicio de economía o de la base de datos.'
     post:
       tags:
-      - economía
-      summary: 'Economía: acciones de negocios'
+      - Economía
+      summary: 'Economía: acciones con negocios'
+      description: 'Las acciones de dinero requieren `amount` como entero positivo. `addMoney` devuelve 404 si el negocio no existe; `removeMoney` y `withdraw` devuelven 409 si faltan fondos. Acciones: `request`, `approve`, `create`, `update`, `delete`, `addMoney`/`removeMoney`/`withdraw` (`businessId`, `amount`), `transfer`, `addEmployee`/`removeEmployee`, `addProduct`/`removeProduct`/`buyProduct`, `returnMoney`, `cancelRequest`. Los parámetros de la acción van en la query; para POST, en el cuerpo JSON.'
       security:
       - BearerAuth: []
+      parameters:
+      - name: action
+        in: query
+        required: true
+        description: 'Acción de la API de economía, se pasa en el parámetro `action` de la query.'
+        schema:
+          type: string
+          enum:
+          - request
+          - approve
+          - create
+          - update
+          - delete
+          - addMoney
+          - removeMoney
+          - withdraw
+          - transfer
+          - addEmployee
+          - removeEmployee
+          - addProduct
+          - removeProduct
+          - buyProduct
+          - returnMoney
+          - cancelRequest
       requestBody:
         required: true
         content:
@@ -480,89 +558,138 @@ paths:
               properties:
                 businessId:
                   type: string
+                businessName:
+                  type: string
+                businessData:
+                  type: object
                 amount:
                   type: integer
-            example:
-              businessId: B7K2Q9XZ
-              amount: 5000
+                  description: 'Importe en E-Coins, un entero positivo.'
+                type:
+                  type: string
+                targetUserId:
+                  type: string
+                userId:
+                  type: string
+                guildId:
+                  type: string
+                item:
+                  type: object
+                itemName:
+                  type: string
+                transactionId:
+                  type: string
+                requestId:
+                  type: string
       responses:
         '200':
-          description: La operación está completa.
+          description: 'OK'
           content:
             application/json:
               example:
-                success: true
-                businessId: B7K2Q9XZ
-                added: 5000
-                newBalance: 125000
-              schema:
-                type: object
-                properties:
-                  success:
-                    type: boolean
-                  businessId:
-                    type: string
-                  added:
-                    type: integer
-                  newBalance:
-                    type: integer
-      description: Solicitudes, crear y eliminar negocios, dinero, empleados y productos.
+                {"success": true, "businessId": "B7K2Q9XZ", "added": 5000, "newBalance": 125000}
+        '400':
+          description: 'Parámetros ausentes o inválidos; el importe no es un entero positivo.'
+        '404':
+          description: 'No se encontró el negocio, la mafia, el jugador o el artículo.'
+        '409':
+          description: 'Fondos insuficientes o conflicto de estado.'
+        '429':
+          description: 'Se superó el límite de peticiones.'
+        '500':
+          description: 'Error del servicio de economía o de la base de datos.'
   /civops/mafias:
     get:
       tags:
-      - economía
+      - Economía
       summary: 'Economía: mafias'
+      description: 'Acciones: `list` (`page`, `limit`), `info` (`mafiaId` o `mafiaName`), `balance`, `members`, `transfers`, `logs` (`mafiaId`, `page`, `limit`). Los parámetros de la acción van en la query; para POST, en el cuerpo JSON.'
       security:
       - BearerAuth: []
+      parameters:
+      - name: action
+        in: query
+        required: true
+        description: 'Acción de la API de economía, se pasa en el parámetro `action` de la query.'
+        schema:
+          type: string
+          enum:
+          - list
+          - info
+          - balance
+          - members
+          - transfers
+          - logs
+      - name: mafiaId
+        in: query
+        required: false
+        description: 'ID de la mafia.'
+        schema:
+          type: string
+      - name: mafiaName
+        in: query
+        required: false
+        description: 'Nombre de la mafia.'
+        schema:
+          type: string
+      - name: page
+        in: query
+        required: false
+        description: 'Número de página, desde 1.'
+        schema:
+          type: integer
+      - name: limit
+        in: query
+        required: false
+        description: 'Tamaño de página.'
+        schema:
+          type: integer
+      - name: fresh
+        in: query
+        required: false
+        description: 'Omitir la caché de respuesta de 3 segundos. Equivale a la cabecera `X-Cache-Refresh: 1`.'
+        schema:
+          type: boolean
       responses:
         '200':
-          description: Listado de mafias y grupos.
+          description: 'OK'
           content:
             application/json:
               example:
-                page: 1
-                total: 1
-                mafias:
-                - id: M3X8P1
-                  name: Солнцевские
-                  leader_id: '123456789012345678'
-                  leader_name: player
-                  color: '#8B0000'
-                  bank: 54000
-                  created_at: 1792083600
-              schema:
-                type: object
-                properties:
-                  page:
-                    type: integer
-                  total:
-                    type: integer
-                  mafias:
-                    type: array
-                    items:
-                      type: object
-                      properties:
-                        id:
-                          type: string
-                        name:
-                          type: string
-                        leader_id:
-                          type: string
-                        leader_name:
-                          type: string
-                        color:
-                          type: string
-                        bank:
-                          type: integer
-                        created_at:
-                          type: integer
-      description: 'Mafias: lista, ficha, saldo, miembros, transferencias y registros.'
+                {"page": 1, "total": 1, "mafias": [{"id": "M3X8P1", "name": "Солнцевские", "bank": 54000}]}
+        '400':
+          description: 'Parámetros ausentes o inválidos; el importe no es un entero positivo.'
+        '404':
+          description: 'No se encontró el negocio, la mafia, el jugador o el artículo.'
+        '409':
+          description: 'Fondos insuficientes o conflicto de estado.'
+        '429':
+          description: 'Se superó el límite de peticiones.'
+        '500':
+          description: 'Error del servicio de economía o de la base de datos.'
     post:
       tags:
-      - economía
-      summary: 'Economía: acciones de mafias'
+      - Economía
+      summary: 'Economía: acciones con mafias'
+      description: 'Las acciones de dinero requieren `amount` como entero positivo. `addMoney` devuelve 404 si la mafia no existe; `removeMoney` y `withdraw` devuelven 409 si faltan fondos. Acciones: `create`, `delete`, `addMoney`/`removeMoney`/`withdraw` (`mafiaId`, `amount`), `transfer`, `addMember`, `removeMember`. Los parámetros de la acción van en la query; para POST, en el cuerpo JSON.'
       security:
       - BearerAuth: []
+      parameters:
+      - name: action
+        in: query
+        required: true
+        description: 'Acción de la API de economía, se pasa en el parámetro `action` de la query.'
+        schema:
+          type: string
+          enum:
+          - create
+          - delete
+          - addMoney
+          - removeMoney
+          - withdraw
+          - transfer
+          - addMember
+          - removeMember
       requestBody:
         required: true
         content:
@@ -572,370 +699,387 @@ paths:
               properties:
                 mafiaId:
                   type: string
+                mafiaName:
+                  type: string
                 amount:
                   type: integer
-            example:
-              mafiaId: M3X8P1
-              amount: 1000
-      responses:
-        '200':
-          description: Estado de operación.
-          content:
-            application/json:
-              example:
-                success: true
-                mafiaId: M3X8P1
-                added: 1000
-                newBalance: 55000
-              schema:
-                type: object
-                properties:
-                  success:
-                    type: boolean
-                  mafiaId:
-                    type: string
-                  added:
-                    type: integer
-                  newBalance:
-                    type: integer
-      description: Crear y eliminar mafias, dinero, transferencias y miembros.
-  /civops/government:
-    get:
-      tags:
-      - economía
-      summary: 'Economía: presupuesto'
-      security:
-      - BearerAuth: []
-      responses:
-        '200':
-          description: Estado del presupuesto y departamentos estatales.
-          content:
-            application/json:
-              example:
-                balance:
-                  bank: 2500000
-              schema:
-                type: object
-                properties:
-                  balance:
-                    type: object
-                    properties:
-                      bank:
-                        type: integer
-      description: Saldo del presupuesto y transferencias del gobierno.
-    post:
-      tags:
-      - economía
-      summary: 'Economía: acciones del presupuesto'
-      security:
-      - BearerAuth: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                amount:
-                  type: integer
-            example:
-              amount: 10000
-      responses:
-        '200':
-          description: La configuración ha sido actualizada.
-          content:
-            application/json:
-              example:
-                success: true
-                added: 10000
-                newBalance: 2510000
-              schema:
-                type: object
-                properties:
-                  success:
-                    type: boolean
-                  added:
-                    type: integer
-                  newBalance:
-                    type: integer
-      description: Añadir y retirar del presupuesto, transferencias a jugador, negocio o mafia.
-  /civops/store:
-    get:
-      tags:
-      - economía
-      summary: 'Economía: tienda'
-      security:
-      - BearerAuth: []
-      responses:
-        '200':
-          description: Catálogo de productos de la tienda.
-          content:
-            application/json:
-              example:
-                count: 1
-                items:
-                - name: Аптечка
-                  description: Восстанавливает здоровье
-                  price_buy: 250
-                  price_sell: 100
-                  quantity: null
-                  can_use: true
-                  can_sell: true
-                  createdAt: 1792083600
-              schema:
-                type: object
-                properties:
-                  count:
-                    type: integer
-                  items:
-                    type: array
-                    items:
-                      type: object
-                      properties:
-                        name:
-                          type: string
-                        description:
-                          type: string
-                        price_buy:
-                          type: integer
-                        price_sell:
-                          type: integer
-                        quantity:
-                          type:
-                          - string
-                          - 'null'
-                        can_use:
-                          type: boolean
-                        can_sell:
-                          type: boolean
-                        createdAt:
-                          type: integer
-      description: Productos de la tienda del juego.
-    post:
-      tags:
-      - economía
-      summary: 'Economía: acciones de la tienda'
-      security:
-      - BearerAuth: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                userId:
+                  description: 'Importe en E-Coins, un entero positivo.'
+                targetUserId:
                   type: string
-                itemName:
-                  type: string
-                quantity:
-                  type: integer
-            example:
-              userId: '123456789012345678'
-              itemName: Аптечка
-              quantity: 2
-      responses:
-        '200':
-          description: El resultado de la transacción.
-          content:
-            application/json:
-              example:
-                success: true
-                userId: '123456789012345678'
-                item: Аптечка
-                quantity: 2
-                totalPrice: 500
-              schema:
-                type: object
-                properties:
-                  success:
-                    type: boolean
-                  userId:
-                    type: string
-                  item:
-                    type: string
-                  quantity:
-                    type: integer
-                  totalPrice:
-                    type: integer
-      description: Añadir y quitar productos, comprar y vender a la tienda.
-  /civops/ads:
-    get:
-      tags:
-      - economía
-      summary: 'Economía: anuncios'
-      security:
-      - BearerAuth: []
-      responses:
-        '200':
-          description: Campañas publicitarias activas.
-          content:
-            application/json:
-              example:
-                count: 1
-                ads:
-                - id: 5
-                  user_id: '123456789012345678'
-                  username: player
-                  business_name: Кафе «Арбат»
-                  address: ул. Арбат, 10
-                  created_at: 1792083600
-              schema:
-                type: object
-                properties:
-                  count:
-                    type: integer
-                  ads:
-                    type: array
-                    items:
-                      type: object
-                      properties:
-                        id:
-                          type: integer
-                        user_id:
-                          type: string
-                        username:
-                          type: string
-                        business_name:
-                          type: string
-                        address:
-                          type: string
-                        created_at:
-                          type: integer
-      description: Solicitudes de anuncios del juego (`action=list`).
-    post:
-      tags:
-      - economía
-      summary: 'Economía: enviar un anuncio'
-      security:
-      - BearerAuth: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
                 userId:
                   type: string
                 username:
                   type: string
-                businessName:
+                reason:
                   type: string
-                address:
-                  type: string
-            example:
-              userId: '123456789012345678'
-              username: player
-              businessName: Кафе «Арбат»
-              address: ул. Арбат, 10
       responses:
         '200':
-          description: El anuncio ha sido publicado.
+          description: 'OK'
           content:
             application/json:
               example:
-                success: true
-                userId: '123456789012345678'
-                businessName: Кафе «Арбат»
-                address: ул. Арбат, 10
-                adSent: true
-              schema:
-                type: object
-                properties:
-                  success:
-                    type: boolean
-                  userId:
-                    type: string
-                  businessName:
-                    type: string
-                  address:
-                    type: string
-                  adSent:
-                    type: boolean
-      description: Crea una solicitud de anuncio (`action=create`).
+                {"success": true, "mafiaId": "M3X8P1", "added": 1000, "newBalance": 55000}
+        '400':
+          description: 'Parámetros ausentes o inválidos; el importe no es un entero positivo.'
+        '404':
+          description: 'No se encontró el negocio, la mafia, el jugador o el artículo.'
+        '409':
+          description: 'Fondos insuficientes o conflicto de estado.'
+        '429':
+          description: 'Se superó el límite de peticiones.'
+        '500':
+          description: 'Error del servicio de economía o de la base de datos.'
+  /civops/government:
+    get:
+      tags:
+      - Economía
+      summary: 'Economía: presupuesto'
+      description: 'Acciones: `balance` para la tesorería, `transfers` (`page`, `limit`) para el historial de transferencias. Los parámetros de la acción van en la query; para POST, en el cuerpo JSON.'
+      security:
+      - BearerAuth: []
+      parameters:
+      - name: action
+        in: query
+        required: true
+        description: 'Acción de la API de economía, se pasa en el parámetro `action` de la query.'
+        schema:
+          type: string
+          enum:
+          - balance
+          - transfers
+      - name: page
+        in: query
+        required: false
+        description: 'Número de página, desde 1.'
+        schema:
+          type: integer
+      - name: limit
+        in: query
+        required: false
+        description: 'Tamaño de página.'
+        schema:
+          type: integer
+      - name: fresh
+        in: query
+        required: false
+        description: 'Omitir la caché de respuesta de 3 segundos. Equivale a la cabecera `X-Cache-Refresh: 1`.'
+        schema:
+          type: boolean
+      responses:
+        '200':
+          description: 'OK'
+          content:
+            application/json:
+              example:
+                {"balance": {"bank": 2500000}}
+        '400':
+          description: 'Parámetros ausentes o inválidos; el importe no es un entero positivo.'
+        '409':
+          description: 'Fondos insuficientes o conflicto de estado.'
+        '429':
+          description: 'Se superó el límite de peticiones.'
+        '500':
+          description: 'Error del servicio de economía o de la base de datos.'
+    post:
+      tags:
+      - Economía
+      summary: 'Economía: acciones con el presupuesto'
+      description: '`amount` es un entero positivo. `removeMoney` devuelve 409 si faltan fondos. `withdraw` requiere `amount`, `toType` (`user`, `business`, `mafia`), `toId`, `authorId` y un `reason` opcional. Acciones: `addMoney`, `removeMoney`, `withdraw`. Los parámetros de la acción van en la query; para POST, en el cuerpo JSON.'
+      security:
+      - BearerAuth: []
+      parameters:
+      - name: action
+        in: query
+        required: true
+        description: 'Acción de la API de economía, se pasa en el parámetro `action` de la query.'
+        schema:
+          type: string
+          enum:
+          - addMoney
+          - removeMoney
+          - withdraw
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                amount:
+                  type: integer
+                  description: 'Importe en E-Coins, un entero positivo.'
+                toType:
+                  type: string
+                toId:
+                  type: string
+                authorId:
+                  type: string
+                reason:
+                  type: string
+      responses:
+        '200':
+          description: 'OK'
+          content:
+            application/json:
+              example:
+                {"success": true, "added": 10000, "newBalance": 2510000}
+        '400':
+          description: 'Parámetros ausentes o inválidos; el importe no es un entero positivo.'
+        '409':
+          description: 'Fondos insuficientes o conflicto de estado.'
+        '429':
+          description: 'Se superó el límite de peticiones.'
+        '500':
+          description: 'Error del servicio de economía o de la base de datos.'
+  /civops/store:
+    get:
+      tags:
+      - Economía
+      summary: 'Economía: tienda'
+      description: 'Acciones: `list` para el catálogo, `info` (`itemName`) para un artículo. Los parámetros de la acción van en la query; para POST, en el cuerpo JSON.'
+      security:
+      - BearerAuth: []
+      parameters:
+      - name: action
+        in: query
+        required: true
+        description: 'Acción de la API de economía, se pasa en el parámetro `action` de la query.'
+        schema:
+          type: string
+          enum:
+          - list
+          - info
+      - name: itemName
+        in: query
+        required: false
+        description: 'Nombre del artículo.'
+        schema:
+          type: string
+      - name: fresh
+        in: query
+        required: false
+        description: 'Omitir la caché de respuesta de 3 segundos. Equivale a la cabecera `X-Cache-Refresh: 1`.'
+        schema:
+          type: boolean
+      responses:
+        '200':
+          description: 'OK'
+          content:
+            application/json:
+              example:
+                {"count": 1, "items": [{"name": "Аптечка", "price_buy": 250, "price_sell": 100}]}
+        '400':
+          description: 'Parámetros ausentes o inválidos; el importe no es un entero positivo.'
+        '404':
+          description: 'No se encontró el negocio, la mafia, el jugador o el artículo.'
+        '429':
+          description: 'Se superó el límite de peticiones.'
+        '500':
+          description: 'Error del servicio de economía o de la base de datos.'
+    post:
+      tags:
+      - Economía
+      summary: 'Economía: acciones de la tienda'
+      description: 'Acciones: `addItem` (`item`), `removeItem` (`itemName`), `buy` (`userId`, `itemName`), `sellToStore` (`userId`, `itemName`). 404 significa que falta el artículo; 400 significa artículo no vendible. Los parámetros de la acción van en la query; para POST, en el cuerpo JSON.'
+      security:
+      - BearerAuth: []
+      parameters:
+      - name: action
+        in: query
+        required: true
+        description: 'Acción de la API de economía, se pasa en el parámetro `action` de la query.'
+        schema:
+          type: string
+          enum:
+          - addItem
+          - removeItem
+          - buy
+          - sellToStore
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                item:
+                  type: object
+                itemName:
+                  type: string
+                userId:
+                  type: string
+      responses:
+        '200':
+          description: 'OK'
+          content:
+            application/json:
+              example:
+                {"success": true, "userId": "123456789012345678", "itemName": "Аптечка"}
+        '400':
+          description: 'Parámetros ausentes o inválidos; el importe no es un entero positivo.'
+        '404':
+          description: 'No se encontró el negocio, la mafia, el jugador o el artículo.'
+        '429':
+          description: 'Se superó el límite de peticiones.'
+        '500':
+          description: 'Error del servicio de economía o de la base de datos.'
+  /civops/ads:
+    get:
+      tags:
+      - Economía
+      summary: 'Economía: publicidad de negocios'
+      description: 'Acción: `list` (`page`, `limit`) para las solicitudes de publicidad. Los parámetros de la acción van en la query; para POST, en el cuerpo JSON.'
+      security:
+      - BearerAuth: []
+      parameters:
+      - name: action
+        in: query
+        required: true
+        description: 'Acción de la API de economía, se pasa en el parámetro `action` de la query.'
+        schema:
+          type: string
+          enum:
+          - list
+      - name: page
+        in: query
+        required: false
+        description: 'Número de página, desde 1.'
+        schema:
+          type: integer
+      - name: limit
+        in: query
+        required: false
+        description: 'Tamaño de página.'
+        schema:
+          type: integer
+      - name: fresh
+        in: query
+        required: false
+        description: 'Omitir la caché de respuesta de 3 segundos. Equivale a la cabecera `X-Cache-Refresh: 1`.'
+        schema:
+          type: boolean
+      responses:
+        '200':
+          description: 'OK'
+          content:
+            application/json:
+              example:
+                {"page": 1, "total": 0, "ads": []}
+        '400':
+          description: 'Parámetros ausentes o inválidos; el importe no es un entero positivo.'
+        '429':
+          description: 'Se superó el límite de peticiones.'
+        '500':
+          description: 'Error del servicio de economía o de la base de datos.'
+    post:
+      tags:
+      - Economía
+      summary: 'Economía: acciones de publicidad'
+      description: 'Acción: `create` envía una solicitud de publicidad. Los parámetros de la acción van en la query; para POST, en el cuerpo JSON.'
+      security:
+      - BearerAuth: []
+      parameters:
+      - name: action
+        in: query
+        required: true
+        description: 'Acción de la API de economía, se pasa en el parámetro `action` de la query.'
+        schema:
+          type: string
+          enum:
+          - create
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                businessId:
+                  type: string
+                businessName:
+                  type: string
+                title:
+                  type: string
+                description:
+                  type: string
+                amount:
+                  type: integer
+                  description: 'Importe en E-Coins, un entero positivo.'
+      responses:
+        '200':
+          description: 'OK'
+          content:
+            application/json:
+              example:
+                {"success": true}
+        '400':
+          description: 'Parámetros ausentes o inválidos; el importe no es un entero positivo.'
+        '429':
+          description: 'Se superó el límite de peticiones.'
+        '500':
+          description: 'Error del servicio de economía o de la base de datos.'
   /civops/system:
     get:
       tags:
-      - economía
-      summary: 'Economía: resumen'
+      - Economía
+      summary: 'Economía: estado del servicio'
+      description: 'Solo lectura. Acciones: `stats`, `uptime`, `dbStatus`. Los parámetros de la acción van en la query; para POST, en el cuerpo JSON.'
       security:
       - BearerAuth: []
+      parameters:
+      - name: action
+        in: query
+        required: true
+        description: 'Acción de la API de economía, se pasa en el parámetro `action` de la query.'
+        schema:
+          type: string
+          enum:
+          - stats
+          - uptime
+          - dbStatus
+      - name: fresh
+        in: query
+        required: false
+        description: 'Omitir la caché de respuesta de 3 segundos. Equivale a la cabecera `X-Cache-Refresh: 1`.'
+        schema:
+          type: boolean
       responses:
         '200':
-          description: Versión y configuración económica.
+          description: 'OK'
           content:
             application/json:
               example:
-                users: 5120
-                businesses: 34
-                mafias: 6
-                governmentBalance: 2500000
-                uptime: 86400.5
-                memory:
-                  rss: 152043520
-                  heapTotal: 98304000
-                  heapUsed: 71303168
-                  external: 2097152
-                timestamp: '2026-10-21T12:00:00.000Z'
-              schema:
-                type: object
-                properties:
-                  users:
-                    type: integer
-                  businesses:
-                    type: integer
-                  mafias:
-                    type: integer
-                  governmentBalance:
-                    type: integer
-                  uptime:
-                    type: number
-                  memory:
-                    type: object
-                    properties:
-                      rss:
-                        type: integer
-                      heapTotal:
-                        type: integer
-                      heapUsed:
-                        type: integer
-                      external:
-                        type: integer
-                  timestamp:
-                    type: string
-                    format: date-time
-      description: Estadísticas generales de la economía y tiempo de actividad.
+                {"status": "ok"}
+        '429':
+          description: 'Se superó el límite de peticiones.'
+        '500':
+          description: 'Error del servicio de economía o de la base de datos.'
   /civops/health:
     get:
       tags:
-      - economía
-      summary: 'Economía: estado'
+      - Economía
+      summary: 'Economía: comprobación de estado'
+      description: 'Comprobación de estado del servicio de economía. Disponible para cualquier clave con lectura de economía. Los parámetros de la acción van en la query; para POST, en el cuerpo JSON.'
       security:
       - BearerAuth: []
+      parameters:
+      - name: fresh
+        in: query
+        required: false
+        description: 'Omitir la caché de respuesta de 3 segundos. Equivale a la cabecera `X-Cache-Refresh: 1`.'
+        schema:
+          type: boolean
       responses:
         '200':
-          description: El servicio económico está activo.
+          description: 'OK'
           content:
             application/json:
               example:
-                status: ok
-                service: Economy API
-                timestamp: '2026-10-21T12:00:00.000Z'
-                uptime: 86400.5
-              schema:
-                type: object
-                properties:
-                  status:
-                    type: string
-                  service:
-                    type: string
-                  timestamp:
-                    type: string
-                    format: date-time
-                  uptime:
-                    type: number
-      description: Si el módulo de economía funciona. No requiere clave.
+                {"status": "ok", "service": "Economy API"}
+        '429':
+          description: 'Se superó el límite de peticiones.'
+        '500':
+          description: 'Error del servicio de economía o de la base de datos.'
   /stats:
     get:
       tags:
@@ -8509,13 +8653,329 @@ paths:
                 createdAt: '2026-10-15T19:00:00Z'
                 expiresAt: null
         '401':
-          description: Se requiere una sesión activa del propietario. La caducidad se comprueba en cada lectura, independientemente de la limpieza. La síntesis del navegador sin archivo de audio no se archiva.
+          description: 'Se requiere una sesión válida del propietario del archivo.'
         '404':
-          description: Se requiere una sesión activa del propietario. La caducidad se comprueba en cada lectura, independientemente de la limpieza. La síntesis del navegador sin archivo de audio no se archiva.
+          description: 'El archivo no existe o no está disponible para este usuario.'
         '429':
-          description: Se requiere una sesión activa del propietario. La caducidad se comprueba en cada lectura, independientemente de la limpieza. La síntesis del navegador sin archivo de audio no se archiva.
+          description: 'Se superó el límite de solicitudes de autorización.'
         '503':
-          description: Se requiere una sesión activa del propietario. La caducidad se comprueba en cada lectura, independientemente de la limpieza. La síntesis del navegador sin archivo de audio no se archiva.
+          description: 'El servicio CDN no está disponible temporalmente.'
+  /ads/analytics:
+    get:
+      tags:
+      - Рекламные кампании V3
+      summary: 'Publicidad: analítica'
+      description: 'Estadísticas agregadas de impresiones y clics del propietario de la sesión. `period` es `24h`, `7d` (por defecto) o `30d`; `campaignId` limita el resultado a una campaña.'
+      security:
+      - CookieAuth: []
+      parameters:
+      - name: period
+        in: query
+        required: false
+        description: 'Periodo de analítica.'
+        schema:
+          type: string
+          enum:
+          - 24h
+          - 7d
+          - 30d
+      - name: campaignId
+        in: query
+        required: false
+        description: 'ID de la campaña.'
+        schema:
+          type: string
+      responses:
+        '200':
+          description: 'Impressions and clicks analytics.'
+          content:
+            application/json:
+              example:
+                {"from":"2026-11-07T00:00:00Z","to":"2026-11-14T00:00:00Z","interval":"day","totals":{"impressions":1200,"clicks":34},"series":[],"campaigns":[],"placements":[]}
+        '400':
+          description: 'Parámetros ausentes o inválidos.'
+        '401':
+          description: 'Se requiere una sesión de usuario válida.'
+        '429':
+          description: 'Demasiados intentos de confirmación; reintente en 5 minutos.'
+  /ads/channel-products:
+    get:
+      tags:
+      - Рекламные кампании V3
+      summary: 'Publicidad: ubicaciones en Discord'
+      description: 'Ubicaciones publicitarias en Discord disponibles para comprar. Los precios y canales los configura un administrador; la respuesta no se cachea.'
+      responses:
+        '200':
+          description: 'Placement catalog.'
+          content:
+            application/json:
+              example:
+                {"products":{}}
+        '503':
+          description: 'El servicio de ubicación o el catálogo no están disponibles temporalmente.'
+  /ads/channel-orders/{code}:
+    get:
+      tags:
+      - Рекламные кампании V3
+      summary: 'Publicidad: estado del pedido'
+      description: 'Estado del pedido de ubicación en Discord: `pending`, `paid`, `sent`, `failed` o `expired`.'
+      security:
+      - CookieAuth: []
+      parameters:
+      - name: code
+        in: path
+        required: true
+        description: 'Código del pedido.'
+        schema:
+          type: string
+      responses:
+        '200':
+          description: 'Order state.'
+          content:
+            application/json:
+              example:
+                {"state":"pending"}
+        '401':
+          description: 'Se requiere una sesión de usuario válida.'
+        '404':
+          description: 'No se encontró el pedido, la compra o el código promocional.'
+  /ads/channel-orders/{code}/redeem:
+    post:
+      tags:
+      - Рекламные кампании V3
+      summary: 'Publicidad: confirmar pago'
+      description: 'Confirma el pago con un código de FunPay. El código del pedido y el código pagado deben coincidir; tras la comprobación la publicación se envía a Discord de inmediato.'
+      security:
+      - CookieAuth: []
+      parameters:
+      - name: code
+        in: path
+        required: true
+        description: 'Código del pedido.'
+        schema:
+          type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - paidCode
+              properties:
+                paidCode:
+                  type: string
+                  description: 'Código de pago de FunPay.'
+            example:
+              paidCode: FP-123456
+      responses:
+        '200':
+          description: 'Payment confirmed and the publication sent.'
+          content:
+            application/json:
+              example:
+                {"success":true}
+        '400':
+          description: 'Parámetros ausentes o inválidos.'
+        '401':
+          description: 'Se requiere una sesión de usuario válida.'
+        '409':
+          description: 'El pedido ya se usó, no está pagado o el código de pago no coincide.'
+        '429':
+          description: 'Demasiados intentos de confirmación; reintente en 5 minutos.'
+        '503':
+          description: 'El servicio de ubicación o el catálogo no están disponibles temporalmente.'
+  /ads/campaigns/{id}/channel-order:
+    post:
+      tags:
+      - Рекламные кампании V3
+      summary: 'Publicidad: pedido de ubicación'
+      description: 'Crea un pedido de ubicación en Discord para una campaña aprobada y el producto elegido. Devuelve el código del pedido y el enlace de pago de FunPay.'
+      security:
+      - CookieAuth: []
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: 'ID de la campaña.'
+        schema:
+          type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - productId
+              properties:
+                productId:
+                  type: string
+                  description: 'ID del producto de ubicación.'
+            example:
+              productId: top-24h
+      responses:
+        '201':
+          description: 'Order created.'
+          content:
+            application/json:
+              example:
+                {"code":"AD-7K2Q","productId":"top-24h","productName":"Top 24h","funpayUrl":"https://funpay.com/lots/offer?id=000","price":199,"quantity":1}
+        '400':
+          description: 'Parámetros ausentes o inválidos.'
+        '401':
+          description: 'Se requiere una sesión de usuario válida.'
+        '503':
+          description: 'El servicio de ubicación o el catálogo no están disponibles temporalmente.'
+  /subscriptions/purchases:
+    get:
+      tags:
+      - API de suscripciones
+      summary: 'Suscripciones: historial de compras'
+      description: 'Historial de compras del usuario actual. Una clave con `subscription.read` o la clave maestra deben pasar `discordId`; una sesión solo ve sus propias compras.'
+      security:
+      - CookieAuth: []
+      - BearerAuth: []
+      parameters:
+      - name: discordId
+        in: query
+        required: false
+        description: 'Discord ID del comprador.'
+        schema:
+          type: string
+      - name: page
+        in: query
+        required: false
+        description: 'Número de página, desde 1.'
+        schema:
+          type: integer
+      - name: limit
+        in: query
+        required: false
+        description: 'Tamaño de página (1–100, por defecto 20).'
+        schema:
+          type: integer
+      - name: type
+        in: query
+        required: false
+        description: 'Tipo de compra: `subscription`, `benefit`, `booster` o `coins`.'
+        schema:
+          type: string
+      - name: status
+        in: query
+        required: false
+        description: 'Estado: `pending`, `completed`, `refunded` o `failed`.'
+        schema:
+          type: string
+      - name: from
+        in: query
+        required: false
+        description: 'Fecha inicial, `YYYY-MM-DD`.'
+        schema:
+          type: string
+      - name: to
+        in: query
+        required: false
+        description: 'Fecha final inclusive, `YYYY-MM-DD`.'
+        schema:
+          type: string
+      - name: search
+        in: query
+        required: false
+        description: 'Búsqueda por nombre o ID del artículo (hasta 64 caracteres).'
+        schema:
+          type: string
+      responses:
+        '200':
+          description: 'Paginated purchase list.'
+          content:
+            application/json:
+              example:
+                {"success":true,"purchases":[],"pagination":{"page":1,"limit":20,"total":0,"totalPages":0,"hasMore":false}}
+        '400':
+          description: 'Parámetros ausentes o inválidos.'
+        '401':
+          description: 'Se requiere una sesión de usuario válida.'
+        '403':
+          description: 'Permisos insuficientes o se solicitó otro usuario.'
+  /subscriptions/purchases/{id}:
+    get:
+      tags:
+      - API de suscripciones
+      summary: 'Suscripciones: compra'
+      description: 'Una compra del usuario actual por ID.'
+      security:
+      - CookieAuth: []
+      - BearerAuth: []
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: 'Purchase ID.'
+        schema:
+          type: string
+      responses:
+        '200':
+          description: 'Purchase.'
+          content:
+            application/json:
+              example:
+                {"success":true,"purchase":{}}
+        '401':
+          description: 'Se requiere una sesión de usuario válida.'
+        '404':
+          description: 'No se encontró el pedido, la compra o el código promocional.'
+  /subscriptions/promo/validate:
+    post:
+      tags:
+      - API de suscripciones
+      summary: 'Suscripciones: comprobación de código'
+      description: 'Vista previa de un código promocional. El código no se reserva; las comprobaciones se repiten al pagar. `discordId` puede omitirse con una sesión; el ID de otro usuario solo lo puede consultar la clave maestra.'
+      security:
+      - CookieAuth: []
+      - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - code
+              - productId
+              properties:
+                code:
+                  type: string
+                  description: 'Código promocional.'
+                productId:
+                  type: string
+                  description: 'ID del producto de ubicación.'
+                discordId:
+                  type: string
+                  description: 'Discord ID del comprador.'
+                duration:
+                  type: string
+                  description: 'Duración de la suscripción, `1month` por defecto.'
+            example:
+              code: SAVE10
+              productId: kreml
+              duration: 1month
+      responses:
+        '200':
+          description: 'Discount quote.'
+          content:
+            application/json:
+              example:
+                {"success":true,"quote":{"code":"SAVE10","percent":10,"productId":"kreml","duration":"1month","originalCoins":400,"discountCoins":40,"finalCoins":360}}
+        '400':
+          description: 'Parámetros ausentes o inválidos.'
+        '401':
+          description: 'Se requiere una sesión de usuario válida.'
+        '403':
+          description: 'Permisos insuficientes o se solicitó otro usuario.'
+        '404':
+          description: 'No se encontró el pedido, la compra o el código promocional.'
+
 components:
   securitySchemes:
     AIManagementKeyHeader:

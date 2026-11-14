@@ -56,5 +56,67 @@
   },
   "appearance": {
     "default": "dark"
-  }
+  },
+  "redirects": [
+    {
+      "source": "/ru/reference/v3/overview",
+      "destination": "/ru/reference/v3/erlc/get-erlc-server"
+    },
+    {
+      "source": "/ru/reference/v3/cdn/overview",
+      "destination": "/ru/other/cdn-integration"
+    },
+    {
+      "source": "/en/reference/v3/overview",
+      "destination": "/en/reference/v3/erlc/get-erlc-server"
+    },
+    {
+      "source": "/en/reference/v3/cdn/overview",
+      "destination": "/en/other/cdn-integration"
+    },
+    {
+      "source": "/uk/reference/v3/overview",
+      "destination": "/uk/reference/v3/erlc/get-erlc-server"
+    },
+    {
+      "source": "/uk/reference/v3/cdn/overview",
+      "destination": "/uk/other/cdn-integration"
+    },
+    {
+      "source": "/es/reference/v3/overview",
+      "destination": "/es/reference/v3/erlc/get-erlc-server"
+    },
+    {
+      "source": "/es/reference/v3/cdn/overview",
+      "destination": "/es/other/cdn-integration"
+    },
+    {
+      "source": "/it/reference/v3/overview",
+      "destination": "/it/reference/v3/erlc/get-erlc-server"
+    },
+    {
+      "source": "/it/reference/v3/cdn/overview",
+      "destination": "/it/other/cdn-integration"
+    },
+    {
+      "source": "/ru/index",
+      "destination": "/ru/introduction"
+    },
+    {
+      "source": "/en/index",
+      "destination": "/en/introduction"
+    },
+    {
+      "source": "/uk/index",
+      "destination": "/uk/introduction"
+    },
+    {
+      "source": "/es/index",
+      "destination": "/es/introduction"
+    },
+    {
+      "source": "/it/index",
+      "destination": "/it/introduction"
+    }
+  ]
 }
