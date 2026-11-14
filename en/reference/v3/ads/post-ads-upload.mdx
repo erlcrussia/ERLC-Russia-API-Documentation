@@ -5,3 +5,18 @@ icon: "image"
 openapi: "/en/openapi/en-api-v3-openapi.yaml POST /ads/upload"
 keywords: ["ads", "campaigns", "post"]
 ---
+
+## Key permissions
+
+| Permission | What it allows |
+|---|---|
+| `ads.read` | Listing and viewing campaigns, analytics, and the Discord order state. |
+| `ads.write` | Uploading a banner, creating a campaign, buying impressions, toggling, creating an order, and confirming payment. The permission is granted explicitly only and is not included in `full`. |
+
+Pass the key in `erlcrussia-api-key` or `Authorization: Bearer <API key>`. The key acts as its owner: campaigns and coins belong to the account that created the key.
+
+| Response | When |
+|---|---|
+| `401` | The key is missing or invalid, or its owner is inactive or banned. |
+| `403` | The key lacks the required permission, is bound to a team, or has no owner. |
+| `503` | Authorization is temporarily unavailable. |

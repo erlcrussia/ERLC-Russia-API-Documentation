@@ -1,7 +1,22 @@
 ---
 title: "Le mie campagne"
-description: "Campagne pubblicitarie del titolare della chiave o sessione."
+description: "Campagne pubblicitarie del titolare della chiave API."
 icon: "rectangle-list"
 openapi: "/it/openapi/it-api-v3-openapi.yaml GET /ads/campaigns"
 keywords: ["ads", "campaigns", "get"]
 ---
+
+## Permessi della chiave
+
+| Permesso | Cosa consente |
+|---|---|
+| `ads.read` | Elenco e visualizzazione delle campagne, analisi e stato dell'ordine su Discord. |
+| `ads.write` | Caricamento del banner, creazione della campagna, acquisto di impression, attivazione o pausa, creazione dell'ordine e conferma del pagamento. Il permesso viene concesso solo esplicitamente e non è incluso nella modalità `full`. |
+
+Passa la chiave nell'intestazione `erlcrussia-api-key` o `Authorization: Bearer <chiave API>`. La chiave agisce come il suo proprietario: campagne e coin appartengono all'account che ha creato la chiave.
+
+| Risposta | Quando |
+|---|---|
+| `401` | La chiave manca o non è valida, oppure il proprietario è inattivo o bannato. |
+| `403` | La chiave non ha il permesso richiesto, è associata a un team o non ha proprietario. |
+| `503` | L'autorizzazione non è temporaneamente disponibile. |

@@ -5,3 +5,18 @@ icon: "circle-info"
 openapi: "/es/openapi/es-api-v3-openapi.yaml GET /ads/channel-orders/{code}"
 keywords: [ "ads", "discord" ]
 ---
+
+## Permisos de la clave
+
+| Permiso | Qué permite |
+|---|---|
+| `ads.read` | Listar y ver campañas, analítica y estado del pedido en Discord. |
+| `ads.write` | Subir un banner, crear una campaña, comprar impresiones, activar o pausar, crear un pedido y confirmar el pago. El permiso se concede solo de forma explícita y no se incluye en el modo `full`. |
+
+Pase la clave en `erlcrussia-api-key` o `Authorization: Bearer <clave API>`. La clave actúa como su propietario: las campañas y las monedas pertenecen a la cuenta que creó la clave.
+
+| Respuesta | Cuándo |
+|---|---|
+| `401` | La clave falta o no es válida, o su propietario está inactivo o baneado. |
+| `403` | La clave no tiene el permiso necesario, está vinculada a un equipo o no tiene propietario. |
+| `503` | La autorización no está disponible temporalmente. |
