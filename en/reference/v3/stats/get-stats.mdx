@@ -1,8 +1,8 @@
 ---
 title: "Server statistics"
-description: "ER:LC online count and Discord server member counts. Several servers and metrics can be requested at once."
+description: "Discord server metrics and ER:LC player count by server ID. Several servers and metrics can be requested at once."
 icon: "chart-simple"
-openapi: /en/openapi/en-api-v3-openapi.yaml GET /stats
+openapi: "/en/openapi/en-api-v3-openapi.yaml GET /stats"
 keywords:
 - stats
 - statistics
@@ -12,21 +12,63 @@ keywords:
 - playercount
 ---
 
-## Compatibility of Metrics and Servers
+`GET /v3/stats` returns an object keyed by server ID; each value contains the requested metrics.
 
-API V3 supports multiple server and metrics selection. Each server has its own set of data:
+## How to specify a server
 
-| Server | Server Description | `membercount` (online) | `allmembercount` (total) | `botcount` (bots) | `playercount` (ER:LC) |
-| :--- | :--- | :---: | :---: | :---: | :---: |
-| **MRP** | Moscow RolePlay (Main Project) | ✅ | ✅ | ✅ | ✅ |
-| **MVD** | Ministry of Internal Affairs | ✅ | ✅ | ✅ | ❌ |
-| **FSB** | Federal Security Service | ✅ | ✅ | ✅ | ❌ |
-| **MCHS** | Russian Emergency Situations Ministry | ✅ | ✅ | ✅ | ❌ |
-| **MZ** | Ministry of Health | ✅ | ✅ | ✅ | ❌ |
-| **112** | Emergency Call Service 112 | ✅ | ✅ | ✅ | ❌ |
-| **DOT** | Department of Transport | ✅ | ❌ | ❌ | ❌ |
+The `servers` parameter is required. Pass a server ID, not a display name:
+
+- for `membercount`, `allmembercount` and `botcount` — the numeric Discord guild ID, for example `1331331077553262765`;
+- for `playercount` — the ER:LC server ID from the API configuration, for example `a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0`.
+
+Repeat the parameter (`servers=A&metrics=x&servers=B&metrics=y`) or pass comma-separated values. With multiple values, servers and metrics are matched by position; one metric applies to every server, and one server applies to every metric. The ID list is configured when the API is deployed: Discord servers come from the bot statistics service, ER:LC servers from `ERLC_SERVER_IDS`.
+
+## Metrics
+
+| Metric | Source | Meaning |
+|---|---|---|
+| `membercount` | Discord | Non-bot server members in the full server snapshot. |
+| `allmembercount` | Discord | Total member count reported by Discord. |
+| `botcount` | Discord | Number of bots on the server. |
+| `playercount` | ER:LC | Current player count on the ER:LC server from the background cache. |
+
+## Examples
+
+Discord statistics:
+
+```bash
+curl "https://api.erlcrussia.com/v3/stats?servers=1331331077553262765&metrics=membercount,allmembercount,botcount"
+```
+
+Several servers with different metrics:
+
+```bash
+curl "https://api.erlcrussia.com/v3/stats?servers=1331331077553262765,a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0&metrics=membercount,playercount"
+```
+
+Response:
+
+```json
+{
+  "1331331077553262765": {
+    "membercount": 4210,
+    "allmembercount": 5380,
+    "botcount": 117
+  },
+  "a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0": {
+    "playercount": 38
+  }
+}
+```
+
+## Errors
+
+| Response | When |
+|---|---|
+| `400` | `servers` or `metrics` is missing, the pairs do not match, or a metric is unknown. |
+| `404` | The server is unknown or hidden in the configuration. |
+| `503` | Bot data or the ER:LC cache is temporarily unavailable. |
 
 <Warning>
-**Please note:**
-The `playercount` metric reflects the number of players on the ER:LC server and is available **only** for the `MRP` server. If you try to request `playercount` for any other server, the error `400 Bad Request` will be returned.
+`playercount` is available only for IDs added to `ERLC_SERVER_IDS`. Other IDs return `404`; when fresh cache data is missing, the response is `503`, not `0`.
 </Warning>
