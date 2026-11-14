@@ -1,20 +1,118 @@
 ---
 title: "Changelog"
-description: "What changed in the API and the documentation."
+description: "What changed in the API and what it means for integrations."
 icon: "clock-rotate-left"
+rss: true
 ---
 
-## November 2026
+<Update label="November 14, 2026" description="Ads: management with an API key and ads.read / ads.write permissions." tags={["Ads", "Keys"]}>
 
-* **Realtime**: added the `response.tool_call` event (`name`, `status: running`). Call completion arrives in `response.done` with `end_session: true`; `end_voice_session` is not published. A voice turn with search takes up to ~40 seconds, the server turn limit is 5 minutes, there are no keepalive events, and the client deadline should be at least 120 seconds.
-* **Economy**: documented the `action` parameter for every CivOps module, request parameters and `400`/`404`/`409` errors. Amounts in every economy module must be positive integers: `400` (`INVALID_AMOUNT`, `AMOUNT_TOO_SMALL`), insufficient funds or assets return `409` (`INSUFFICIENT_FUNDS`, `NOT_ENOUGH_ASSETS`).
-* **Teams**: soft delete with a 30-day restore window service methods.
-* **User assets**: private `user-assets` are served through signed URLs; the owner session is checked on every read.
-* **CDN**: image metadata stripping on upload, edge access analytics and custom domain status updates.
-* **Ads**: separate impression and click accounting, multi-slot campaigns and Discord placements paid with FunPay codes.
-* **Subscriptions**: purchase history, discount promo codes and a discount preview.
+### New
 
-## October 2026
+- `erlcrussia-api-key` or `Authorization: Bearer <API key>` for `/v3/ads/upload`, `POST` and `GET /v3/ads/campaigns`, `GET /v3/ads/campaigns/{id}`, `/buy`, `/toggle`, `/analytics` and Discord placement orders.
+- `ads.read` covers reads: campaign list and details, analytics and order state; `ads.write` covers changes and payments: banner upload, campaign creation, buying impressions, toggling, order creation and payment confirmation.
 
-* **API V3**: unified `/v3/keys` keys, team binding for CDN and short links.
-* **Short links**: system domains moved to `erlc.click`, per-team analytics.
+### Changed
+
+- The key acts as its owner: campaigns and the coin balance belong to the Discord account that created the key.
+- `ads.write` must be granted explicitly and is not implied by the `full` mode; `ads.read` is available in `full`, while `restricted` needs an explicit allow rule. An explicit deny always wins.
+- `401` means the key is missing, invalid, or its owner is inactive or banned; `403` means the key lacks the permission, is bound to a team, or has no owner; `503` means authorization is temporarily unavailable.
+- `/v3/ads/packages`, `/v3/ads/channel-products` and `/v3/ads/serve` remain public without authentication.
+
+</Update>
+<Update label="November 14, 2026" description="Realtime: tools and timeouts; economy: consistent error codes." tags={["Realtime", "Economy"]}>
+
+### New
+
+- The `response.tool_call` event with `response_id`, `name` and `status: "running"` announces that a tool such as `web_search` has started.
+- The `end_voice_session` tool ends the call; `response.done` carries `end_session: true`.
+
+### Changed
+
+- A voice turn with search takes up to ~40 seconds, the server turn limit is 5 minutes, there are no keepalive events, and the client deadline should be at least 120 seconds.
+- Amounts in every CivOps module must be positive integers: `400` with `INVALID_AMOUNT` or `AMOUNT_TOO_SMALL`.
+- Insufficient funds or assets return `409` with `INSUFFICIENT_FUNDS` or `NOT_ENOUGH_ASSETS`, including `store` and `economy`.
+- `returnMoney` verifies transaction ownership; business bank, mafia bank and the treasury are updated atomically.
+
+<Warning>
+Handle `400` and `409`: some of these errors previously arrived as `500`. Do not close the voice WebSocket earlier than 120 seconds.
+</Warning>
+
+</Update>
+
+<Update label="November 10, 2026" description="Ads: separate accounting; CDN: metadata; subscriptions: purchase history." tags={["Ads", "CDN", "Subscriptions"]}>
+
+### New
+
+- Ad impressions and clicks are counted separately; one payment can cover several slots.
+- CDN removes EXIF/GPS/XMP on upload; AVIF, TIFF, BMP and HEIC are rejected with `415`.
+- `GET /v3/subscriptions/purchases` and `GET /v3/subscriptions/purchases/{id}` return purchase history.
+
+### Changed
+
+- Images are optimized to 2048 px; video is transcoded to MP4 H.264/AAC up to 1920 px and 30 fps.
+- Ad banners are published through CDN and the asset registry.
+
+</Update>
+
+<Update label="October 27, 2026" description="OpenAI /v1, webhooks and Discord placements." tags={["API V3", "AI", "Ads"]}>
+
+### New
+
+- `/v1/chat/completions`, `/v1/models`, `/v1/audio/speech` and `/v1/audio/transcriptions` are OpenAI SDK compatible.
+- Discord placements: `GET /v3/ads/channel-products`, order via `POST /v3/ads/campaigns/{id}/channel-order`, state and FunPay payment confirmation.
+
+### Changed
+
+- `GET /v3/webhooks/status` returns the URL check `status` and `reason`.
+- `429` contains only `code` and `message`; limits move to `X-RateLimit-*` and `Retry-After`.
+
+</Update>
+
+<Update label="October 14, 2026" description="Custom CDN domains and key modes." tags={["CDN", "Keys"]}>
+
+### New
+
+- `GET/POST /v3/cdn/custom-domains`, `GET/PATCH/DELETE /v3/cdn/custom-domains/{id}`, verify, purge and regenerate-token.
+
+### Changed
+
+- CDN separates public paths and S3 keys and adds an edge registry.
+- Rate limiting uses the token hash; API keys gained `restricted` and `full` access modes.
+
+</Update>
+
+<Update label="October 7, 2026" description="Unified keys and user webhooks." tags={["Keys", "Subscriptions"]}>
+
+### New
+
+- `GET /v3/keys` and `POST /v3/keys` combine API keys and WebSocket keys.
+- User webhooks: list, add, update, remove URL, test and enable.
+
+### Changed
+
+- The `lifetime` plan can no longer be purchased with coins or through FunPay.
+
+<Warning>
+Remove `lifetime` from purchase flows: the plan is no longer sold.
+</Warning>
+
+</Update>
+
+<Update label="September 13, 2026" description="Go API V3 release: unified routes, gateway and webhooks." tags={["API V3", "Security"]}>
+
+### New
+
+- Canonical `/v3` routes for ER:LC, stats, points, users, keys, CDN, short links and subscriptions.
+- WebSocket gateway `/v3/gateway` and `/v3/health` check.
+- Multi-server webhooks and ER:LC server aliases.
+
+### Changed
+
+- `/v1` and `/v2` are deprecated and return `5028`; admin routes moved to `/v3/admin`.
+
+<Warning>
+Move integrations to `/v3`: `/v1` and `/v2` calls return `5028`.
+</Warning>
+
+</Update>

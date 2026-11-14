@@ -1,20 +1,118 @@
 ---
 title: "Historial de cambios"
-description: "Qué cambió en la API y en la documentación."
+description: "Qué cambió en la API y qué significa para las integraciones."
 icon: "clock-rotate-left"
+rss: true
 ---
 
-## Noviembre de 2026
+<Update label="14 de noviembre de 2026" description="Publicidad: gestión con clave API y permisos ads.read / ads.write." tags={["Publicidad", "Claves"]}>
 
-* **Realtime**: se añadió el evento `response.tool_call` (`name`, `status: running`). El fin de la llamada llega en `response.done` con `end_session: true`; `end_voice_session` no se publica. Un turno de voz con búsqueda tarda hasta ~40 segundos, el límite del servidor es de 5 minutos, no hay keepalive y el plazo del cliente debe ser de al menos 120 segundos.
-* **Economía**: se documentó el parámetro `action` para todos los módulos CivOps, los parámetros de petición y los errores `400`/`404`/`409`. Los importes en todos los módulos de economía deben ser enteros positivos: `400` (`INVALID_AMOUNT`, `AMOUNT_TOO_SMALL`), la falta de fondos o activos devuelve `409` (`INSUFFICIENT_FUNDS`, `NOT_ENOUGH_ASSETS`).
-* **Equipos**: borrado suave con restauración durante 30 días y métodos de servicio.
-* **Archivos personales**: los `user-assets` privados se sirven con URL firmadas; la sesión del propietario se comprueba en cada lectura.
-* **CDN**: eliminación de metadatos de imágenes al subir, analítica de acceso del edge y actualización del estado de dominios propios.
-* **Publicidad**: contabilidad separada de impresiones y clics, campañas con varios espacios y ubicaciones en Discord pagadas con códigos FunPay.
-* **Suscripciones**: historial de compras, códigos promocionales con descuento y vista previa del descuento.
+### Nuevo
 
-## Octubre de 2026
+- `erlcrussia-api-key` o `Authorization: Bearer <clave API>` para `/v3/ads/upload`, `POST` y `GET /v3/ads/campaigns`, `GET /v3/ads/campaigns/{id}`, `/buy`, `/toggle`, `/analytics` y pedidos de ubicación en Discord.
+- `ads.read` cubre lecturas: lista y detalle de campañas, analítica y estado del pedido; `ads.write` cubre cambios y pagos: subida de banner, creación de campaña, compra de impresiones, alternancia, creación de pedido y confirmación de pago.
 
-* **API V3**: claves unificadas `/v3/keys`, vinculación de equipo para CDN y enlaces cortos.
-* **Enlaces cortos**: dominios del sistema migrados a `erlc.click`, analítica por equipo.
+### Cambiado
+
+- La clave actúa como su propietario: las campañas y el saldo de monedas pertenecen a la cuenta de Discord que creó la clave.
+- `ads.write` debe concederse explícitamente y no lo implica el modo `full`; `ads.read` está disponible en `full`, mientras que `restricted` necesita una regla de permiso explícita. Una denegación explícita siempre gana.
+- `401` significa que falta la clave, es inválida o su propietario está inactivo o baneado; `403` que la clave no tiene el permiso, está vinculada a un equipo o no tiene propietario; `503` que la autorización no está disponible temporalmente.
+- `/v3/ads/packages`, `/v3/ads/channel-products` y `/v3/ads/serve` siguen siendo públicos sin autenticación.
+
+</Update>
+<Update label="14 de noviembre de 2026" description="Realtime: herramientas y tiempos; economía: códigos de error únicos." tags={["Realtime", "Economía"]}>
+
+### Nuevo
+
+- El evento `response.tool_call` con `response_id`, `name` y `status: "running"` anuncia el inicio de una herramienta como `web_search`.
+- La herramienta `end_voice_session` termina la llamada; `response.done` incluye `end_session: true`.
+
+### Cambiado
+
+- Un turno de voz con búsqueda tarda hasta ~40 segundos, el límite del turno es de 5 minutos, no hay keepalive y el plazo del cliente debe ser de al menos 120 segundos.
+- Los importes en todos los módulos CivOps son enteros positivos: `400` con `INVALID_AMOUNT` o `AMOUNT_TOO_SMALL`.
+- La falta de fondos o activos devuelve `409` con `INSUFFICIENT_FUNDS` o `NOT_ENOUGH_ASSETS`, incluidos `store` y `economy`.
+- `returnMoney` verifica el propietario de la transacción; el banco del negocio, el de la mafia y la tesorería se actualizan de forma atómica.
+
+<Warning>
+Gestione `400` y `409`: algunos de estos errores antes llegaban como `500`. No cierre el WebSocket de voz antes de 120 segundos.
+</Warning>
+
+</Update>
+
+<Update label="10 de noviembre de 2026" description="Publicidad: contabilidad separada; CDN: metadatos; suscripciones: compras." tags={["Publicidad", "CDN", "Suscripciones"]}>
+
+### Nuevo
+
+- Las impresiones y los clics se cuentan por separado; un pago puede cubrir varios espacios.
+- CDN elimina EXIF/GPS/XMP al subir; AVIF, TIFF, BMP y HEIC se rechazan con `415`.
+- `GET /v3/subscriptions/purchases` y `GET /v3/subscriptions/purchases/{id}` devuelven el historial de compras.
+
+### Cambiado
+
+- Las imágenes se optimizan a 2048 px; el vídeo se transcodifica a MP4 H.264/AAC hasta 1920 px y 30 fps.
+- Los banners de publicidad se publican mediante CDN y el registro de activos.
+
+</Update>
+
+<Update label="27 de octubre de 2026" description="OpenAI /v1, webhooks y ubicaciones en Discord." tags={["API V3", "AI", "Publicidad"]}>
+
+### Nuevo
+
+- `/v1/chat/completions`, `/v1/models`, `/v1/audio/speech` y `/v1/audio/transcriptions` son compatibles con OpenAI SDK.
+- Ubicaciones en Discord: `GET /v3/ads/channel-products`, pedido `POST /v3/ads/campaigns/{id}/channel-order`, estado y pago con código FunPay.
+
+### Cambiado
+
+- `GET /v3/webhooks/status` devuelve `status` y `reason` de la comprobación de URL.
+- `429` solo contiene `code` y `message`; los límites van en `X-RateLimit-*` y `Retry-After`.
+
+</Update>
+
+<Update label="14 de octubre de 2026" description="Dominios CDN propios y modos de clave." tags={["CDN", "Claves"]}>
+
+### Nuevo
+
+- `GET/POST /v3/cdn/custom-domains`, `GET/PATCH/DELETE /v3/cdn/custom-domains/{id}`, verify, purge y regenerate-token.
+
+### Cambiado
+
+- CDN separa rutas públicas y claves S3 y añade un registro edge.
+- El rate limiting usa el hash del token; las claves API tienen modos `restricted` y `full`.
+
+</Update>
+
+<Update label="7 de octubre de 2026" description="Claves unificadas y webhooks de usuario." tags={["Claves", "Suscripciones"]}>
+
+### Nuevo
+
+- `GET /v3/keys` y `POST /v3/keys` combinan claves API y claves WebSocket.
+- Webhooks de usuario: lista, alta, cambio, baja de URL, prueba y activación.
+
+### Cambiado
+
+- El plan `lifetime` ya no se puede comprar con monedas ni mediante FunPay.
+
+<Warning>
+Elimine `lifetime` de los flujos de compra: el plan ya no se vende.
+</Warning>
+
+</Update>
+
+<Update label="13 de septiembre de 2026" description="Lanzamiento de Go API V3: rutas, gateway y webhooks." tags={["API V3", "Seguridad"]}>
+
+### Nuevo
+
+- Rutas canónicas `/v3` para ER:LC, estadísticas, puntos, usuarios, claves, CDN, enlaces cortos y suscripciones.
+- Gateway WebSocket `/v3/gateway` y comprobación `/v3/health`.
+- Webhooks multiservidor y alias de servidores ER:LC.
+
+### Cambiado
+
+- `/v1` y `/v2` están obsoletos y devuelven `5028`; las rutas admin pasaron a `/v3/admin`.
+
+<Warning>
+Migre las integraciones a `/v3`: las llamadas a `/v1` y `/v2` devuelven `5028`.
+</Warning>
+
+</Update>
