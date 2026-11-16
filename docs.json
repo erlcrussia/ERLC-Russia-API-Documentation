@@ -638,5 +638,10 @@
       "source": "/it/reference/v3/ai/create-studio-key",
       "destination": "/it/reference/v3/ai/list-studio-keys"
     }
-  ]
+  ],
+  "api": {
+    "playground": {
+      "proxy": false
+    }
+  }
 }
