@@ -20,6 +20,7 @@
           "pages": [
             "it/documentation/erlc-location-information",
             "it/documentation/rate-limits",
+            "it/documentation/key-permissions",
             "it/documentation/error-codes"
           ]
         },

@@ -1,0 +1,53 @@
+---
+title: "Permessi della chiave"
+description: "Quali permessi può avere una chiave API, cosa copre ciascuno e come ottenerli."
+icon: "key"
+---
+
+Un permesso (scope) è una stringa nell'elenco di regole della chiave API. Ogni endpoint verifica il proprio permesso: una chiave senza di esso riceve `403`. Crea e configura le chiavi nella [dashboard](https://erlcrussia.com/my/tokens) dopo l'accesso con Discord; lì si selezionano anche i permessi.
+
+## Come ottenere i permessi
+
+1. Accedi con Discord e apri [I miei token](https://erlcrussia.com/my/tokens).
+2. Crea una chiave e seleziona i permessi necessari: i nomi corrispondono alla tabella qui sotto.
+3. Alcuni permessi si attivano solo se selezionati esplicitamente (ad esempio `ads.write` e le azioni `action:*`).
+
+Invia la chiave nell'header `erlcrussia-api-key` o come `Authorization: Bearer <chiave API>`.
+
+## Tipi di permessi
+
+| Tipo | Forma | Scopo |
+|---|---|---|
+| Endpoint | `module.read`, `module.write` | Accesso agli endpoint di lettura o scrittura. |
+| Query | `query:Nome` | Il parametro `query` nelle risposte di ER:LC (quali dati restituire). |
+| Azione | `action:nome` | Un'operazione specifica nei moduli CivOps. |
+| Azione di gilda | `action:guild:<id>` | Operazioni CivOps limitate a una gilda Discord. |
+
+## Tutti i permessi
+
+| Modulo | Permessi |
+|---|---|
+| ER:LC V1 (deprecato) | `erlc.server`, `erlc.bans`, `erlc.command` |
+| ER:LC V2 | `erlc.v2.server`, `erlc.v2.command` |
+| Query di ER:LC V2 | `query:Players`, `query:Staff`, `query:JoinLogs`, `query:Queue`, `query:KillLogs`, `query:CommandLogs`, `query:ModCalls`, `query:EmergencyCalls`, `query:Vehicles` |
+| Economia | `civops.v2.economy.read`, `civops.v2.economy.write` |
+| Azioni di economia | `action:balance`, `action:leaderboard`, `action:rank`, `action:holdings`, `action:stocks`, `action:cooldowns`, `action:transfer`, `action:deposit`, `action:withdraw`, `action:pay`, `action:add`, `action:remove`, `action:reset`, `action:resetCooldown` |
+| Utenti | `civops.v2.users.read`, `civops.v2.users.write` |
+| Azioni sugli utenti | `action:inventory`, `action:transactions`, `action:addItem`, `action:removeItem`, `action:clearInventory` |
+| Attività | `civops.v2.businesses.read`, `civops.v2.businesses.write` |
+| Azioni sulle attività | `action:business_list`, `action:business_info`, `action:business_request`, `action:business_approve`, `action:business_create`, `action:business_delete`, `action:business_addMoney`, `action:business_withdraw`, `action:business_employee`, `action:business_product` |
+| Mafie | `civops.v2.mafias.read`, `civops.v2.mafias.write` |
+| Azioni sulle mafie | `action:mafia_list`, `action:mafia_info`, `action:mafia_balance`, `action:mafia_members`, `action:mafia_money` |
+| Governo | `civops.v2.government.read`, `civops.v2.government.write` |
+| Azioni di governo | `action:gov_treasury`, `action:gov_setTax`, `action:gov_setBudget` |
+| Negozio e annunci CivOps | `civops.v2.store.read`, `civops.v2.store.write`, `civops.v2.ads.read`, `civops.v2.ads.write` |
+| Sistema | `civops.v2.system.read` |
+| Campagne pubblicitarie | `ads.read`, `ads.write` |
+| CDN | `cdn.assets.read`, `cdn.assets.upload`, `cdn.assets.delete`, `cdn.folders.manage`, `cdn.cache.purge`, `cdn.domains.manage` |
+| Redirect | `redirects.read`, `redirects.manage`, `redirects.analytics` |
+| Webhook | `webhooks.read`, `webhooks.manage`, `webhooks.ping` |
+| Ecosistema | `subscription.read`, `verification.v2.lookup`, `points.read`, `points.add`, `points.remove`, `points.history` |
+
+<Note>
+Un elenco di permessi vuoto non limita la chiave: senza regole esplicite si applica la modalità della chiave (`full` o `restricted`). Ogni pagina di endpoint indica il permesso richiesto, ad es. "richiede `ads.read`".
+</Note>

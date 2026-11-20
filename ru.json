@@ -20,6 +20,7 @@
           "pages": [
             "ru/documentation/erlc-location-information",
             "ru/documentation/rate-limits",
+            "ru/documentation/key-permissions",
             "ru/documentation/error-codes"
           ]
         },
