@@ -28,5 +28,5 @@ Un dominio personalizzato serve i file del team a indirizzi come `https://files.
 
 * `PATCH /v3/cdn/custom-domains/{id}` modifica l'origine esterna (`originUrl`) e il backup (`s3Backup`). Un `originUrl` vuoto disattiva l'origine esterna.
 * Un dominio con file non si può eliminare: elimina prima i file.
-* Il `deployHookToken` serve per [svuotare la cache dalla CI/CD](/it/tutorials/cdn-cache-purge-cicd). Conservalo nei segreti della CI.
+* Il `deployHookToken` serve per [svuotare la cache dalla CI/CD](/it/tutorials/cdn-cache-purge-cicd). È visibile e rigenerabile nella dashboard del team: «Domini → CDN» (`/dashboard/{team}/domains/cdn`), scheda del dominio. Conservalo nei segreti della CI.
 * Se la verifica non riesce, controlla che i record DNS coincidano con la risposta e si siano propagati.

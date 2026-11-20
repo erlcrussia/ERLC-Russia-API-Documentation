@@ -28,5 +28,5 @@ Un dominio propio sirve los archivos del equipo en direcciones como `https://fil
 
 * `PATCH /v3/cdn/custom-domains/{id}` cambia el origen externo (`originUrl`) y la copia de seguridad (`s3Backup`). Un `originUrl` vacío desactiva el origen externo.
 * No se puede eliminar un dominio con archivos: elimínalos antes.
-* El `deployHookToken` sirve para [purgar la caché desde CI/CD](/es/tutorials/cdn-cache-purge-cicd). Guárdalo en los secretos de CI.
+* El `deployHookToken` sirve para [purgar la caché desde CI/CD](/es/tutorials/cdn-cache-purge-cicd). Se muestra y se puede regenerar en el panel del equipo: «Dominios → CDN» (`/dashboard/{equipo}/domains/cdn`), tarjeta del dominio. Guárdalo en los secretos de CI.
 * Si la verificación falla, comprueba que los registros DNS coinciden con la respuesta y ya se propagaron.

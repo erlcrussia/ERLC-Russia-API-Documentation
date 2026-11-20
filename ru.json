@@ -399,6 +399,7 @@
       "icon": "robot",
       "pages": [
         "ru/openai-api/v1/overview",
+        "ru/openai-api/v1/realtime",
         {
           "group": "Документация AI API",
           "icon": "file-code",
@@ -423,8 +424,7 @@
               "icon": "waveform-lines",
               "pages": [
                 "ru/openai-api/v1/speech",
-                "ru/openai-api/v1/transcriptions",
-                "ru/openai-api/v1/realtime"
+                "ru/openai-api/v1/transcriptions"
               ]
             }
           ]
@@ -463,8 +463,7 @@
             "ru/other/cdn-integration",
             "ru/tutorials/nextjs-cdn-integration",
             "ru/tutorials/cdn-custom-domains",
-            "ru/tutorials/cdn-cache-purge-cicd",
-            "ru/other/user-assets"
+            "ru/tutorials/cdn-cache-purge-cicd"
           ]
         }
       ]

@@ -399,6 +399,7 @@
       "icon": "robot",
       "pages": [
         "en/openai-api/v1/overview",
+        "en/openai-api/v1/realtime",
         {
           "group": "AI API documentation",
           "icon": "file-code",
@@ -423,8 +424,7 @@
               "icon": "waveform-lines",
               "pages": [
                 "en/openai-api/v1/speech",
-                "en/openai-api/v1/transcriptions",
-                "en/openai-api/v1/realtime"
+                "en/openai-api/v1/transcriptions"
               ]
             }
           ]
@@ -463,8 +463,7 @@
             "en/other/cdn-integration",
             "en/tutorials/nextjs-cdn-integration",
             "en/tutorials/cdn-custom-domains",
-            "en/tutorials/cdn-cache-purge-cicd",
-            "en/other/user-assets"
+            "en/tutorials/cdn-cache-purge-cicd"
           ]
         }
       ]
