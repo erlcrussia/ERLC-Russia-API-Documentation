@@ -184,31 +184,31 @@
     },
     {
       "source": "/ru/reference/v3/user-assets/delete-user-assets-id",
-      "destination": "/ru/other/user-assets"
+      "destination": "//introduction"
     },
     {
       "source": "/ru/reference/v3/user-assets/get-user-assets-authorize",
-      "destination": "/ru/other/user-assets"
+      "destination": "//introduction"
     },
     {
       "source": "/ru/reference/v3/user-assets/get-user-assets-id-content",
-      "destination": "/ru/other/user-assets"
+      "destination": "//introduction"
     },
     {
       "source": "/ru/reference/v3/user-assets/get-user-assets-id",
-      "destination": "/ru/other/user-assets"
+      "destination": "//introduction"
     },
     {
       "source": "/ru/reference/v3/user-assets/get-user-assets",
-      "destination": "/ru/other/user-assets"
+      "destination": "//introduction"
     },
     {
       "source": "/ru/reference/v3/user-assets/head-user-assets-id-content",
-      "destination": "/ru/other/user-assets"
+      "destination": "//introduction"
     },
     {
       "source": "/ru/reference/v3/user-assets/post-user-assets",
-      "destination": "/ru/other/user-assets"
+      "destination": "//introduction"
     },
     {
       "source": "/ru/reference/v3/subscriptions/post-subscriptions-promo-validate",
@@ -288,31 +288,31 @@
     },
     {
       "source": "/en/reference/v3/user-assets/delete-user-assets-id",
-      "destination": "/en/other/user-assets"
+      "destination": "//introduction"
     },
     {
       "source": "/en/reference/v3/user-assets/get-user-assets-authorize",
-      "destination": "/en/other/user-assets"
+      "destination": "//introduction"
     },
     {
       "source": "/en/reference/v3/user-assets/get-user-assets-id-content",
-      "destination": "/en/other/user-assets"
+      "destination": "//introduction"
     },
     {
       "source": "/en/reference/v3/user-assets/get-user-assets-id",
-      "destination": "/en/other/user-assets"
+      "destination": "//introduction"
     },
     {
       "source": "/en/reference/v3/user-assets/get-user-assets",
-      "destination": "/en/other/user-assets"
+      "destination": "//introduction"
     },
     {
       "source": "/en/reference/v3/user-assets/head-user-assets-id-content",
-      "destination": "/en/other/user-assets"
+      "destination": "//introduction"
     },
     {
       "source": "/en/reference/v3/user-assets/post-user-assets",
-      "destination": "/en/other/user-assets"
+      "destination": "//introduction"
     },
     {
       "source": "/en/reference/v3/subscriptions/post-subscriptions-promo-validate",
@@ -392,31 +392,31 @@
     },
     {
       "source": "/uk/reference/v3/user-assets/delete-user-assets-id",
-      "destination": "/uk/other/user-assets"
+      "destination": "//introduction"
     },
     {
       "source": "/uk/reference/v3/user-assets/get-user-assets-authorize",
-      "destination": "/uk/other/user-assets"
+      "destination": "//introduction"
     },
     {
       "source": "/uk/reference/v3/user-assets/get-user-assets-id-content",
-      "destination": "/uk/other/user-assets"
+      "destination": "//introduction"
     },
     {
       "source": "/uk/reference/v3/user-assets/get-user-assets-id",
-      "destination": "/uk/other/user-assets"
+      "destination": "//introduction"
     },
     {
       "source": "/uk/reference/v3/user-assets/get-user-assets",
-      "destination": "/uk/other/user-assets"
+      "destination": "//introduction"
     },
     {
       "source": "/uk/reference/v3/user-assets/head-user-assets-id-content",
-      "destination": "/uk/other/user-assets"
+      "destination": "//introduction"
     },
     {
       "source": "/uk/reference/v3/user-assets/post-user-assets",
-      "destination": "/uk/other/user-assets"
+      "destination": "//introduction"
     },
     {
       "source": "/uk/reference/v3/subscriptions/post-subscriptions-promo-validate",
@@ -496,31 +496,31 @@
     },
     {
       "source": "/es/reference/v3/user-assets/delete-user-assets-id",
-      "destination": "/es/other/user-assets"
+      "destination": "//introduction"
     },
     {
       "source": "/es/reference/v3/user-assets/get-user-assets-authorize",
-      "destination": "/es/other/user-assets"
+      "destination": "//introduction"
     },
     {
       "source": "/es/reference/v3/user-assets/get-user-assets-id-content",
-      "destination": "/es/other/user-assets"
+      "destination": "//introduction"
     },
     {
       "source": "/es/reference/v3/user-assets/get-user-assets-id",
-      "destination": "/es/other/user-assets"
+      "destination": "//introduction"
     },
     {
       "source": "/es/reference/v3/user-assets/get-user-assets",
-      "destination": "/es/other/user-assets"
+      "destination": "//introduction"
     },
     {
       "source": "/es/reference/v3/user-assets/head-user-assets-id-content",
-      "destination": "/es/other/user-assets"
+      "destination": "//introduction"
     },
     {
       "source": "/es/reference/v3/user-assets/post-user-assets",
-      "destination": "/es/other/user-assets"
+      "destination": "//introduction"
     },
     {
       "source": "/es/reference/v3/subscriptions/post-subscriptions-promo-validate",
@@ -600,31 +600,31 @@
     },
     {
       "source": "/it/reference/v3/user-assets/delete-user-assets-id",
-      "destination": "/it/other/user-assets"
+      "destination": "//introduction"
     },
     {
       "source": "/it/reference/v3/user-assets/get-user-assets-authorize",
-      "destination": "/it/other/user-assets"
+      "destination": "//introduction"
     },
     {
       "source": "/it/reference/v3/user-assets/get-user-assets-id-content",
-      "destination": "/it/other/user-assets"
+      "destination": "//introduction"
     },
     {
       "source": "/it/reference/v3/user-assets/get-user-assets-id",
-      "destination": "/it/other/user-assets"
+      "destination": "//introduction"
     },
     {
       "source": "/it/reference/v3/user-assets/get-user-assets",
-      "destination": "/it/other/user-assets"
+      "destination": "//introduction"
     },
     {
       "source": "/it/reference/v3/user-assets/head-user-assets-id-content",
-      "destination": "/it/other/user-assets"
+      "destination": "//introduction"
     },
     {
       "source": "/it/reference/v3/user-assets/post-user-assets",
-      "destination": "/it/other/user-assets"
+      "destination": "//introduction"
     },
     {
       "source": "/it/reference/v3/subscriptions/post-subscriptions-promo-validate",

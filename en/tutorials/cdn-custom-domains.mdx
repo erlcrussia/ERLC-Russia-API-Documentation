@@ -28,5 +28,5 @@ A custom domain serves team files at addresses like `https://files.example.com/i
 
 * `PATCH /v3/cdn/custom-domains/{id}` changes the external file origin (`originUrl`) and backup (`s3Backup`). An empty `originUrl` disables the external origin.
 * A domain with files cannot be deleted: delete the files first.
-* The `deployHookToken` is used to [purge cache from CI/CD](/en/tutorials/cdn-cache-purge-cicd). Keep it in CI secrets.
+* The `deployHookToken` is used to [purge cache from CI/CD](/en/tutorials/cdn-cache-purge-cicd). It is shown and can be regenerated in the team dashboard: "Domains → CDN" (`/dashboard/{team}/domains/cdn`), on the domain card. Keep it in CI secrets.
 * If verification fails, check that the DNS records match the response and have propagated.
