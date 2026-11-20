@@ -1,0 +1,53 @@
+---
+title: "Права ключа"
+description: "Які права бувають у API-ключа, за що відповідає кожне і як їх отримати."
+icon: "key"
+---
+
+Право (scope) — рядок у списку правил API-ключа. Кожен ендпоінт перевіряє своє право: без нього ключ отримує `403`. Ключ створюється та налаштовується в [особистому кабінеті](https://erlcrussia.com/my/tokens) після входу через Discord — там же обираються права.
+
+## Як отримати права
+
+1. Увійдіть через Discord і відкрийте [«Мої токени»](https://erlcrussia.com/my/tokens).
+2. Створіть ключ і позначте потрібні права — назви збігаються з таблицею нижче.
+3. Частина прав вмикається лише при явному виборі (наприклад, `ads.write` і дії `action:*`).
+
+Передавайте ключ у заголовку `erlcrussia-api-key` або `Authorization: Bearer <API-ключ>`.
+
+## Типи прав
+
+| Тип | Вигляд | Призначення |
+|---|---|---|
+| Ендпоінт | `module.read`, `module.write` | Доступ до ендпоінтів читання або зміни. |
+| Запит | `query:Ім'я` | Параметр `query` у відповідях ER:LC (які дані повертати). |
+| Дія | `action:ім'я` | Конкретна операція в модулях CivOps. |
+| Дія за гільдією | `action:guild:<id>` | Операції CivOps, обмежені однією Discord-гільдією. |
+
+## Усі права
+
+| Модуль | Права |
+|---|---|
+| ER:LC V1 (застаріло) | `erlc.server`, `erlc.bans`, `erlc.command` |
+| ER:LC V2 | `erlc.v2.server`, `erlc.v2.command` |
+| Запити ER:LC V2 | `query:Players`, `query:Staff`, `query:JoinLogs`, `query:Queue`, `query:KillLogs`, `query:CommandLogs`, `query:ModCalls`, `query:EmergencyCalls`, `query:Vehicles` |
+| Економіка | `civops.v2.economy.read`, `civops.v2.economy.write` |
+| Дії економіки | `action:balance`, `action:leaderboard`, `action:rank`, `action:holdings`, `action:stocks`, `action:cooldowns`, `action:transfer`, `action:deposit`, `action:withdraw`, `action:pay`, `action:add`, `action:remove`, `action:reset`, `action:resetCooldown` |
+| Користувачі | `civops.v2.users.read`, `civops.v2.users.write` |
+| Дії з користувачами | `action:inventory`, `action:transactions`, `action:addItem`, `action:removeItem`, `action:clearInventory` |
+| Бізнеси | `civops.v2.businesses.read`, `civops.v2.businesses.write` |
+| Дії з бізнесами | `action:business_list`, `action:business_info`, `action:business_request`, `action:business_approve`, `action:business_create`, `action:business_delete`, `action:business_addMoney`, `action:business_withdraw`, `action:business_employee`, `action:business_product` |
+| Мафії | `civops.v2.mafias.read`, `civops.v2.mafias.write` |
+| Дії з мафіями | `action:mafia_list`, `action:mafia_info`, `action:mafia_balance`, `action:mafia_members`, `action:mafia_money` |
+| Уряд | `civops.v2.government.read`, `civops.v2.government.write` |
+| Дії уряду | `action:gov_treasury`, `action:gov_setTax`, `action:gov_setBudget` |
+| Магазин і реклама CivOps | `civops.v2.store.read`, `civops.v2.store.write`, `civops.v2.ads.read`, `civops.v2.ads.write` |
+| Система | `civops.v2.system.read` |
+| Рекламні кампанії | `ads.read`, `ads.write` |
+| CDN | `cdn.assets.read`, `cdn.assets.upload`, `cdn.assets.delete`, `cdn.folders.manage`, `cdn.cache.purge`, `cdn.domains.manage` |
+| Редиректи | `redirects.read`, `redirects.manage`, `redirects.analytics` |
+| Вебхуки | `webhooks.read`, `webhooks.manage`, `webhooks.ping` |
+| Екосистема | `subscription.read`, `verification.v2.lookup`, `points.read`, `points.add`, `points.remove`, `points.history` |
+
+<Note>
+Порожній список прав не обмежує ключ: без явних правил діє режим ключа (`full` або `restricted`). Ендпоінти вказують потрібне право у своєму розділі, наприклад «потребує право `ads.read`».
+</Note>

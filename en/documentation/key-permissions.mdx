@@ -1,0 +1,53 @@
+---
+title: "Key permissions"
+description: "Which permissions an API key can hold, what each one covers, and how to get them."
+icon: "key"
+---
+
+A permission (scope) is a string in the API key's rule list. Every endpoint checks its own permission: a key without it gets `403`. Create and configure keys in the [dashboard](https://erlcrussia.com/my/tokens) after signing in with Discord — permissions are selected there too.
+
+## Getting permissions
+
+1. Sign in with Discord and open [My tokens](https://erlcrussia.com/my/tokens).
+2. Create a key and tick the permissions you need — the names match the table below.
+3. Some permissions are enabled only when explicitly selected (for example, `ads.write` and `action:*` actions).
+
+Send the key in the `erlcrussia-api-key` header or as `Authorization: Bearer <API key>`.
+
+## Permission kinds
+
+| Kind | Form | Purpose |
+|---|---|---|
+| Endpoint | `module.read`, `module.write` | Access to read or write endpoints. |
+| Query | `query:Name` | The `query` parameter in ER:LC responses (which data to return). |
+| Action | `action:name` | A specific operation in CivOps modules. |
+| Guild action | `action:guild:<id>` | CivOps operations limited to one Discord guild. |
+
+## All permissions
+
+| Module | Permissions |
+|---|---|
+| ER:LC V1 (deprecated) | `erlc.server`, `erlc.bans`, `erlc.command` |
+| ER:LC V2 | `erlc.v2.server`, `erlc.v2.command` |
+| ER:LC V2 queries | `query:Players`, `query:Staff`, `query:JoinLogs`, `query:Queue`, `query:KillLogs`, `query:CommandLogs`, `query:ModCalls`, `query:EmergencyCalls`, `query:Vehicles` |
+| Economy | `civops.v2.economy.read`, `civops.v2.economy.write` |
+| Economy actions | `action:balance`, `action:leaderboard`, `action:rank`, `action:holdings`, `action:stocks`, `action:cooldowns`, `action:transfer`, `action:deposit`, `action:withdraw`, `action:pay`, `action:add`, `action:remove`, `action:reset`, `action:resetCooldown` |
+| Users | `civops.v2.users.read`, `civops.v2.users.write` |
+| User actions | `action:inventory`, `action:transactions`, `action:addItem`, `action:removeItem`, `action:clearInventory` |
+| Businesses | `civops.v2.businesses.read`, `civops.v2.businesses.write` |
+| Business actions | `action:business_list`, `action:business_info`, `action:business_request`, `action:business_approve`, `action:business_create`, `action:business_delete`, `action:business_addMoney`, `action:business_withdraw`, `action:business_employee`, `action:business_product` |
+| Mafias | `civops.v2.mafias.read`, `civops.v2.mafias.write` |
+| Mafia actions | `action:mafia_list`, `action:mafia_info`, `action:mafia_balance`, `action:mafia_members`, `action:mafia_money` |
+| Government | `civops.v2.government.read`, `civops.v2.government.write` |
+| Government actions | `action:gov_treasury`, `action:gov_setTax`, `action:gov_setBudget` |
+| Store & CivOps ads | `civops.v2.store.read`, `civops.v2.store.write`, `civops.v2.ads.read`, `civops.v2.ads.write` |
+| System | `civops.v2.system.read` |
+| Ad campaigns | `ads.read`, `ads.write` |
+| CDN | `cdn.assets.read`, `cdn.assets.upload`, `cdn.assets.delete`, `cdn.folders.manage`, `cdn.cache.purge`, `cdn.domains.manage` |
+| Redirects | `redirects.read`, `redirects.manage`, `redirects.analytics` |
+| Webhooks | `webhooks.read`, `webhooks.manage`, `webhooks.ping` |
+| Ecosystem | `subscription.read`, `verification.v2.lookup`, `points.read`, `points.add`, `points.remove`, `points.history` |
+
+<Note>
+An empty permission list does not restrict the key: without explicit rules the key's mode (`full` or `restricted`) applies. Each endpoint page states the required permission, e.g. "requires `ads.read`".
+</Note>

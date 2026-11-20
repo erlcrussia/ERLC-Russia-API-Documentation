@@ -5,6 +5,22 @@ icon: "clock-rotate-left"
 rss: true
 ---
 
+<Update label="20 de noviembre de 2026" description="CivOps: healthcheck público, endpoint de sistema y permisos por gremio." tags={["CivOps", "Claves"]}>
+
+### Nuevo
+
+- `GET /health` — verificación de disponibilidad pública, sin clave API.
+- `/system` — estado del sistema, requiere el permiso `civops.v2.system.read`.
+- Los permisos `action:guild:<id>` restringen las acciones de CivOps a un gremio de Discord.
+
+### Cambiado
+
+- Las solicitudes de escritura sin el campo `action` reciben `400` con el código `MISSING_ACTION` (`5162`).
+- Nuevos códigos de error: `BOT_UNAVAILABLE` (`5160`) — `503` cuando el bot no está disponible; `GUILD_SCOPE_DENIED` (`5159`) — el permiso está limitado a otro gremio; `UPSTREAM_RESPONSE_TOO_LARGE` (`5161`) — la respuesta del bot supera el límite de 16 MB; `SERVICE_UNAVAILABLE` (`5155`) — el servicio no está disponible temporalmente.
+- Las redirecciones del bot no se siguen: una respuesta con redirección se devuelve tal cual.
+
+</Update>
+
 <Update label="14 de noviembre de 2026" description="Publicidad: gestión con clave API y permisos ads.read / ads.write." tags={["Publicidad", "Claves"]}>
 
 ### Nuevo

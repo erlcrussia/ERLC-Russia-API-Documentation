@@ -5,6 +5,22 @@ icon: "clock-rotate-left"
 rss: true
 ---
 
+<Update label="November 20, 2026" description="CivOps: public healthcheck, system endpoint, and guild-scoped permissions." tags={["CivOps", "Keys"]}>
+
+### New
+
+- `GET /health` — public liveness check, no API key required.
+- `/system` — system status, requires the `civops.v2.system.read` permission.
+- `action:guild:<id>` permissions restrict CivOps actions to a single Discord guild.
+
+### Changed
+
+- Write requests without the `action` field get `400` with code `MISSING_ACTION` (`5162`).
+- New error codes: `BOT_UNAVAILABLE` (`5160`) — `503` when the bot is unavailable; `GUILD_SCOPE_DENIED` (`5159`) — the permission is limited to another guild; `UPSTREAM_RESPONSE_TOO_LARGE` (`5161`) — the bot response exceeds the 16 MB limit; `SERVICE_UNAVAILABLE` (`5155`) — the service is temporarily unavailable.
+- Bot redirects are not followed: a redirect response is returned as is.
+
+</Update>
+
 <Update label="November 14, 2026" description="Ads: management with an API key and ads.read / ads.write permissions." tags={["Ads", "Keys"]}>
 
 ### New

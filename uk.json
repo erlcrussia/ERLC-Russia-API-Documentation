@@ -20,6 +20,7 @@
           "pages": [
             "uk/documentation/erlc-location-information",
             "uk/documentation/rate-limits",
+            "uk/documentation/key-permissions",
             "uk/documentation/error-codes"
           ]
         },
