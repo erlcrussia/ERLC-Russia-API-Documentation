@@ -5,6 +5,15 @@ icon: "clock-rotate-left"
 rss: true
 ---
 
+<Update label="21 de noviembre de 2026" description="CivOps: verificación de licencia de conducir y obtención del logo del negocio." tags={["CivOps", "Economía"]}>
+
+### Nuevo
+
+- `GET /civops/users?action=license` (también disponible como `GET /civops/users/{userId}/license`; también se admite el alias `driverLicense`) — verificación de la licencia de conducir del usuario por Discord ID (`userId`). Acepta opcionalmente `guildId` para la verificación dentro de un servidor de Discord. Devuelve el estado `hasLicense` y el objeto `license` (estado, fecha de emisión, emisor, `guildId`). Equivalente para el panel de administración: `GET /v3/admin/discord/users/{discordId}/license` (solo con token de administrador).
+- `GET /civops/businesses?action=logo` (también disponible como `GET /civops/businesses/{businessId}/logo`) — obtención de la URL directa del logo del negocio (`logoUrl`) y del indicador `hasLogo` por el ID del negocio (`businessId`) o su nombre (`businessName`). Equivalente para el panel de administración: `GET /v3/admin/businesses/{businessId}/logo`.
+
+</Update>
+
 <Update label="20 de noviembre de 2026" description="CivOps: healthcheck público, endpoint de sistema y permisos por gremio." tags={["CivOps", "Claves"]}>
 
 ### Nuevo

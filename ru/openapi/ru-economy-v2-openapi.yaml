@@ -294,7 +294,7 @@ paths:
 
         - `transactions` - история транзакций (требует userId, page, limit).
 
-        - `license` - проверка наличия водительских прав (требует userId, опционально guildId).
+        - `license` - проверка наличия водительских прав (требует userId, опционально guildId; алиас `driverLicense`; возвращает `hasLicense` и поля `license`: `status`, `createdAt`, `issuedBy`, `guildId`).
 
         '
       security:

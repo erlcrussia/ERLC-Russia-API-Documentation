@@ -333,7 +333,7 @@ paths:
       tags:
       - Economia
       summary: 'Economia: giocatore'
-      description: 'Inventario e cronologia operazioni. Azioni: `inventory` (`userId`), `transactions` (`userId`, `page`, `limit`). I parametri dell''azione vanno nella query; per POST, nel corpo JSON.'
+      description: 'Inventario, verifica della patente di guida e cronologia operazioni. Azioni: `inventory` (`userId`), `transactions` (`userId`, `page`, `limit`), `license` (`userId`, `guildId` opzionale; alias `driverLicense`). L''azione `license` restituisce `hasLicense` e l''oggetto `license` (`status`, `createdAt`, `issuedBy`, `guildId`). I parametri dell''azione vanno nella query; per POST, nel corpo JSON.'
       security:
       - BearerAuth: []
       parameters:
@@ -346,10 +346,17 @@ paths:
           enum:
           - inventory
           - transactions
+          - license
       - name: userId
         in: query
         required: false
         description: 'Discord ID del giocatore.'
+        schema:
+          type: string
+      - name: guildId
+        in: query
+        required: false
+        description: 'ID del server Discord (gilda) per la verifica della patente nel contesto del server.'
         schema:
           type: string
       - name: page
@@ -437,7 +444,7 @@ paths:
       tags:
       - Economia
       summary: 'Economia: attività'
-      description: 'Azioni: `list` (`page`, `limit`), `info` (`businessId` o `businessName`), `balance`, `employees`, `store` (`businessName`), `transfers`, `logs` (`businessId`, `page`, `limit`), `rating`, `pending`. I parametri dell''azione vanno nella query; per POST, nel corpo JSON.'
+      description: 'Azioni: `list` (`page`, `limit`), `info` (`businessId` o `businessName`), `balance`, `employees`, `store` (`businessName`), `transfers`, `logs` (`businessId`, `page`, `limit`), `rating`, `pending`, `logo` (`businessId` o `businessName`). I parametri dell''azione vanno nella query; per POST, nel corpo JSON.'
       security:
       - BearerAuth: []
       parameters:
@@ -457,6 +464,7 @@ paths:
           - logs
           - rating
           - pending
+          - logo
       - name: businessId
         in: query
         required: false

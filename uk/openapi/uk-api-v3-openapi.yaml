@@ -333,7 +333,7 @@ paths:
       tags:
       - Економіка
       summary: 'Економіка: гравець'
-      description: 'Інвентар та історія операцій. Дії: `inventory` (`userId`), `transactions` (`userId`, `page`, `limit`). Параметри дії передаються в query; для POST — у JSON-тілі.'
+      description: 'Інвентар, перевірка водійських прав та історія операцій. Дії: `inventory` (`userId`), `transactions` (`userId`, `page`, `limit`), `license` (`userId`, опціонально `guildId`; аліас `driverLicense`). Дія `license` повертає `hasLicense` та об''єкт `license` (`status`, `createdAt`, `issuedBy`, `guildId`). Параметри дії передаються в query; для POST — у JSON-тілі.'
       security:
       - BearerAuth: []
       parameters:
@@ -346,10 +346,17 @@ paths:
           enum:
           - inventory
           - transactions
+          - license
       - name: userId
         in: query
         required: false
         description: 'Discord ID гравця.'
+        schema:
+          type: string
+      - name: guildId
+        in: query
+        required: false
+        description: 'ID Discord-сервера (гільдії) для перевірки прав у межах сервера.'
         schema:
           type: string
       - name: page
@@ -437,7 +444,7 @@ paths:
       tags:
       - Економіка
       summary: 'Економіка: бізнеси'
-      description: 'Дії: `list` (`page`, `limit`), `info` (`businessId` або `businessName`), `balance`, `employees`, `store` (`businessName`), `transfers`, `logs` (`businessId`, `page`, `limit`), `rating`, `pending`. Параметри дії передаються в query; для POST — у JSON-тілі.'
+      description: 'Дії: `list` (`page`, `limit`), `info` (`businessId` або `businessName`), `balance`, `employees`, `store` (`businessName`), `transfers`, `logs` (`businessId`, `page`, `limit`), `rating`, `pending`, `logo` (`businessId` або `businessName`). Параметри дії передаються в query; для POST — у JSON-тілі.'
       security:
       - BearerAuth: []
       parameters:
@@ -457,6 +464,7 @@ paths:
           - logs
           - rating
           - pending
+          - logo
       - name: businessId
         in: query
         required: false
