@@ -285,7 +285,7 @@ paths:
       tags:
       - Moscow RolePlay Economy API V2
       summary: Get User Data
-      description: 'Retrieve user inventory and transaction history.
+      description: 'Retrieve user inventory, transaction history, and driver license check.
 
 
         Available actions:
@@ -293,6 +293,8 @@ paths:
         - `inventory` - user inventory (requires userId).
 
         - `transactions` - transaction history (requires userId, page, limit).
+
+        - `license` - driver license check (requires userId, optional guildId).
 
         '
       security:
@@ -307,9 +309,16 @@ paths:
           enum:
           - inventory
           - transactions
+          - license
       - name: userId
         in: query
         description: User ID (required).
+        required: false
+        schema:
+          type: string
+      - name: guildId
+        in: query
+        description: Discord guild ID for guild-scoped license verification.
         required: false
         schema:
           type: string
@@ -502,6 +511,8 @@ paths:
 
         - `pending` - pending business creation requests.
 
+        - `logo` - get direct link to business logo (requires businessId or businessName).
+
         '
       security:
       - MRPAPIKey: []
@@ -521,6 +532,7 @@ paths:
           - transfers
           - rating
           - pending
+          - logo
       - name: businessId
         in: query
         description: Business ID (for info, balance, employees, transfers).

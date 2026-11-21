@@ -285,7 +285,7 @@ paths:
       tags:
       - Moscow RolePlay API Экономики V2
       summary: Получение данных пользователей
-      description: 'Получение инвентаря и истории транзакций пользователя.
+      description: 'Получение инвентаря, истории транзакций и проверки водительских прав пользователя.
 
 
         Доступные действия:
@@ -293,6 +293,8 @@ paths:
         - `inventory` - инвентарь пользователя (требует userId).
 
         - `transactions` - история транзакций (требует userId, page, limit).
+
+        - `license` - проверка наличия водительских прав (требует userId, опционально guildId).
 
         '
       security:
@@ -307,9 +309,16 @@ paths:
           enum:
           - inventory
           - transactions
+          - license
       - name: userId
         in: query
         description: ID пользователя (обязателен).
+        required: false
+        schema:
+          type: string
+      - name: guildId
+        in: query
+        description: ID сервера (гильдии) для проверки прав в рамках гильдии.
         required: false
         schema:
           type: string
@@ -502,6 +511,8 @@ paths:
 
         - `pending` - ожидающие заявки на создание бизнеса.
 
+        - `logo` - получение прямой ссылки на логотип бизнеса (требует businessId или businessName).
+
         '
       security:
       - MRPAPIKey: []
@@ -521,6 +532,7 @@ paths:
           - transfers
           - rating
           - pending
+          - logo
       - name: businessId
         in: query
         description: ID бизнеса (для info, balance, employees, transfers).

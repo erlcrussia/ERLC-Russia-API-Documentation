@@ -5,6 +5,15 @@ icon: "clock-rotate-left"
 rss: true
 ---
 
+<Update label="November 21, 2026" description="CivOps: driver license verification and business logo retrieval." tags={["CivOps", "Economy"]}>
+
+### New
+
+- `GET /civops/users?action=license` (also available as `GET /discord/users/:discordId/license` and `GET /users/:userId/license`) — check user driver license by Discord ID (`userId`). Accepts optional `guildId` for guild-scoped license checks. Returns `hasLicense` status and the `license` details (category, status, createdAt, issuedBy).
+- `GET /civops/businesses?action=logo` (also available as `GET /businesses/:businessId/logo`) — retrieve direct URL to business logo (`logoUrl`) and `hasLogo` boolean by business ID (`businessId`) or business name (`businessName`).
+
+</Update>
+
 <Update label="November 20, 2026" description="CivOps: public healthcheck, system endpoint, and guild-scoped permissions." tags={["CivOps", "Keys"]}>
 
 ### New
