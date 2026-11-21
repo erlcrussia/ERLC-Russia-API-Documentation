@@ -331,7 +331,7 @@ paths:
       tags:
       - Economía
       summary: 'Economía: jugador'
-      description: 'Inventario e historial de operaciones. Acciones: `inventory` (`userId`), `transactions` (`userId`, `page`, `limit`). Los parámetros de la acción van en la query; para POST, en el cuerpo JSON.'
+      description: 'Inventario, verificación de licencia de conducir e historial de operaciones. Acciones: `inventory` (`userId`), `transactions` (`userId`, `page`, `limit`), `license` (`userId`, `guildId` opcional; alias `driverLicense`). La acción `license` devuelve `hasLicense` y el objeto `license` (`status`, `createdAt`, `issuedBy`, `guildId`). Los parámetros de la acción van en la query; para POST, en el cuerpo JSON.'
       security:
       - BearerAuth: []
       parameters:
@@ -344,10 +344,17 @@ paths:
           enum:
           - inventory
           - transactions
+          - license
       - name: userId
         in: query
         required: false
         description: 'Discord ID del jugador.'
+        schema:
+          type: string
+      - name: guildId
+        in: query
+        required: false
+        description: 'ID del servidor de Discord (gremio) para la verificación de la licencia dentro del servidor.'
         schema:
           type: string
       - name: page
@@ -435,7 +442,7 @@ paths:
       tags:
       - Economía
       summary: 'Economía: negocios'
-      description: 'Acciones: `list` (`page`, `limit`), `info` (`businessId` o `businessName`), `balance`, `employees`, `store` (`businessName`), `transfers`, `logs` (`businessId`, `page`, `limit`), `rating`, `pending`. Los parámetros de la acción van en la query; para POST, en el cuerpo JSON.'
+      description: 'Acciones: `list` (`page`, `limit`), `info` (`businessId` o `businessName`), `balance`, `employees`, `store` (`businessName`), `transfers`, `logs` (`businessId`, `page`, `limit`), `rating`, `pending`, `logo` (`businessId` o `businessName`). Los parámetros de la acción van en la query; para POST, en el cuerpo JSON.'
       security:
       - BearerAuth: []
       parameters:
@@ -455,6 +462,7 @@ paths:
           - logs
           - rating
           - pending
+          - logo
       - name: businessId
         in: query
         required: false

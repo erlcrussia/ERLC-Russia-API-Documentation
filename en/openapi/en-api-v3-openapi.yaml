@@ -331,7 +331,7 @@ paths:
       tags:
       - Economy
       summary: 'Economy: player'
-      description: 'Inventory, driver license check, and transaction history. Actions: `inventory` (`userId`), `transactions` (`userId`, `page`, `limit`), `license` (`userId`, optional `guildId`). Action parameters go in the query string; for POST, in the JSON body.'
+      description: 'Inventory, driver license check, and transaction history. Actions: `inventory` (`userId`), `transactions` (`userId`, `page`, `limit`), `license` (`userId`, optional `guildId`; alias `driverLicense`). The `license` action returns `hasLicense` and `license` details (`status`, `createdAt`, `issuedBy`, `guildId`). Action parameters go in the query string; for POST, in the JSON body.'
       security:
       - BearerAuth: []
       parameters:

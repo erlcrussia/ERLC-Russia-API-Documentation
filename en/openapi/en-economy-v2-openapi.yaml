@@ -294,7 +294,7 @@ paths:
 
         - `transactions` - transaction history (requires userId, page, limit).
 
-        - `license` - driver license check (requires userId, optional guildId).
+        - `license` - driver license check (requires userId, optional guildId; alias `driverLicense`; returns `hasLicense` and `license` fields: `status`, `createdAt`, `issuedBy`, `guildId`).
 
         '
       security:

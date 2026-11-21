@@ -9,8 +9,8 @@ rss: true
 
 ### New
 
-- `GET /civops/users?action=license` (also available as `GET /discord/users/:discordId/license` and `GET /users/:userId/license`) — check user driver license by Discord ID (`userId`). Accepts optional `guildId` for guild-scoped license checks. Returns `hasLicense` status and the `license` details (status, createdAt, issuedBy).
-- `GET /civops/businesses?action=logo` (also available as `GET /businesses/:businessId/logo`) — retrieve direct URL to business logo (`logoUrl`) and `hasLogo` boolean by business ID (`businessId`) or business name (`businessName`).
+- `GET /civops/users?action=license` (also available as `GET /civops/users/{userId}/license`; the alias `driverLicense` is also supported) — check user driver license by Discord ID (`userId`). Accepts optional `guildId` for guild-scoped license checks. Returns `hasLicense` status and the `license` details (status, createdAt, issuedBy, guildId). Admin-panel equivalent: `GET /v3/admin/discord/users/{discordId}/license` (admin token only).
+- `GET /civops/businesses?action=logo` (also available as `GET /civops/businesses/{businessId}/logo`) — retrieve direct URL to business logo (`logoUrl`) and `hasLogo` boolean by business ID (`businessId`) or business name (`businessName`). Admin-panel equivalent: `GET /v3/admin/businesses/{businessId}/logo`.
 
 </Update>
 
