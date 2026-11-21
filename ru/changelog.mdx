@@ -9,7 +9,7 @@ rss: true
 
 ### Новое
 
-- `GET /civops/users?action=license` (также доступен как `GET /discord/users/:discordId/license` и `GET /users/:userId/license`) — проверка наличия водительских прав у пользователя по Discord ID (`userId`). Опционально принимает `guildId` для проверки в рамках конкретного Discord-сервера. Возвращает статус `hasLicense` и объект `license` (категория, статус, дата выдачи, кем выдано).
+- `GET /civops/users?action=license` (также доступен как `GET /discord/users/:discordId/license` и `GET /users/:userId/license`) — проверка наличия водительских прав у пользователя по Discord ID (`userId`). Опционально принимает `guildId` для проверки в рамках конкретного Discord-сервера. Возвращает статус `hasLicense` и объект `license` (статус, дата выдачи, кем выдано).
 - `GET /civops/businesses?action=logo` (также доступен как `GET /businesses/:businessId/logo`) — получение прямой ссылки на логотип бизнеса (`logoUrl`) и флага `hasLogo` по идентификатору бизнеса (`businessId`) или его названию (`businessName`).
 
 </Update>
