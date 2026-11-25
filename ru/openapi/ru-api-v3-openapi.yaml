@@ -325,7 +325,7 @@ paths:
       tags:
       - Экономика
       summary: 'Экономика: игрок'
-      description: 'Инвентарь и история операций. Действия: `inventory` (`userId`), `transactions` (`userId`, `page`, `limit`). Параметры действия передаются в query; для POST — в JSON-теле.'
+      description: 'Инвентарь, проверка водительских прав и история операций. Действия: `inventory` (`userId`), `transactions` (`userId`, `page`, `limit`), `license` (`userId`, опционально `guildId`; алиас `driverLicense`). Действие `license` возвращает `hasLicense` и объект `license` (`status`, `createdAt`, `issuedBy`, `guildId`). Параметры действия передаются в query; для POST — в JSON-теле.'
       security:
       - BearerAuth: []
       parameters:
@@ -338,10 +338,17 @@ paths:
           enum:
           - inventory
           - transactions
+          - license
       - name: userId
         in: query
         required: false
         description: 'Discord ID игрока.'
+        schema:
+          type: string
+      - name: guildId
+        in: query
+        required: false
+        description: 'ID Discord-сервера (гильдии) для проверки прав в рамках сервера.'
         schema:
           type: string
       - name: page
@@ -429,7 +436,7 @@ paths:
       tags:
       - Экономика
       summary: 'Экономика: бизнесы'
-      description: 'Действия: `list` (`page`, `limit`), `info` (`businessId` или `businessName`), `balance`, `employees`, `store` (`businessName`), `transfers`, `logs` (`businessId`, `page`, `limit`), `rating`, `pending`. Параметры действия передаются в query; для POST — в JSON-теле.'
+      description: 'Действия: `list` (`page`, `limit`), `info` (`businessId` или `businessName`), `balance`, `employees`, `store` (`businessName`), `transfers`, `logs` (`businessId`, `page`, `limit`), `rating`, `pending`, `logo` (`businessId` или `businessName`). Параметры действия передаются в query; для POST — в JSON-теле.'
       security:
       - BearerAuth: []
       parameters:
@@ -449,6 +456,7 @@ paths:
           - logs
           - rating
           - pending
+          - logo
       - name: businessId
         in: query
         required: false

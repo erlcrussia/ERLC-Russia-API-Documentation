@@ -331,7 +331,7 @@ paths:
       tags:
       - Economy
       summary: 'Economy: player'
-      description: 'Inventory and transaction history. Actions: `inventory` (`userId`), `transactions` (`userId`, `page`, `limit`). Action parameters go in the query string; for POST, in the JSON body.'
+      description: 'Inventory, driver license check, and transaction history. Actions: `inventory` (`userId`), `transactions` (`userId`, `page`, `limit`), `license` (`userId`, optional `guildId`; alias `driverLicense`). The `license` action returns `hasLicense` and `license` details (`status`, `createdAt`, `issuedBy`, `guildId`). Action parameters go in the query string; for POST, in the JSON body.'
       security:
       - BearerAuth: []
       parameters:
@@ -344,10 +344,17 @@ paths:
           enum:
           - inventory
           - transactions
+          - license
       - name: userId
         in: query
         required: false
         description: 'Discord ID of the player.'
+        schema:
+          type: string
+      - name: guildId
+        in: query
+        required: false
+        description: 'Discord guild ID for guild-scoped license verification.'
         schema:
           type: string
       - name: page
@@ -435,7 +442,7 @@ paths:
       tags:
       - Economy
       summary: 'Economy: businesses'
-      description: 'Actions: `list` (`page`, `limit`), `info` (`businessId` or `businessName`), `balance`, `employees`, `store` (`businessName`), `transfers`, `logs` (`businessId`, `page`, `limit`), `rating`, `pending`. Action parameters go in the query string; for POST, in the JSON body.'
+      description: 'Actions: `list` (`page`, `limit`), `info` (`businessId` or `businessName`), `balance`, `employees`, `store` (`businessName`), `transfers`, `logs` (`businessId`, `page`, `limit`), `rating`, `pending`, `logo` (`businessId` or `businessName`). Action parameters go in the query string; for POST, in the JSON body.'
       security:
       - BearerAuth: []
       parameters:
@@ -455,6 +462,7 @@ paths:
           - logs
           - rating
           - pending
+          - logo
       - name: businessId
         in: query
         required: false

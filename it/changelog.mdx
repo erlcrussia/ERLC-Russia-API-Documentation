@@ -5,6 +5,15 @@ icon: "clock-rotate-left"
 rss: true
 ---
 
+<Update label="21 novembre 2026" description="CivOps: verifica della patente di guida e recupero del logo dell'attività." tags={["CivOps", "Economia"]}>
+
+### Novità
+
+- `GET /civops/users?action=license` (disponibile anche come `GET /civops/users/{userId}/license`; è supportato anche l'alias `driverLicense`) — verifica della patente di guida dell'utente tramite Discord ID (`userId`). Accetta opzionalmente `guildId` per la verifica nell'ambito di un server Discord specifico. Restituisce lo stato `hasLicense` e l'oggetto `license` (stato, data di emissione, emittente, `guildId`). Equivalente per il pannello admin: `GET /v3/admin/discord/users/{discordId}/license` (solo con token admin).
+- `GET /civops/businesses?action=logo` (disponibile anche come `GET /civops/businesses/{businessId}/logo`) — recupero dell'URL diretto del logo dell'attività (`logoUrl`) e del flag `hasLogo` tramite l'ID dell'attività (`businessId`) o il suo nome (`businessName`). Equivalente per il pannello admin: `GET /v3/admin/businesses/{businessId}/logo`.
+
+</Update>
+
 <Update label="20 novembre 2026" description="CivOps: healthcheck pubblico, endpoint di sistema e permessi per gilda." tags={["CivOps", "Chiavi"]}>
 
 ### Novità

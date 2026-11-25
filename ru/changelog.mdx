@@ -5,6 +5,15 @@ icon: "clock-rotate-left"
 rss: true
 ---
 
+<Update label="21 ноября 2026" description="CivOps: проверка водительских прав и получение логотипа бизнеса." tags={["CivOps", "Экономика"]}>
+
+### Новое
+
+- `GET /civops/users?action=license` (также доступен как `GET /civops/users/{userId}/license`; также поддерживается алиас `driverLicense`) — проверка наличия водительских прав у пользователя по Discord ID (`userId`). Опционально принимает `guildId` для проверки в рамках конкретного Discord-сервера. Возвращает статус `hasLicense` и объект `license` (статус, дата выдачи, кем выдано, `guildId`). Эквивалент для админ-панели: `GET /v3/admin/discord/users/{discordId}/license` (только с админ-токеном).
+- `GET /civops/businesses?action=logo` (также доступен как `GET /civops/businesses/{businessId}/logo`) — получение прямой ссылки на логотип бизнеса (`logoUrl`) и флага `hasLogo` по идентификатору бизнеса (`businessId`) или его названию (`businessName`). Эквивалент для админ-панели: `GET /v3/admin/businesses/{businessId}/logo`.
+
+</Update>
+
 <Update label="20 ноября 2026" description="CivOps: публичный healthcheck, системный эндпоинт и права по гильдии." tags={["CivOps", "Ключи"]}>
 
 ### Новое
