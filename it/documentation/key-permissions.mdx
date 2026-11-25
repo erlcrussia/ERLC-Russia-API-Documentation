@@ -27,21 +27,25 @@ Invia la chiave nell'header `erlcrussia-api-key` o come `Authorization: Bearer <
 
 | Modulo | Permessi |
 |---|---|
-| ER:LC V1 (deprecato) | `erlc.server`, `erlc.bans`, `erlc.command` |
-| ER:LC V2 | `erlc.v2.server`, `erlc.v2.command` |
+| ER:LC V1 (deprecato) | `erlc.server`, `erlc.bans`, `erlc.command` — nomi legacy ancora accettati su `/v3` per le chiavi esistenti |
+| ER:LC V2 | `erlc.v2.server`, `erlc.v2.command`, `erlc.v2.bans` (ban: solo `/v3`) |
 | Query di ER:LC V2 | `query:Players`, `query:Staff`, `query:JoinLogs`, `query:Queue`, `query:KillLogs`, `query:CommandLogs`, `query:ModCalls`, `query:EmergencyCalls`, `query:Vehicles` |
 | Economia | `civops.v2.economy.read`, `civops.v2.economy.write` |
-| Azioni di economia | `action:balance`, `action:leaderboard`, `action:rank`, `action:holdings`, `action:stocks`, `action:cooldowns`, `action:transfer`, `action:deposit`, `action:withdraw`, `action:pay`, `action:add`, `action:remove`, `action:reset`, `action:resetCooldown` |
+| Azioni di economia | `action:balance`, `action:leaderboard`, `action:rank`, `action:holdings`, `action:stocks`, `action:cooldowns`, `action:transfer`, `action:deposit`, `action:withdraw`, `action:add`, `action:remove`, `action:reset`, `action:resetCooldown` |
 | Utenti | `civops.v2.users.read`, `civops.v2.users.write` |
 | Azioni sugli utenti | `action:inventory`, `action:transactions`, `action:addItem`, `action:removeItem`, `action:clearInventory` |
 | Attività | `civops.v2.businesses.read`, `civops.v2.businesses.write` |
-| Azioni sulle attività | `action:business_list`, `action:business_info`, `action:business_request`, `action:business_approve`, `action:business_create`, `action:business_delete`, `action:business_addMoney`, `action:business_withdraw`, `action:business_employee`, `action:business_product` |
+| Azioni sulle attività | `action:business_list`, `action:business_info`, `action:business_balance`, `action:business_employees`, `action:business_store`, `action:business_transfers`, `action:business_logs`, `action:business_rating`, `action:business_pending`, `action:business_request`, `action:business_approve`, `action:business_create`, `action:business_edit`, `action:business_delete`, `action:business_addMoney`, `action:business_removeMoney`, `action:business_withdraw`, `action:business_transfer`, `action:business_returnMoney`, `action:business_cancelRequest`, `action:business_employee`, `action:business_product` |
 | Mafie | `civops.v2.mafias.read`, `civops.v2.mafias.write` |
-| Azioni sulle mafie | `action:mafia_list`, `action:mafia_info`, `action:mafia_balance`, `action:mafia_members`, `action:mafia_money` |
+| Azioni sulle mafie | `action:mafia_list`, `action:mafia_info`, `action:mafia_balance`, `action:mafia_transfers`, `action:mafia_logs`, `action:mafia_create`, `action:mafia_delete`, `action:mafia_members`, `action:mafia_money` |
 | Governo | `civops.v2.government.read`, `civops.v2.government.write` |
-| Azioni di governo | `action:gov_treasury`, `action:gov_setTax`, `action:gov_setBudget` |
-| Negozio e annunci CivOps | `civops.v2.store.read`, `civops.v2.store.write`, `civops.v2.ads.read`, `civops.v2.ads.write` |
+| Azioni di governo | `action:gov_treasury`, `action:gov_setBudget` |
+| Negozio | `civops.v2.store.read`, `civops.v2.store.write` |
+| Azioni del negozio | `action:store_list`, `action:store_info`, `action:store_addItem`, `action:store_removeItem`, `action:store_buy`, `action:store_sellToStore` |
+| Annunci CivOps | `civops.v2.ads.read`, `civops.v2.ads.write` |
+| Azioni degli annunci CivOps | `action:ads_list`, `action:ads_create` |
 | Sistema | `civops.v2.system.read` |
+| Azioni di sistema | `action:system_stats`, `action:system_uptime`, `action:system_dbStatus` |
 | Campagne pubblicitarie | `ads.read`, `ads.write` |
 | CDN | `cdn.assets.read`, `cdn.assets.upload`, `cdn.assets.delete`, `cdn.folders.manage`, `cdn.cache.purge`, `cdn.domains.manage` |
 | Redirect | `redirects.read`, `redirects.manage`, `redirects.analytics` |
