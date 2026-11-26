@@ -28,8 +28,9 @@ Envíe la clave en el encabezado `erlcrussia-api-key` o como `Authorization: Bea
 | Módulo | Permisos |
 |---|---|
 | ER:LC V1 (obsoleto) | `erlc.server`, `erlc.bans`, `erlc.command` — nombres antiguos que aún se aceptan en `/v3` para claves existentes |
-| ER:LC V2 | `erlc.v2.server`, `erlc.v2.command`, `erlc.v2.bans` (baneos: solo `/v3`) |
-| Consultas de ER:LC V2 | `query:Players`, `query:Staff`, `query:JoinLogs`, `query:Queue`, `query:KillLogs`, `query:CommandLogs`, `query:ModCalls`, `query:EmergencyCalls`, `query:Vehicles` |
+| ER:LC V2 | `erlc.v2.server`, `erlc.v2.command` |
+| ER:LC V3 | `erlc.v3.server`, `erlc.v3.command`, `erlc.v3.bans` — los nombres canónicos de `/v3`; `erlc.v2.bans` sigue aceptándose como alias para claves existentes |
+| Consultas de ER:LC V2/V3 | `query:Players`, `query:Staff`, `query:JoinLogs`, `query:Queue`, `query:KillLogs`, `query:CommandLogs`, `query:ModCalls`, `query:EmergencyCalls`, `query:Vehicles` |
 | Economía | `civops.v2.economy.read`, `civops.v2.economy.write` |
 | Acciones de economía | `action:balance`, `action:leaderboard`, `action:rank`, `action:holdings`, `action:stocks`, `action:cooldowns`, `action:transfer`, `action:deposit`, `action:withdraw`, `action:add`, `action:remove`, `action:reset`, `action:resetCooldown` |
 | Usuarios | `civops.v2.users.read`, `civops.v2.users.write` |

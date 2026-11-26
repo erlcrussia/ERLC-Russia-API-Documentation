@@ -28,8 +28,9 @@ icon: "key"
 | Модуль | Права |
 |---|---|
 | ER:LC V1 (устарело) | `erlc.server`, `erlc.bans`, `erlc.command` — устаревшие имена, по-прежнему принимаются на `/v3` для существующих ключей |
-| ER:LC V2 | `erlc.v2.server`, `erlc.v2.command`, `erlc.v2.bans` (баны: только `/v3`) |
-| Запросы ER:LC V2 | `query:Players`, `query:Staff`, `query:JoinLogs`, `query:Queue`, `query:KillLogs`, `query:CommandLogs`, `query:ModCalls`, `query:EmergencyCalls`, `query:Vehicles` |
+| ER:LC V2 | `erlc.v2.server`, `erlc.v2.command` |
+| ER:LC V3 | `erlc.v3.server`, `erlc.v3.command`, `erlc.v3.bans` — каноничные имена `/v3`; `erlc.v2.bans` принимается как алиас для существующих ключей |
+| Запросы ER:LC V2/V3 | `query:Players`, `query:Staff`, `query:JoinLogs`, `query:Queue`, `query:KillLogs`, `query:CommandLogs`, `query:ModCalls`, `query:EmergencyCalls`, `query:Vehicles` |
 | Экономика | `civops.v2.economy.read`, `civops.v2.economy.write` |
 | Действия экономики | `action:balance`, `action:leaderboard`, `action:rank`, `action:holdings`, `action:stocks`, `action:cooldowns`, `action:transfer`, `action:deposit`, `action:withdraw`, `action:add`, `action:remove`, `action:reset`, `action:resetCooldown` |
 | Пользователи | `civops.v2.users.read`, `civops.v2.users.write` |

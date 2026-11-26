@@ -28,8 +28,9 @@ Send the key in the `erlcrussia-api-key` header or as `Authorization: Bearer <AP
 | Module | Permissions |
 |---|---|
 | ER:LC V1 (deprecated) | `erlc.server`, `erlc.bans`, `erlc.command` — legacy names still honoured on `/v3` for existing keys |
-| ER:LC V2 | `erlc.v2.server`, `erlc.v2.command`, `erlc.v2.bans` (bans: `/v3` only) |
-| ER:LC V2 queries | `query:Players`, `query:Staff`, `query:JoinLogs`, `query:Queue`, `query:KillLogs`, `query:CommandLogs`, `query:ModCalls`, `query:EmergencyCalls`, `query:Vehicles` |
+| ER:LC V2 | `erlc.v2.server`, `erlc.v2.command` |
+| ER:LC V3 | `erlc.v3.server`, `erlc.v3.command`, `erlc.v3.bans` — the canonical `/v3` names; `erlc.v2.bans` still works as an alias for existing keys |
+| ER:LC V2/V3 queries | `query:Players`, `query:Staff`, `query:JoinLogs`, `query:Queue`, `query:KillLogs`, `query:CommandLogs`, `query:ModCalls`, `query:EmergencyCalls`, `query:Vehicles` |
 | Economy | `civops.v2.economy.read`, `civops.v2.economy.write` |
 | Economy actions | `action:balance`, `action:leaderboard`, `action:rank`, `action:holdings`, `action:stocks`, `action:cooldowns`, `action:transfer`, `action:deposit`, `action:withdraw`, `action:add`, `action:remove`, `action:reset`, `action:resetCooldown` |
 | Users | `civops.v2.users.read`, `civops.v2.users.write` |
